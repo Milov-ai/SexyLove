@@ -1,0 +1,13 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src"],
+  "entryPointStrategy": "expand",
+  "out": "docs/api",
+  "name": "SexyLove API Documentation",
+  "includeVersion": true,
+  "readme": "README.md",
+  "exclude": ["**/*.test.ts", "**/*.spec.ts", "**/vite-env.d.ts"],
+  "plugin": [],
+  "theme": "default",
+  "cleanOutputDir": true
+}
