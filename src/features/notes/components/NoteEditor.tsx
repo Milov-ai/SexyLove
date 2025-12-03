@@ -10,6 +10,8 @@ import {
   CheckSquare,
   Image as ImageIcon,
   Heading,
+  List,
+  Table as TableIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -22,7 +24,27 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  MouseSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface NoteEditorProps {
   noteId: string;
@@ -37,6 +59,38 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
+
+  // DnD Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require movement before drag starts (prevents accidental clicks)
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+    useSensor(TouchSensor, {
+      // Mobile: Long press to drag
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor, {
+      // Desktop: Instant drag
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
+  const handleDragStart = () => {
+    // Haptic feedback for mobile
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+  };
 
   // Initialize state from note
   useEffect(() => {
@@ -87,15 +141,60 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
     setBlocks((prev) => prev.filter((b) => b.id !== id));
   };
 
-  const addBlock = (type: BlockType, content: string = "") => {
+  const addBlock = (
+    type: BlockType,
+    content: string = "",
+    props?: Record<string, unknown>,
+    index?: number, // Optional index to insert at
+  ) => {
     const newBlock: Block = {
       id: uuidv4(),
       type,
       content,
       isCompleted: false,
+      props,
     };
-    setBlocks((prev) => [...prev, newBlock]);
+
+    setBlocks((prev) => {
+      if (index !== undefined) {
+        const newBlocks = [...prev];
+        newBlocks.splice(index, 0, newBlock);
+        return newBlocks;
+      }
+      return [...prev, newBlock];
+    });
     setFocusedBlockId(newBlock.id);
+  };
+
+  // Handle Enter key to create new blocks
+  const handleKeyDown = (e: React.KeyboardEvent, blockId: string) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const index = blocks.findIndex((b) => b.id === blockId);
+      if (index === -1) return;
+
+      const currentBlock = blocks[index];
+
+      // If Todo or Bullet, create another one of same type
+      if (currentBlock.type === "todo" || currentBlock.type === "bullet") {
+        addBlock(currentBlock.type, "", undefined, index + 1);
+      } else {
+        // Default to text block for others
+        addBlock("text", "", undefined, index + 1);
+      }
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setBlocks((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +288,6 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
       </header>
 
       {/* Editor Area */}
-      {/* Editor Area */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto p-6 pb-32 space-y-2">
           {/* Title */}
@@ -202,17 +300,30 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
           />
 
           {/* Blocks */}
-          <div className="space-y-1">
-            {blocks.map((block) => (
-              <BlockRenderer
-                key={block.id}
-                block={block}
-                onChange={handleBlockChange}
-                onDelete={handleBlockDelete}
-                autoFocus={focusedBlockId === block.id}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={blocks.map((b) => b.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-1">
+                {blocks.map((block) => (
+                  <BlockRenderer
+                    key={block.id}
+                    block={block}
+                    onChange={handleBlockChange}
+                    onDelete={handleBlockDelete}
+                    onKeyDown={(e) => handleKeyDown(e, block.id)}
+                    autoFocus={focusedBlockId === block.id}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
 
           {/* Add Block Button */}
           <div className="pt-4">
@@ -236,18 +347,54 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
                 >
                   <Type size={16} /> Texto
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => addBlock("heading")}
-                  className="gap-2 cursor-pointer hover:bg-slate-800"
-                >
-                  <Heading size={16} /> Título
-                </DropdownMenuItem>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="gap-2 cursor-pointer hover:bg-slate-800">
+                    <Heading size={16} /> Título
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="bg-slate-900 border-slate-800 text-slate-200">
+                    <DropdownMenuItem
+                      onClick={() => addBlock("heading", "", { level: 1 })}
+                      className="gap-2 cursor-pointer hover:bg-slate-800"
+                    >
+                      <Heading size={16} /> Título 1
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => addBlock("heading", "", { level: 2 })}
+                      className="gap-2 cursor-pointer hover:bg-slate-800"
+                    >
+                      <Heading size={14} /> Título 2
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => addBlock("heading", "", { level: 3 })}
+                      className="gap-2 cursor-pointer hover:bg-slate-800"
+                    >
+                      <Heading size={12} /> Título 3
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+
                 <DropdownMenuItem
                   onClick={() => addBlock("todo")}
                   className="gap-2 cursor-pointer hover:bg-slate-800"
                 >
                   <CheckSquare size={16} /> Lista de tareas
                 </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => addBlock("bullet")}
+                  className="gap-2 cursor-pointer hover:bg-slate-800"
+                >
+                  <List size={16} /> Lista con viñetas
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => addBlock("table")}
+                  className="gap-2 cursor-pointer hover:bg-slate-800"
+                >
+                  <TableIcon size={16} /> Tabla
+                </DropdownMenuItem>
+
                 <DropdownMenuItem
                   onSelect={(e) => e.preventDefault()}
                   className="gap-2 cursor-pointer hover:bg-slate-800"

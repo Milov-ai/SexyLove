@@ -5,22 +5,30 @@ import { v4 as uuidv4 } from "uuid";
 // --- Types ---
 export interface Folder {
   id: string;
-  parent_id: string | null;
   name: string;
+  parent_id: string | null;
+  content: string; // JSON string of Block[]
+  is_pinned: boolean;
   color: string;
-  icon: string;
   created_at: string;
+  updated_at: string;
 }
 
-export type BlockType = "text" | "todo" | "image" | "heading" | "divider";
+export type BlockType =
+  | "text"
+  | "heading"
+  | "todo"
+  | "image"
+  | "bullet"
+  | "table";
 
 export interface Block {
   id: string;
   type: BlockType;
   content: string;
-  isCompleted?: boolean;
+  isCompleted?: boolean; // For todos
   reminder?: string | null; // ISO date string
-  metadata?: Record<string, unknown>;
+  props?: Record<string, unknown>; // For additional properties (e.g. heading level, table data)
 }
 
 export interface Note {

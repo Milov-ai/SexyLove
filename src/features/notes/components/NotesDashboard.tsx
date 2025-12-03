@@ -14,7 +14,9 @@ import {
   ChevronRight,
   ChevronLeft,
   Folder as FolderIcon,
+  Sparkles,
 } from "lucide-react";
+import { App } from "@capacitor/app";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthScreen from "@/features/auth/components/AuthScreen";
@@ -56,6 +58,30 @@ const NotesDashboard = () => {
     initialize();
   }, [initialize]);
 
+  // Hardware Back Button Handling
+  useEffect(() => {
+    const handleBackButton = async () => {
+      if (selectedNoteId) {
+        setSelectedNoteId(null);
+      } else if (currentFolderId) {
+        // Navigate up one level
+        const parentId = folders.find(
+          (f) => f.id === currentFolderId,
+        )?.parent_id;
+        setCurrentFolderId(parentId || null);
+      } else {
+        // Exit app if at root
+        App.exitApp();
+      }
+    };
+
+    const listener = App.addListener("backButton", handleBackButton);
+
+    return () => {
+      listener.then((l) => l.remove());
+    };
+  }, [currentFolderId, selectedNoteId, folders]);
+
   // Navigation Logic
   const currentFolder = folders.find((f) => f.id === currentFolderId);
 
@@ -90,7 +116,6 @@ const NotesDashboard = () => {
       name: newFolderName,
       parent_id: currentFolderId,
       color: "bg-slate-800",
-      icon: "folder",
     });
     setNewFolderName("");
     setIsCreateOpen(false);
@@ -153,14 +178,46 @@ const NotesDashboard = () => {
       />
 
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 pt-safe-top">
-        <div className="px-6 py-4 flex items-center justify-between">
+      {/* Header */}
+      {/* Header */}
+      <header className="sticky top-0 z-40 pt-safe-top transition-all duration-300">
+        {/* Seamless Background - Matches body, no border */}
+        <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-sm" />
+
+        {/* CLEAN BACKGROUND - No decorative elements */}
+
+        <div className="relative px-6 pt-12 pb-2 md:pt-16 md:pb-4 flex items-center justify-between max-w-7xl mx-auto w-full">
           <div
             onClick={handleTitleClick}
-            className="cursor-pointer select-none"
+            className="cursor-pointer select-none group relative"
           >
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
-              Pide un deseo ✨
+            {/* Logo Container */}
+            <h1 className="relative text-4xl md:text-5xl font-bold tracking-tight drop-shadow-sm flex items-center gap-4">
+              <span className="font-sans text-slate-200 group-hover:text-white transition-colors tracking-tighter">
+                Pide un
+              </span>
+
+              <div className="relative px-4 py-1">
+                {/* Rounded Pill Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-indigo-500/20 rounded-full blur-md" />
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full border border-white/5" />
+
+                <span className="font-serif italic bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-neon animate-shimmer bg-[length:200%_auto] relative z-10">
+                  Deseo
+                </span>
+              </div>
+
+              {/* Star - Subtle, no float */}
+              <div className="relative flex items-center justify-center">
+                <div className="absolute inset-0 bg-yellow-400/20 blur-lg rounded-full animate-pulse-glow" />
+                <span className="relative z-10">
+                  <Sparkles
+                    className="text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.6)]"
+                    size={32}
+                    strokeWidth={2.5}
+                  />
+                </span>
+              </div>
             </h1>
           </div>
 
@@ -169,12 +226,12 @@ const NotesDashboard = () => {
               variant="ghost"
               size="icon"
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
+              className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-full w-12 h-12 transition-all hover:scale-105"
             >
               {viewMode === "grid" ? (
-                <ListIcon size={20} />
+                <ListIcon size={24} />
               ) : (
-                <Grid size={20} />
+                <Grid size={24} />
               )}
             </Button>
           </div>
@@ -189,10 +246,13 @@ const NotesDashboard = () => {
               onClick={() =>
                 setCurrentFolderId(currentFolder?.parent_id || null)
               }
-              className="text-slate-400 hover:text-white pl-0 gap-1"
+              className="bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white px-3 py-1.5 h-auto rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-105 flex items-center gap-1.5 group"
             >
-              <ChevronLeft size={16} />
-              Atrás
+              <ChevronLeft
+                size={16}
+                className="group-hover:-translate-x-0.5 transition-transform"
+              />
+              <span className="text-sm font-medium">Atrás</span>
             </Button>
           ) : (
             <span className="text-sm font-medium text-slate-500">Inicio</span>
@@ -265,46 +325,68 @@ const NotesDashboard = () => {
           ))}
 
           {/* Notes */}
-          {filteredNotes.map((note) => (
-            <motion.div
-              key={note.id}
-              layout
-              onClick={() => setSelectedNoteId(note.id)}
-              className={`group relative overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-900/40 backdrop-blur-sm p-4 hover:bg-slate-800/60 hover:border-pink-500/30 transition-all cursor-pointer flex flex-col justify-between h-32`}
-            >
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-slate-200 mb-2 truncate">
-                  {note.title || "Sin título"}
-                </h3>
-                <p className="text-xs text-slate-500 line-clamp-2">
-                  {note.content.includes('"type":"text"')
-                    ? "Texto..."
-                    : "Nota..."}
-                </p>
-              </div>
+          {filteredNotes.map((note) => {
+            const getNotePreview = (content: string) => {
+              try {
+                const blocks = JSON.parse(content);
+                if (!Array.isArray(blocks) || blocks.length === 0)
+                  return "Nota vacía";
 
-              <div className="flex items-center justify-between mt-auto pt-2">
-                <span className="text-xs text-slate-600">
-                  {format(new Date(note.updated_at), "MMM d")}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 -mr-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 z-10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteTarget({
-                      type: "note",
-                      id: note.id,
-                      name: note.title || "Sin título",
-                    });
-                  }}
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            </motion.div>
-          ))}
+                const firstContentBlock = blocks.find(
+                  (b) => b.content && b.content.trim().length > 0,
+                );
+
+                if (!firstContentBlock) return "Nota vacía";
+
+                if (firstContentBlock.type === "image") return "📷 Imagen";
+                if (firstContentBlock.type === "table") return "📊 Tabla";
+
+                // For text-based blocks
+                return firstContentBlock.content.slice(0, 100);
+              } catch {
+                return "Nota...";
+              }
+            };
+
+            return (
+              <motion.div
+                key={note.id}
+                layout
+                onClick={() => setSelectedNoteId(note.id)}
+                className={`group relative overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-900/40 backdrop-blur-sm p-4 hover:bg-slate-800/60 hover:border-pink-500/30 transition-all cursor-pointer flex flex-col justify-between h-32`}
+              >
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-slate-200 mb-2 truncate">
+                    {note.title || "Sin título"}
+                  </h3>
+                  <p className="text-xs text-slate-500 line-clamp-3 whitespace-pre-wrap break-words">
+                    {getNotePreview(note.content)}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between mt-auto pt-2">
+                  <span className="text-xs text-slate-600">
+                    {format(new Date(note.updated_at), "MMM d")}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 -mr-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTarget({
+                        type: "note",
+                        id: note.id,
+                        name: note.title || "Sin título",
+                      });
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {filteredFolders.length === 0 && filteredNotes.length === 0 && (

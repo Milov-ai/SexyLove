@@ -1,9 +1,16 @@
 import type { Block } from "@/store/notes.store";
 import { Button } from "@/components/ui/button";
-
-import { Check, GripVertical, Trash2, X, Bell } from "lucide-react";
+import {
+  Check,
+  GripVertical,
+  Trash2,
+  X,
+  Bell,
+  Bold,
+  Italic,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { format } from "date-fns";
 import {
   Popover,
@@ -11,11 +18,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+import { TableBlock } from "./TableBlock";
 
 interface BlockProps {
   block: Block;
   onChange: (id: string, updates: Partial<Block>) => void;
   onDelete: (id: string) => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
   autoFocus?: boolean;
 }
 
@@ -23,20 +35,47 @@ export const BlockRenderer = ({
   block,
   onChange,
   onDelete,
+  onKeyDown,
   autoFocus,
 }: BlockProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [selectionRange, setSelectionRange] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
+
+  // DnD Hook
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: block.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   useEffect(() => {
     if (autoFocus && textareaRef.current) {
       textareaRef.current.focus();
-      // Set cursor to end
-      textareaRef.current.setSelectionRange(
-        textareaRef.current.value.length,
-        textareaRef.current.value.length,
-      );
+      const len = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(len, len);
     }
   }, [autoFocus]);
+
+  // Auto-resize on mount and content change
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [block.content]);
 
   const handleContentChange = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -63,31 +102,108 @@ export const BlockRenderer = ({
     handleContentChange(e);
   };
 
+  // Rich Text Selection Handler
+  const handleSelect = () => {
+    if (textareaRef.current) {
+      const start = textareaRef.current.selectionStart;
+      const end = textareaRef.current.selectionEnd;
+      if (start !== end) {
+        setSelectionRange({ start, end });
+        setShowToolbar(true);
+      } else {
+        setShowToolbar(false);
+      }
+    }
+  };
+
+  const applyFormat = (format: "bold" | "italic") => {
+    if (!selectionRange || !textareaRef.current) return;
+
+    const text = block.content;
+    const { start, end } = selectionRange;
+    const selectedText = text.substring(start, end);
+    let newText = text;
+
+    if (format === "bold") {
+      newText =
+        text.substring(0, start) + `**${selectedText}**` + text.substring(end);
+    } else if (format === "italic") {
+      newText =
+        text.substring(0, start) + `_${selectedText}_` + text.substring(end);
+    }
+
+    onChange(block.id, { content: newText });
+    setShowToolbar(false);
+  };
+
   return (
-    <div className="group flex items-start gap-2 py-1 relative">
-      {/* Drag Handle (Visual only for now) */}
-      <div className="mt-1.5 text-slate-700 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity">
-        <GripVertical size={16} />
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group flex items-start gap-2 py-1 relative"
+    >
+      {/* Drag Handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="mt-1.5 text-slate-700 cursor-grab active:cursor-grabbing touch-none p-2 -ml-2 hover:text-slate-400 transition-colors"
+      >
+        <GripVertical size={18} />
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative">
+        {/* Rich Text Toolbar */}
+        {showToolbar && (block.type === "text" || block.type === "bullet") && (
+          <div className="absolute -top-10 left-0 bg-slate-800 border border-slate-700 rounded-lg shadow-xl flex items-center p-1 gap-1 z-50">
+            <button
+              onClick={() => applyFormat("bold")}
+              className="p-1 hover:bg-slate-700 rounded text-slate-300 hover:text-white"
+            >
+              <Bold size={14} />
+            </button>
+            <button
+              onClick={() => applyFormat("italic")}
+              className="p-1 hover:bg-slate-700 rounded text-slate-300 hover:text-white"
+            >
+              <Italic size={14} />
+            </button>
+          </div>
+        )}
+
         {block.type === "text" && (
           <textarea
             ref={textareaRef}
             value={block.content}
             onChange={handleInput}
+            onKeyDown={onKeyDown}
+            onSelect={handleSelect}
             placeholder="Escribe algo..."
-            className="w-full bg-transparent border-none resize-none focus:ring-0 p-0 text-slate-300 leading-relaxed overflow-hidden"
+            className="w-full bg-transparent border-none resize-none focus:ring-0 p-1 text-slate-300 leading-relaxed whitespace-pre-wrap break-words"
             rows={1}
+            style={{ height: "auto", minHeight: "32px" }}
           />
         )}
 
         {block.type === "heading" && (
-          <input
+          <textarea
+            ref={textareaRef}
             value={block.content}
-            onChange={handleContentChange}
+            onChange={(e) => {
+              handleInput(e);
+              handleContentChange(e);
+            }}
+            onKeyDown={onKeyDown}
             placeholder="Título"
-            className="w-full bg-transparent border-none focus:ring-0 p-0 text-2xl font-bold text-slate-100"
+            className={cn(
+              "w-full bg-transparent border-none focus:ring-0 p-0 font-bold text-slate-100 resize-none overflow-hidden leading-tight",
+              block.props?.level === 1
+                ? "text-3xl"
+                : block.props?.level === 2
+                  ? "text-2xl"
+                  : "text-xl",
+            )}
+            rows={1}
+            style={{ height: "auto", minHeight: "40px" }}
             autoFocus={autoFocus}
           />
         )}
@@ -109,16 +225,45 @@ export const BlockRenderer = ({
               ref={textareaRef}
               value={block.content}
               onChange={handleInput}
+              onKeyDown={onKeyDown}
+              onSelect={handleSelect}
               placeholder="Tarea..."
               className={cn(
-                "w-full bg-transparent border-none resize-none focus:ring-0 p-0 leading-relaxed overflow-hidden mt-0.5",
+                "w-full bg-transparent border-none resize-none focus:ring-0 p-0 leading-relaxed whitespace-pre-wrap break-words mt-0.5",
                 block.isCompleted
                   ? "text-slate-500 line-through"
                   : "text-slate-300",
               )}
               rows={1}
+              style={{ height: "auto", minHeight: "24px" }}
             />
           </div>
+        )}
+
+        {block.type === "bullet" && (
+          <div className="flex items-start gap-3">
+            <div className="mt-2 w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" />
+            <textarea
+              ref={textareaRef}
+              value={block.content}
+              onChange={handleInput}
+              onKeyDown={onKeyDown}
+              onSelect={handleSelect}
+              placeholder="Elemento de lista..."
+              className="w-full bg-transparent border-none resize-none focus:ring-0 p-0 text-slate-300 leading-relaxed whitespace-pre-wrap break-words"
+              rows={1}
+              style={{ height: "auto", minHeight: "24px" }}
+            />
+          </div>
+        )}
+
+        {block.type === "table" && (
+          <TableBlock
+            content={block.content}
+            onChange={(newContent) =>
+              onChange(block.id, { content: newContent })
+            }
+          />
         )}
 
         {block.type === "image" && (

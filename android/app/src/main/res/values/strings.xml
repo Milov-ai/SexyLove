@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">SexyLove</string>
-    <string name="title_activity_main">SexyLove</string>
+    <string name="app_name">Azulinaa</string>
+    <string name="title_activity_main">Azulinaa</string>
     <string name="package_name">com.sexylove.app</string>
     <string name="custom_url_scheme">com.sexylove.app</string>
 </resources>

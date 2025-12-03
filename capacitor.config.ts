@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.sexylove.app",
-  appName: "SexyLove",
+  appName: "Azulinaa",
   webDir: "dist",
 };
 
