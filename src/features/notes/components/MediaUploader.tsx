@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Image as ImageIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useNotesStore } from "@/store/notes.store";
@@ -40,7 +41,7 @@ const MediaUploader = ({ noteId }: MediaUploaderProps) => {
       });
     } catch (error) {
       console.error("Error uploading media:", error);
-      alert("Error al subir la imagen");
+      toast.error("Error al subir la imagen");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

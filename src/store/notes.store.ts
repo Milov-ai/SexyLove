@@ -12,6 +12,8 @@ export interface Folder {
   color: string;
   created_at: string;
   updated_at: string;
+  is_locked?: boolean;
+  lock_code?: string | null;
 }
 
 export type BlockType =
@@ -22,6 +24,16 @@ export type BlockType =
   | "bullet"
   | "table";
 
+export interface BlockStyle {
+  fontFamily?: "sans" | "serif" | "mono";
+  textAlign?: "left" | "center" | "right" | "justify";
+  fontSize?: "sm" | "base" | "lg" | "xl" | "2xl";
+  textColor?: string;
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+}
+
 export interface Block {
   id: string;
   type: BlockType;
@@ -29,6 +41,7 @@ export interface Block {
   isCompleted?: boolean; // For todos
   reminder?: string | null; // ISO date string
   props?: Record<string, unknown>; // For additional properties (e.g. heading level, table data)
+  style?: BlockStyle;
 }
 
 export interface Note {
@@ -84,6 +97,11 @@ interface NotesState {
 
   addMedia: (media: Partial<Media>) => Promise<string>;
   deleteMedia: (id: string) => Promise<void>;
+
+  // Private Folders
+  unlockedFolderIds: string[];
+  unlockFolder: (id: string) => void;
+  lockFolder: (id: string) => void;
 }
 
 // --- Store ---
@@ -222,5 +240,18 @@ export const useNotesStore = create<NotesState>((set, get) => ({
   deleteMedia: async (id) => {
     set((state) => ({ media: state.media.filter((m) => m.id !== id) }));
     await supabase.from("media").delete().eq("id", id);
+  },
+
+  // Private Folders
+  unlockedFolderIds: [],
+  unlockFolder: (id) => {
+    set((state) => ({
+      unlockedFolderIds: [...state.unlockedFolderIds, id],
+    }));
+  },
+  lockFolder: (id) => {
+    set((state) => ({
+      unlockedFolderIds: state.unlockedFolderIds.filter((fid) => fid !== id),
+    }));
   },
 }));
