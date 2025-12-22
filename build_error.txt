@@ -1,0 +1,14 @@
+Γ£ù Build failed in 335ms
+error during build:
+[@tailwindcss/vite:generate:build] Cannot apply unknown utility class `glass-premium`
+file: C:/Users/theru/Downloads/LinguaFlow/SexyLove/src/index.css
+    at onInvalidCandidate (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:21:1511)
+    at Ae (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:16:36011)
+    at file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:21:355
+    at hr (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:3:1718)
+    at I (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:3:1377)
+    at xe (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:21:172)
+    at zi (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:38:294)
+    at async Ba (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:38:631)
+    at async Hu (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/tailwindcss@4.1.16/node_modules/tailwindcss/dist/chunk-OQ4W6SLL.mjs:38:1406)
+    at async nu (file:///C:/Users/theru/Downloads/LinguaFlow/SexyLove/node_modules/.pnpm/@tailwindcss+node@4.1.16/node_modules/@tailwindcss/node/dist/index.mjs:10:3433)

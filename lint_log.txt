@@ -1,0 +1,11 @@
+
+> sexylove@1.1.0 lint C:\Users\theru\Downloads\LinguaFlow\SexyLove
+> eslint .
+
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\components\common\BrandLogo.tsx
+  14:3  error  'variant' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 1 problem (1 error, 0 warnings)
+
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

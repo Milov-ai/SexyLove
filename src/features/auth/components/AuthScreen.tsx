@@ -152,7 +152,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
   if (isSuccess) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[400px] bg-slate-950 text-slate-50 border-slate-800">
+        <DialogContent className="sm:max-w-[400px] glass-dirty border-white/10 text-foreground !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%]">
           <div className="flex flex-col items-center justify-center py-6 space-y-4 text-center">
             <div className="p-3 bg-green-500/10 rounded-full">
               <CheckCircle2 className="w-12 h-12 text-green-500" />
@@ -184,7 +184,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px] bg-slate-950 text-slate-50 border-slate-800">
+      <DialogContent className="sm:max-w-[400px] glass-dirty border-white/10 text-foreground !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%]">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
             Acceso Privado
@@ -195,7 +195,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
         </DialogHeader>
 
         <Tabs defaultValue="login" className="w-full mt-4">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-900">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
             <TabsTrigger value="login">Entrar</TabsTrigger>
             <TabsTrigger value="register">Registrarse</TabsTrigger>
           </TabsList>
@@ -210,7 +210,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-900 border-slate-800"
+                  className="bg-black/20 border-white/10 focus:border-primary/50"
                   required
                 />
               </div>
@@ -221,7 +221,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-slate-900 border-slate-800"
+                  className="bg-black/20 border-white/10 focus:border-primary/50"
                   required
                 />
               </div>
@@ -230,7 +230,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full text-sm text-pink-400 hover:text-pink-300"
+                  className="w-full text-sm text-primary hover:text-primary/80"
                   onClick={handleResendConfirmation}
                   disabled={isLoading}
                 >
@@ -240,7 +240,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
 
               <Button
                 type="submit"
-                className="w-full bg-pink-600 hover:bg-pink-700"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon transition-all hover:scale-[1.02]"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -261,7 +261,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="Código secreto"
                   value={accessCode}
                   onChange={(e) => setAccessCode(e.target.value)}
-                  className="bg-slate-900 border-slate-800"
+                  className="bg-black/20 border-white/10 focus:border-primary/50"
                   required
                 />
               </div>
@@ -273,7 +273,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="Usuario"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="bg-slate-900 border-slate-800"
+                  className="bg-black/20 border-white/10 focus:border-secondary/50"
                   required
                 />
               </div>
@@ -285,7 +285,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-900 border-slate-800"
+                  className="bg-black/20 border-white/10 focus:border-secondary/50"
                   required
                 />
               </div>
@@ -296,13 +296,13 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-slate-900 border-slate-800"
+                  className="bg-black/20 border-white/10 focus:border-secondary/50"
                   required
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-violet-600 hover:bg-violet-700"
+                className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-secondary/20 transition-all hover:scale-[1.02]"
                 disabled={isLoading}
               >
                 {isLoading ? (

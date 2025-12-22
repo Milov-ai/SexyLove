@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Bold,
-  Italic,
-  Underline,
   Type,
   Palette,
   Plus,
@@ -11,7 +8,13 @@ import {
   List,
   Image as ImageIcon,
   Table as TableIcon,
+  Link2,
+  IndentIncrease,
+  IndentDecrease,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+import { AddLinkDialog } from "./AddLinkDialog";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -35,9 +38,13 @@ interface StyleToolbarProps {
   activeBlockType: BlockType | null;
   currentStyle: BlockStyle;
   onStyleChange: (updates: Partial<BlockStyle>) => void;
-  onAddBlock: (type: BlockType) => void;
+  onAddBlock: (type: BlockType, props?: Record<string, unknown>) => void;
   onAuraChange: (color: string) => void;
   currentAura: string;
+  onIndent: () => void;
+  onOutdent: () => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
 }
 
 export const StyleToolbar = ({
@@ -47,90 +54,94 @@ export const StyleToolbar = ({
   onAddBlock,
   onAuraChange,
   currentAura,
+  onIndent,
+  onOutdent,
+  onZoomIn,
+  onZoomOut,
 }: StyleToolbarProps) => {
   const [isTypographyOpen, setIsTypographyOpen] = useState(false);
   const [isAuraOpen, setIsAuraOpen] = useState(false);
-
-  const toggleStyle = (key: keyof BlockStyle) => {
-    onStyleChange({ [key]: !currentStyle[key] });
-  };
-
-  // if (!activeBlockId) return null; // Allow rendering for Add Block button
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-950/80 backdrop-blur-xl border-t border-white/10 p-2 px-4 pb-6 z-40 flex items-center justify-between gap-2 safe-area-bottom">
-        {/* Left: Quick Format */}
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-950/80 backdrop-blur-xl border-t border-white/10 p-2 px-3 pb-6 z-40 flex items-center justify-between gap-1 safe-area-bottom">
+        {/* Left: Essential Actions - Compact for Mobile */}
         <div
           className={cn(
-            "flex items-center gap-1",
+            "flex items-center gap-0.5",
             !activeBlockId && "opacity-50 pointer-events-none",
           )}
         >
+          {/* Typography (Opens Full Sheet) */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsTypographyOpen(true)}
-            className="text-slate-400 hover:text-white hover:bg-white/10"
+            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
           >
-            <Type size={20} />
+            <Type size={18} />
           </Button>
 
-          <div className="w-px h-6 bg-white/10 mx-1" />
+          <div className="w-px h-5 bg-white/10 mx-0.5" />
 
+          {/* Indent Controls */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => toggleStyle("isBold")}
-            className={cn(
-              "text-slate-400 hover:text-white hover:bg-white/10",
-              currentStyle.isBold && "text-violet-400 bg-violet-500/10",
-            )}
+            onClick={onOutdent}
+            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
           >
-            <Bold size={18} />
+            <IndentDecrease size={16} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => toggleStyle("isItalic")}
-            className={cn(
-              "text-slate-400 hover:text-white hover:bg-white/10",
-              currentStyle.isItalic && "text-violet-400 bg-violet-500/10",
-            )}
+            onClick={onIndent}
+            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
           >
-            <Italic size={18} />
+            <IndentIncrease size={16} />
+          </Button>
+
+          <div className="w-px h-5 bg-white/10 mx-0.5" />
+
+          {/* Zoom Controls */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onZoomOut}
+            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
+          >
+            <Minimize2 size={16} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => toggleStyle("isUnderline")}
-            className={cn(
-              "text-slate-400 hover:text-white hover:bg-white/10",
-              currentStyle.isUnderline && "text-violet-400 bg-violet-500/10",
-            )}
+            onClick={onZoomIn}
+            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
           >
-            <Underline size={18} />
+            <Maximize2 size={16} />
           </Button>
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        {/* Right: Primary Actions - Always Visible */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsAuraOpen(true)}
-            className="text-slate-400 hover:text-white hover:bg-white/10"
+            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
           >
-            <Palette size={20} />
+            <Palette size={18} />
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 size="icon"
-                className="bg-white text-black hover:bg-slate-200 rounded-full h-10 w-10 shadow-lg shadow-violet-500/20"
+                className="bg-white text-black hover:bg-slate-200 rounded-full h-10 w-10 shadow-lg shadow-violet-500/20 flex-shrink-0"
               >
-                <Plus size={24} />
+                <Plus size={22} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -161,6 +172,12 @@ export const StyleToolbar = ({
                 className="gap-2"
               >
                 <TableIcon size={16} /> Tabla
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setIsLinkDialogOpen(true)}
+                className="gap-2"
+              >
+                <Link2 size={16} /> Link Smart
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onAddBlock("image")}
@@ -205,6 +222,12 @@ export const StyleToolbar = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      <AddLinkDialog
+        open={isLinkDialogOpen}
+        onOpenChange={setIsLinkDialogOpen}
+        onAdd={(meta) => onAddBlock("link", { meta })}
+      />
     </>
   );
 };

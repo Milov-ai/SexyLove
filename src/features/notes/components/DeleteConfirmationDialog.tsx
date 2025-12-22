@@ -26,22 +26,22 @@ export const DeleteConfirmationDialog = ({
 }: DeleteConfirmationDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-slate-950 border-slate-800 text-slate-200">
+      <AlertDialogContent className="glass-dirty !fixed z-[100] border-white/10 text-foreground">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-slate-100">
+          <AlertDialogTitle className="text-foreground tracking-tight">
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-slate-400">
+          <AlertDialogDescription className="text-muted-foreground">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-900 hover:text-white">
+          <AlertDialogCancel className="bg-transparent border-white/10 text-muted-foreground hover:bg-white/5 hover:text-foreground">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="bg-red-600 hover:bg-red-700 text-white border-none"
+            className="bg-red-500/80 hover:bg-red-500 text-white border-none shadow-[0_0_15px_rgba(239,68,68,0.4)]"
           >
             Eliminar
           </AlertDialogAction>

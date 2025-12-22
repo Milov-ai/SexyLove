@@ -50,7 +50,9 @@ export const PinPad = ({
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-xs mx-auto">
-      <h2 className="text-xl font-medium text-slate-200 mb-8">{title}</h2>
+      <h2 className="text-xl font-medium text-foreground/80 mb-8 tracking-wide font-serif italic">
+        {title}
+      </h2>
 
       {/* PIN Dots */}
       <motion.div
@@ -62,9 +64,9 @@ export const PinPad = ({
           <div
             key={i}
             className={cn(
-              "w-4 h-4 rounded-full border border-slate-600 transition-all duration-300",
+              "w-4 h-4 rounded-full border border-white/10 transition-all duration-300",
               pin.length > i
-                ? "bg-pink-500 border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.5)]"
+                ? "bg-primary border-primary shadow-neon"
                 : "bg-transparent",
             )}
           />
@@ -80,7 +82,7 @@ export const PinPad = ({
               <button
                 key="del"
                 onClick={handleDelete}
-                className="w-16 h-16 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors active:scale-95"
+                className="w-16 h-16 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors active:scale-95"
               >
                 <Delete size={24} />
               </button>
@@ -90,7 +92,7 @@ export const PinPad = ({
             <button
               key={num}
               onClick={() => handlePress(num)}
-              className="w-16 h-16 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-2xl font-light text-white backdrop-blur-sm transition-all active:scale-95 active:bg-white/20 flex items-center justify-center"
+              className="w-16 h-16 rounded-full glass-dirty hover:bg-white/10 border-white/5 text-2xl font-light text-foreground backdrop-blur-sm transition-all active:scale-95 active:bg-white/20 flex items-center justify-center"
             >
               {num}
             </button>
@@ -101,7 +103,7 @@ export const PinPad = ({
       {onCancel && (
         <button
           onClick={onCancel}
-          className="mt-12 text-sm text-slate-500 hover:text-slate-300 transition-colors"
+          className="mt-12 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           Cancelar
         </button>

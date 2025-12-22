@@ -16,13 +16,177 @@
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
             android:exported="true">
+        </activity>
 
+        <!-- CHAMELEON PROTOCOL: 5 Personalities -->
+        <!-- Note to User: Using NANO VECTOR DRAWABLES (XML) for infinite resolution -->
+
+        <!-- CHAMELEON IDENTITY SYSTEM -->
+        
+        <!-- 1. BASE: Pide un Deseo (Default) -->
+        <activity-alias
+            android:name=".AliasPideUnDeseo"
+            android:targetActivity=".MainActivity"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_pide_un_deseo"
+            android:roundIcon="@drawable/ic_launcher_pide_un_deseo"
+            android:label="pide un deseo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity-alias>
 
-        </activity>
+        <!-- 2. ñaaam (Hunger) -->
+        <activity-alias
+            android:name=".AliasNaaam"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_naaam"
+            android:roundIcon="@drawable/ic_launcher_naaam"
+            android:label="ñaaam">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 3. azulinaa (Hallucination) -->
+        <activity-alias
+            android:name=".AliasAzulinaa"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_azulinaa"
+            android:roundIcon="@drawable/ic_launcher_azulinaa"
+            android:label="azulinaa">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 4. muaah (Kiss) -->
+        <activity-alias
+            android:name=".AliasMuaah"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_muaah"
+            android:roundIcon="@drawable/ic_launcher_muaah"
+            android:label="muaah">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 5. t'amuu (Love) -->
+        <activity-alias
+            android:name=".AliasTamuu"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_tamuu"
+            android:roundIcon="@drawable/ic_launcher_tamuu"
+            android:label="t'amuu">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 6. kiss kiss (Chaos) -->
+        <activity-alias
+            android:name=".AliasKissKiss"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_kisskiss"
+            android:roundIcon="@drawable/ic_launcher_kisskiss"
+            android:label="kiss kiss">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 7. uuuf (Passion) -->
+        <activity-alias
+            android:name=".AliasUuuf"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_uuuf"
+            android:roundIcon="@drawable/ic_launcher_uuuf"
+            android:label="uuuf">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 8. plop (Playful) -->
+        <activity-alias
+            android:name=".AliasPlop"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_plop"
+            android:roundIcon="@drawable/ic_launcher_plop"
+            android:label="plop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 9. hohoho (Christmas) -->
+        <activity-alias
+            android:name=".AliasHohoho"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_hohoho"
+            android:roundIcon="@drawable/ic_launcher_hohoho"
+            android:label="hohoho">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 10. wow (Amazement) -->
+        <activity-alias
+            android:name=".AliasWow"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_wow"
+            android:roundIcon="@drawable/ic_launcher_wow"
+            android:label="wow">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 11. xoxo (Love) -->
+        <activity-alias
+            android:name=".AliasXoxo"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_xoxo"
+            android:roundIcon="@drawable/ic_launcher_xoxo"
+            android:label="xoxo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <provider
             android:name="androidx.core.content.FileProvider"

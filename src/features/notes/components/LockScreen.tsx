@@ -38,10 +38,10 @@ export const LockScreen = ({
       initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
       animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
       exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/80"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80"
     >
-      <div className="mb-8 p-4 rounded-full bg-slate-900/50 border border-slate-800">
-        <Lock size={32} className="text-pink-500" />
+      <div className="mb-8 p-4 rounded-full glass-dirty border-primary/20 animate-pulse-glow">
+        <Lock size={32} className="text-primary" />
       </div>
 
       <PinPad

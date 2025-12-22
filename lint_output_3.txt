@@ -1,0 +1,23 @@
+
+> sexylove@1.1.0 lint C:\Users\theru\Downloads\LinguaFlow\SexyLove
+> eslint .
+
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\BlockRenderer.tsx
+  139:17  error  'e' is defined but never used                  @typescript-eslint/no-unused-vars
+  233:13  error  'type' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  233:19  error  'content' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  233:28  error  'children' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  452:44  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\logic\link-resolver.ts
+  34:61   error  Unnecessary escape character: \/  no-useless-escape
+  34:119  error  Unnecessary escape character: \/  no-useless-escape
+  43:17   error  Empty block statement             no-empty
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\proposal\components\ProposalOverlay.tsx
+  147:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 9 problems (9 errors, 0 warnings)
+
+ ELIFECYCLE  Command failed with exit code 1.

@@ -1,0 +1,48 @@
+
+> sexylove@1.1.0 lint C:\Users\theru\Downloads\LinguaFlow\SexyLove
+> eslint .
+
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\chameleon\components\IdentitySelectorDialog.tsx
+  18:14  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\AddLinkDialog.tsx
+  17:10  error  'text' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  18:10  error  'isValidating' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\BlockRenderer.tsx
+  139:17  error  'e' is defined but never used                            @typescript-eslint/no-unused-vars
+  234:11  error  'renderBlockContent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  455:44  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\NoteEditor.tsx
+  112:6  warning  React Hook useEffect has a missing dependency: 'note'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\logic\link-resolver.ts
+  21:11   error  'metadata' is never reassigned. Use 'const' instead  prefer-const
+  29:61   error  Unnecessary escape character: \/                     no-useless-escape
+  29:119  error  Unnecessary escape character: \/                     no-useless-escape
+  38:17   error  Empty block statement                                no-empty
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\logic\tree-utils.ts
+  168:7  error  'adjustedTargetIndex' is never reassigned. Use 'const' instead  prefer-const
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\proposal\components\ProposalOverlay.tsx
+   80:48  error  Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+   91:17  error  'accThingsILove' is never reassigned. Use 'const' instead  prefer-const
+   92:17  error  'accFirstTimes' is never reassigned. Use 'const' instead   prefer-const
+   93:17  error  'accTu' is never reassigned. Use 'const' instead           prefer-const
+  140:68  error  '_err' is defined but never used                           @typescript-eslint/no-unused-vars
+  146:45  error  Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+  151:60  error  Unnecessary escape character: \.                           no-useless-escape
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\proposal\components\Starfield.tsx
+  32:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\proposal\hooks\useEternitySync.ts
+  52:8  warning  React Hook useEffect has missing dependencies: 'startSequence', 'state', and 'triggerProposal'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 21 problems (19 errors, 2 warnings)
+  5 errors and 0 warnings potentially fixable with the `--fix` option.
+
+ ELIFECYCLE  Command failed with exit code 1.

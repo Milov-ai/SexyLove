@@ -22,7 +22,8 @@ export type BlockType =
   | "todo"
   | "image"
   | "bullet"
-  | "table";
+  | "table"
+  | "link";
 
 export interface BlockStyle {
   fontFamily?: "sans" | "serif" | "mono";
@@ -42,6 +43,7 @@ export interface Block {
   reminder?: string | null; // ISO date string
   props?: Record<string, unknown>; // For additional properties (e.g. heading level, table data)
   style?: BlockStyle;
+  children?: Block[]; // Interactive nesting
 }
 
 export interface Note {

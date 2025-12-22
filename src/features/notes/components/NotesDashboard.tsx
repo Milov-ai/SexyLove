@@ -45,6 +45,9 @@ import { THEMES, type ThemeId } from "@/lib/theme-constants";
 import { ColorPicker } from "@/components/ui/ColorPicker";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/common/BrandLogo";
+import { IdentitySelectorDialog } from "@/features/chameleon/components/IdentitySelectorDialog";
+import { useEternitySync } from "@/features/proposal/hooks/useEternitySync";
 
 const NotesDashboard = () => {
   const {
@@ -79,11 +82,34 @@ const NotesDashboard = () => {
   // Auth Trigger State
   const [showAuthScreen, setShowAuthScreen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
+  const [isChameleonOpen, setIsChameleonOpen] = useState(false);
   const [lastClickTime, setLastClickTime] = useState(0);
+
+  // ETERNITY PROTOCOL: Sync Hook
+  const { broadcastSignal } = useEternitySync();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // ETERNITY PROTOCOL: Trigger Check
+  useEffect(() => {
+    if (searchQuery.trim().toUpperCase() === "ESTRELLITA") {
+      // 1. Clear Input
+      setSearchQuery("");
+      // 2. Blur Keyboard (Mobile)
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      // 3. Broadcast Signal
+      broadcastSignal();
+      // 4. Feedback
+      toast.success("Sintonizando frecuencia...", {
+        icon: "🌹",
+        style: { background: "#000", color: "#fff" },
+      });
+    }
+  }, [searchQuery, broadcastSignal]);
 
   // Hardware Back Button Handling
   useEffect(() => {
@@ -131,7 +157,7 @@ const NotesDashboard = () => {
       ]),
       folder_id: currentFolderId,
       is_pinned: false,
-      color: "bg-slate-900",
+      color: "default",
     });
     setIsCreateOpen(false);
     setSelectedNoteId(newNoteId);
@@ -305,7 +331,7 @@ const NotesDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-violet-500/30">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
       <AnimatePresence>
         {selectedNoteId && (
           <NoteEditor
@@ -335,10 +361,15 @@ const NotesDashboard = () => {
         }}
       />
 
+      <IdentitySelectorDialog
+        open={isChameleonOpen}
+        onOpenChange={setIsChameleonOpen}
+      />
+
       <Sheet open={isEditAuraOpen} onOpenChange={setIsEditAuraOpen}>
         <SheetContent
           side="bottom"
-          className="rounded-t-[32px] border-t border-white/10 bg-slate-950/95 backdrop-blur-xl p-6 pb-10"
+          className="rounded-t-[32px] border-t border-white/10 bg-background/95 backdrop-blur-xl p-6 pb-10"
         >
           <SheetHeader className="mb-6">
             <SheetTitle className="text-2xl font-serif font-medium text-white">
@@ -370,46 +401,44 @@ const NotesDashboard = () => {
       {/* Header */}
       <header className="sticky top-0 z-40 pt-safe-top transition-all duration-300">
         {/* Seamless Background - Matches body, no border */}
-        <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-background/95 backdrop-blur-sm" />
 
         {/* CLEAN BACKGROUND - No decorative elements */}
 
-        <div className="relative px-6 pt-12 pb-2 md:pt-16 md:pb-4 flex items-center justify-between max-w-7xl mx-auto w-full">
+        <div className="relative pl-6 pr-10 pt-12 pb-2 md:pt-16 md:pb-4 flex items-center justify-between max-w-7xl mx-auto w-full overflow-visible">
           <div
             onClick={handleTitleClick}
             className="cursor-pointer select-none group relative"
           >
             {/* Logo Container */}
-            <h1 className="relative text-4xl md:text-5xl font-bold tracking-tight drop-shadow-sm flex items-center gap-4">
-              <span className="font-sans text-slate-200 group-hover:text-white transition-colors tracking-tighter">
-                Pide un
-              </span>
-
-              <div className="relative px-4 py-1">
-                {/* Rounded Pill Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-indigo-500/20 rounded-full blur-md" />
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full border border-white/5" />
-
-                <span className="font-serif italic bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-neon animate-shimmer bg-[length:200%_auto] relative z-10">
-                  Deseo
-                </span>
+            {/* Brand Synergy Layout v5 - Mobile Optimized */}
+            <div className="flex flex-row items-center gap-3 md:gap-10 group">
+              {/* V4 Logo - Responsive Sizing */}
+              <div className="relative group-hover:scale-110 transition-transform duration-500 ease-out w-14 h-14 md:w-24 md:h-24">
+                {/* Logo v7 Self-Contained Glow & Shape - No external circular div */}
+                <BrandLogo className="w-full h-full relative z-10 drop-shadow-2xl filter brightness-110" />
               </div>
 
-              {/* Star - Subtle, no float */}
-              <div className="relative flex items-center justify-center">
-                <div className="absolute inset-0 bg-yellow-400/20 blur-lg rounded-full animate-pulse-glow" />
-                <span className="relative z-10">
-                  <Sparkles
-                    className="text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.6)]"
-                    size={32}
-                    strokeWidth={2.5}
-                  />
+              {/* Vertical Separator */}
+              <div className="w-px h-10 md:h-24 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
+
+              {/* Typographic Stack */}
+              <div className="flex flex-col items-start text-left -space-y-0.5 md:-space-y-1 pr-12 pb-4 overflow-visible">
+                <span className="font-sans text-[10px] md:text-sm font-bold tracking-[0.2em] md:tracking-[0.6em] uppercase text-slate-400 group-hover:text-white transition-colors duration-300 ml-0.5">
+                  PIDE UN
                 </span>
+
+                <h1 className="font-sans text-4xl md:text-7xl font-black tracking-tighter leading-none overflow-visible drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] md:drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+                  {/* Liquid Metal + Neon Gradient */}
+                  <span className="bg-gradient-to-b from-white via-slate-200 to-slate-400 bg-clip-text text-transparent pr-2">
+                    DESEO
+                  </span>
+                </h1>
               </div>
-            </h1>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0 ml-4">
             <Button
               variant="ghost"
               size="icon"
@@ -466,9 +495,17 @@ const NotesDashboard = () => {
           />
           <Input
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "#CHAMELEON" || val === "#777") {
+                setIsChameleonOpen(true);
+                setSearchQuery("");
+              } else {
+                setSearchQuery(val);
+              }
+            }}
             placeholder="Buscar..."
-            className="h-12 w-full bg-slate-900 border-slate-800 rounded-2xl pl-12 text-base focus:border-pink-500/50 focus:ring-pink-500/20"
+            className="h-12 w-full bg-card border-border rounded-2xl pl-12 text-base focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
 
@@ -490,7 +527,7 @@ const NotesDashboard = () => {
                 THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg
               } ${
                 THEMES[folder.color as ThemeId]?.border || THEMES.default.border
-              } hover:bg-slate-800/60 hover:border-violet-500/30`}
+              } hover:bg-white/5 hover:border-primary/30`}
               style={{
                 boxShadow: THEMES[folder.color as ThemeId]?.glow
                   ? `0 0 20px -5px ${THEMES[folder.color as ThemeId].glow.match(/rgba\(([^)]+)\)/)?.[1] || "transparent"}`
@@ -532,7 +569,7 @@ const NotesDashboard = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="start"
-                      className="w-48 bg-slate-900 border-slate-800 text-slate-200"
+                      className="w-48 glass-dirty border-white/10 text-foreground"
                     >
                       <DropdownMenuLabel>Opciones</DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-slate-800" />
@@ -545,7 +582,7 @@ const NotesDashboard = () => {
                             color: folder.color,
                           });
                         }}
-                        className="gap-2 cursor-pointer focus:bg-slate-800 focus:text-white"
+                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
                       >
                         <Sparkles size={14} />
                         <span>Cambiar Aura</span>
@@ -555,7 +592,7 @@ const NotesDashboard = () => {
                           e.stopPropagation();
                           handleSecurityAction(folder);
                         }}
-                        className="gap-2 cursor-pointer focus:bg-slate-800 focus:text-white"
+                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
                       >
                         {folder.is_locked ? (
                           <Lock size={14} className="text-pink-500" />
@@ -700,34 +737,34 @@ const NotesDashboard = () => {
             </SheetTrigger>
             <SheetContent
               side="bottom"
-              className="bg-slate-950 border-t border-slate-800 rounded-t-[2rem] p-6 pb-10"
+              className="bg-background border-t border-white/10 rounded-t-[2rem] p-6 pb-10 glass-dirty !fixed z-50"
             >
-              <SheetTitle className="text-lg font-semibold text-center text-slate-200 mb-2">
+              <SheetTitle className="text-lg font-semibold text-center text-foreground mb-2">
                 Crear Nuevo
               </SheetTitle>
-              <SheetDescription className="text-center text-slate-500 mb-4">
+              <SheetDescription className="text-center text-muted-foreground mb-4">
                 ¿Qué deseas agregar aquí?
               </SheetDescription>
 
               <div className="flex flex-col gap-4">
                 <button
                   onClick={handleCreateNote}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-pink-500/30 transition-all group"
+                  className="flex items-center gap-4 p-4 rounded-xl glass-premium border-white/5 hover:bg-white/5 hover:border-primary/40 transition-all group"
                 >
-                  <div className="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-500 group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-neon">
                     <FilePlus size={24} />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-slate-200">Nueva Nota</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="font-medium text-foreground">Nueva Nota</p>
+                    <p className="text-sm text-muted-foreground">
                       Crear archivo con bloques
                     </p>
                   </div>
-                  <ChevronRight className="ml-auto text-slate-600" />
+                  <ChevronRight className="ml-auto text-muted-foreground" />
                 </button>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-slate-400 ml-1">
+                  <p className="text-sm font-medium text-muted-foreground ml-1">
                     Nueva Carpeta
                   </p>
                   <div className="flex flex-col gap-2 w-full">
@@ -736,11 +773,11 @@ const NotesDashboard = () => {
                         placeholder="Nombre de la carpeta..."
                         value={newFolderName}
                         onChange={(e) => setNewFolderName(e.target.value)}
-                        className="bg-slate-900 border-slate-800 focus:border-violet-500 h-12"
+                        className="bg-black/20 border-white/10 focus:border-primary h-12 text-foreground"
                       />
                       <Button
                         onClick={handleCreateFolder}
-                        className="h-12 w-12 bg-violet-600 hover:bg-violet-700"
+                        className="h-12 w-12 bg-secondary hover:bg-secondary/80 text-secondary-foreground shadow-lg"
                         disabled={
                           !newFolderName.trim() ||
                           (isPrivate && newPin.length !== 4)
@@ -751,7 +788,7 @@ const NotesDashboard = () => {
                     </div>
 
                     <div className="space-y-2 px-1">
-                      <Label className="text-xs font-medium text-slate-400">
+                      <Label className="text-xs font-medium text-muted-foreground">
                         Aura (Color & Mood)
                       </Label>
                       <ColorPicker
@@ -763,7 +800,7 @@ const NotesDashboard = () => {
                     <div className="flex items-center justify-between px-1">
                       <button
                         onClick={() => setIsPrivate(!isPrivate)}
-                        className={`text-xs flex items-center gap-1.5 transition-colors ${isPrivate ? "text-pink-500 font-medium" : "text-slate-500 hover:text-slate-400"}`}
+                        className={`text-xs flex items-center gap-1.5 transition-colors ${isPrivate ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"}`}
                       >
                         <Lock size={12} />
                         {isPrivate ? "Carpeta Privada" : "Hacer Privada"}
@@ -790,7 +827,7 @@ const NotesDashboard = () => {
                                 .slice(0, 4);
                               setNewPin(val);
                             }}
-                            className="bg-slate-900/50 border-pink-500/30 focus:border-pink-500 h-10 text-center tracking-[0.5em] font-mono text-lg"
+                            className="bg-black/40 border-primary/30 focus:border-primary h-10 text-center tracking-[0.5em] font-mono text-lg text-primary"
                           />
                         </motion.div>
                       )}
