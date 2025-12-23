@@ -14,6 +14,7 @@ export interface Folder {
   updated_at: string;
   is_locked?: boolean;
   lock_code?: string | null;
+  icon?: string;
 }
 
 export type BlockType =
@@ -23,7 +24,8 @@ export type BlockType =
   | "image"
   | "bullet"
   | "table"
-  | "link";
+  | "link"
+  | "polaroid";
 
 export interface BlockStyle {
   fontFamily?: "sans" | "serif" | "mono";
