@@ -18,8 +18,11 @@ description: Execute the implementation of assigned tasks for a feature and sync
 2. Read the instructions in `agent-os/commands/implement-tasks/implement-tasks.md`.
 3. Identify pending tasks in `agent-os/specs/[feature-name]/tasks.md`.
 4. Implement the feature according to the `agent-os/standards/` and the technical spec.
+5. **Quality Assurance**:
+   - Run `run_command` 'npm run lint'.
+   - Run `run_command` 'npm run build' to catch runtime and type errors early.
 
-5. **Github Sync (Implementation Phase)**:
+6. **Github Sync (Implementation Phase)**:
    - **Push**: Run `run_command` 'git push origin feature/[name]' (ensure upstream set).
    - **Update Issue**:
      - Find the Tracking Issue: `mcp_github-mcp-server_search_issues` (query="[Feature Name] is:issue").
@@ -34,9 +37,8 @@ description: Execute the implementation of assigned tasks for a feature and sync
        - title: "feat: [Feature Name]"
        - body: "Closes #[TrackingIssueNumber]\n\n## Implementation Details\n..."
 
-6. Self-verify with tests/screenshots and mark tasks as complete `[x]`.
-
-7. **Final Verification & Close**:
+7. Self-verify with tests/screenshots and mark tasks as complete `[x]`.
+8. **Final Verification & Close**:
    - Ask the user: "Does the feature work well? Are there any errors?"
    - **IF Verified/No Errors**:
      - Move the Project Item to **"Done"**:
