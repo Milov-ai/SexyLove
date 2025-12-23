@@ -90,14 +90,39 @@ export const PolaroidBlock = ({ block, onChange }: BlockProps) => {
   };
 
   // Rotation Randomness (Stored in props to persist)
-  // Rotation Randomness (Stored in props to persist)
   const randomRotation = useRef(Math.random() * 4 - 2).current;
 
   useEffect(() => {
     if (!props.rotation) {
       updateProps({ rotation: randomRotation });
     }
-  }, [props.rotation, randomRotation, updateProps]); // Run once on mount or if rotation missing
+  }, [props.rotation, randomRotation, updateProps]);
+
+  // Device Orientation Tilt (Mobile First)
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.DeviceOrientationEvent) return;
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (isFlipped) return;
+
+      // Beta: -180 to 180 (tilt front/back), Gamma: -90 to 90 (tilt left/right)
+      const { beta, gamma } = e;
+      if (beta !== null && gamma !== null) {
+        // Map to -0.5 to 0.5 range for our transforms
+        // Normal handheld range is roughly beta 45 (flat) to 90 (upright)
+        // Gamma -30 to 30
+        const yPct = (beta - 70) / 40; // Center around 70 degrees
+        const xPct = gamma / 40;
+
+        x.set(Math.max(-0.5, Math.min(0.5, xPct)));
+        y.set(Math.max(-0.5, Math.min(0.5, yPct)));
+      }
+    };
+
+    window.addEventListener("deviceorientation", handleOrientation);
+    return () =>
+      window.removeEventListener("deviceorientation", handleOrientation);
+  }, [isFlipped, x, y]);
 
   return (
     <div className="flex justify-center py-8 perspective-1000">
@@ -112,10 +137,16 @@ export const PolaroidBlock = ({ block, onChange }: BlockProps) => {
           rotateY: isFlipped ? 180 : rotateY,
           rotateZ: isFlipped ? 0 : randomRotation,
         }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98, rotateZ: `${randomRotation + 2}deg` }}
         animate={{
           rotateY: isFlipped ? 180 : 0,
+          y: [0, -4, 0], // Subtle breathing animation
         }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        transition={{
+          rotateY: { type: "spring", stiffness: 260, damping: 20 },
+          y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+        }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={(e) => {

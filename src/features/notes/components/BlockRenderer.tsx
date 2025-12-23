@@ -91,13 +91,13 @@ const BlockRendererInner = ({
       // Just became selected - record timestamp
       if (selectionTimeRef.current === 0) {
         selectionTimeRef.current = Date.now();
-      }
-      // Auto-edit ONLY for newly created empty blocks
-      if (!block.content && selectionTimeRef.current === 0) {
-        setIsEditing(true);
+        // Auto-edit ONLY for newly created empty blocks or if explicitly requested via prop
+        if (!block.content || autoFocus) {
+          setIsEditing(true);
+        }
       }
     }
-  }, [isSelected, block.content]);
+  }, [isSelected, block.content, autoFocus]);
 
   // DnD Hook
   const {
@@ -514,13 +514,15 @@ const BlockRendererInner = ({
         <div className="flex items-center gap-0.5 pl-1 shrink-0 opacity-60 hover:opacity-100 focus-within:opacity-100 transition-opacity">
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10"
-              >
-                <Bell size={14} />
-              </Button>
+              <motion.div whileTap={{ scale: 0.8 }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10"
+                >
+                  <Bell size={14} />
+                </Button>
+              </motion.div>
             </PopoverTrigger>
             <PopoverContent
               className="w-auto p-0 bg-slate-950 border-slate-800"
@@ -535,14 +537,16 @@ const BlockRendererInner = ({
             </PopoverContent>
           </Popover>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(block.id)}
-            className="h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
-          >
-            <Trash2 size={14} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(block.id)}
+              className="h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </motion.div>
         </div>
       </div>
 

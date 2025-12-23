@@ -490,18 +490,22 @@ const NotesDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-full w-12 h-12 transition-all hover:scale-105"
-            >
-              {viewMode === "grid" ? (
-                <ListIcon size={24} />
-              ) : (
-                <Grid size={24} />
-              )}
-            </Button>
+            <motion.div whileTap={{ scale: 0.9 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() =>
+                  setViewMode(viewMode === "grid" ? "list" : "grid")
+                }
+                className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-full w-12 h-12 transition-all hover:scale-105"
+              >
+                {viewMode === "grid" ? (
+                  <ListIcon size={24} />
+                ) : (
+                  <Grid size={24} />
+                )}
+              </Button>
+            </motion.div>
           </div>
         </div>
 
@@ -539,7 +543,7 @@ const NotesDashboard = () => {
       {/* Main Content */}
       <main className="p-6 pb-24 max-w-7xl mx-auto">
         {/* Search */}
-        <div className="mb-6 relative">
+        <motion.div whileTap={{ scale: 0.99 }} className="mb-6 relative">
           <Search
             className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
             size={18}
@@ -558,7 +562,7 @@ const NotesDashboard = () => {
             placeholder="Buscar..."
             className="h-12 w-full bg-card border-border rounded-2xl pl-12 text-base focus:border-primary/50 focus:ring-primary/20"
           />
-        </div>
+        </motion.div>
 
         {/* Content Grid/List */}
         <div
@@ -573,6 +577,8 @@ const NotesDashboard = () => {
             <motion.div
               key={folder.id}
               layout
+              whileHover={{ scale: 1.01, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => handleFolderClick(folder)}
               className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[140px] ${
                 THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg
@@ -744,6 +750,8 @@ const NotesDashboard = () => {
               <motion.div
                 key={note.id}
                 layout
+                whileHover={{ scale: 1.01, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedNoteId(note.id)}
                 className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[160px] ${
                   THEMES[note.color as ThemeId]?.bg || THEMES.default.bg

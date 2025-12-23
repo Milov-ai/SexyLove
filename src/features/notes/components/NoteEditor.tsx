@@ -478,14 +478,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
         />
 
         <header className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-0 z-10 transition-all">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
-          >
-            <ArrowLeft size={24} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
+            >
+              <ArrowLeft size={24} />
+            </Button>
+          </motion.div>
 
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Clock size={12} />
@@ -496,14 +498,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
             </span>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-full"
-          >
-            <Trash2 size={24} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-full"
+            >
+              <Trash2 size={24} />
+            </Button>
+          </motion.div>
         </header>
 
         {/* Zoom Breadcrumbs */}
