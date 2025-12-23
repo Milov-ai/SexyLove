@@ -5,34 +5,39 @@
 - **Application Framework:** React 19 (Frontend) + Supabase (BaaS)
 - **Language/Runtime:** TypeScript / Vite
 - **Package Manager:** pnpm
+- **Native Bridge:** Capacitor 7 (Android)
 
 ### Frontend
 
 - **JavaScript Framework:** React 19
 - **CSS Framework:** Tailwind CSS 4
 - **UI Components:** Shadcn/ui (customized) + Radix UI Primitives
-- **Animations:** GSAP + Framer Motion
-- **State Management:** Zustand (Global) + TanStack Query (Server)
+- **Animations:** GSAP 3 + Framer Motion 12
+- **State Management:** Zustand 5 (Global) + TanStack Query 5 (Server)
 
-### Database & Storage
+### Security & Data
 
 - **Database:** PostgreSQL (Supabase)
-- **Realtime:** Supabase Realtime (Sync)
-- **Storage:** Supabase Storage (Media)
+- **Authentication:** Supabase Auth (with Access Code gate)
+- **Encryption:** AES-256 (via `crypto-js`)
+- **Realtime / Sync:** Supabase Realtime + Custom "Eternity" Sync Protocol (Offline Queue + Optimistic Updates)
+- **Storage:** Supabase Storage (Media/Images)
+
+### Geospatial (Geografía del Deseo)
+
+- **Engine:** MapLibre GL
+- **React Wrapper:** `react-map-gl/maplibre`
 
 ### Testing & Quality
 
 - **Test Framework:** Vitest + React Testing Library
 - **Linting/Formatting:** ESLint + Prettier
-- **Documentation:** TypeDoc
+- **Git Hooks:** Husky + lint-staged
 
-### Deployment & Infrastructure
+### Key Third-Party Libraries
 
-- **Mobile:** Capacitor (Android)
-- **Hosting:** Web (TBD) / Android (Play Store)
-
-### Third-Party Services
-
-- **Authentication:** Supabase Auth
-- **Geospatial:** MapLibre GL
-- **Icons:** Lucide React
+- **Date Handling:** `date-fns`
+- **Icons:** `lucide-react`
+- **Form Management:** `react-hook-form` + `zod`
+- **Drag & Drop:** `@dnd-kit` (Core, Sortable, Utilities)
+- **Toast Notifications:** `sonner`
