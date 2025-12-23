@@ -1,5 +1,6 @@
 import type { Block } from "@/store/notes.store";
 import { LinkBlockSecure as LinkBlock } from "./blocks/LinkBlock";
+import { PolaroidBlock } from "./blocks/PolaroidBlock";
 import { Button } from "@/components/ui/button";
 import {
   Check,
@@ -76,10 +77,11 @@ const BlockRendererInner = ({
 
   // Toggle Edit Mode: If selected, another tap enables editing.
   // If not selected, tap selects it (Silhouette).
-  const [isEditing, setIsEditing] = useState(false);
+  // Initialize to true if it's born for focus to avoid "jump" on mount
+  const [isEditing, setIsEditing] = useState(autoFocus);
 
   // Timestamp to prevent ghost clicks from immediately entering edit mode
-  const selectionTimeRef = useRef<number>(0);
+  const selectionTimeRef = useRef<number>(isSelected ? Date.now() : 0);
 
   // Reset editing state if focus changes
   useEffect(() => {
@@ -90,13 +92,13 @@ const BlockRendererInner = ({
       // Just became selected - record timestamp
       if (selectionTimeRef.current === 0) {
         selectionTimeRef.current = Date.now();
-      }
-      // Auto-edit ONLY for newly created empty blocks
-      if (!block.content && selectionTimeRef.current === 0) {
-        setIsEditing(true);
+        // Auto-edit ONLY for newly created empty blocks or if explicitly requested via prop
+        if (!block.content || autoFocus) {
+          setIsEditing(true);
+        }
       }
     }
-  }, [isSelected, block.content]);
+  }, [isSelected, block.content, autoFocus]);
 
   // DnD Hook
   const {
@@ -464,6 +466,11 @@ const BlockRendererInner = ({
             <LinkBlock meta={block.props?.meta as LinkMetadata} />
           )}
 
+          {/* Polaroid Block */}
+          {block.type === "polaroid" && (
+            <PolaroidBlock block={block} onChange={onChange} />
+          )}
+
           {/* Image Block */}
           {block.type === "image" && (
             <div className="relative rounded-xl overflow-hidden bg-slate-900/50 border border-slate-800/50 group/image">
@@ -508,13 +515,15 @@ const BlockRendererInner = ({
         <div className="flex items-center gap-0.5 pl-1 shrink-0 opacity-60 hover:opacity-100 focus-within:opacity-100 transition-opacity">
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10"
-              >
-                <Bell size={14} />
-              </Button>
+              <motion.div whileTap={{ scale: 0.8 }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10"
+                >
+                  <Bell size={14} />
+                </Button>
+              </motion.div>
             </PopoverTrigger>
             <PopoverContent
               className="w-auto p-0 bg-slate-950 border-slate-800"
@@ -529,14 +538,16 @@ const BlockRendererInner = ({
             </PopoverContent>
           </Popover>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(block.id)}
-            className="h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
-          >
-            <Trash2 size={14} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(block.id)}
+              className="h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </motion.div>
         </div>
       </div>
 
@@ -564,6 +575,7 @@ const BlockRendererInner = ({
                   onFocus={onFocus}
                   depth={depth + 1}
                   activeBlockId={activeBlockId}
+                  autoFocus={activeBlockId === child.id}
                 />
               ))}
             </SortableContext>

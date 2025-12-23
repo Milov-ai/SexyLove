@@ -242,11 +242,13 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
             if (!found) return prev;
 
             const { node } = found;
-            // Inherit type if it's a list item
-            const newType =
-              node.type === "todo" || node.type === "bullet"
-                ? node.type
-                : "text";
+            // Smart Type Resolution
+            let newType: BlockType = "text";
+
+            if (node.type === "todo") newType = "todo";
+            else if (node.type === "bullet") newType = "bullet";
+            else if (node.type === "heading") newType = "text";
+            else newType = node.type;
 
             const newBlock: Block = {
               id: newId,
@@ -292,8 +294,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
           if (!found) return prev;
 
           const { node } = found;
-          const newType =
-            node.type === "todo" || node.type === "bullet" ? node.type : "text";
+          // Smart Type Resolution
+          let newType: BlockType = "text";
+
+          if (node.type === "todo") newType = "todo";
+          else if (node.type === "bullet") newType = "bullet";
+          // Headings should implicitly revert to text for the next block (standard document flow)
+          else if (node.type === "heading") newType = "text";
+          else newType = node.type; // Default to same type for others if not specified
+
+          // If it was text, it stays text.
 
           const newBlock: Block = {
             id: newId,
@@ -307,6 +317,7 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
           return res.success ? res.tree : prev;
         });
 
+        // setTimeout 0 ensures the new block is rendered before we try to focus it
         setTimeout(() => setFocusedBlockId(newId), 0);
       }
     },
@@ -467,14 +478,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
         />
 
         <header className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-0 z-10 transition-all">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
-          >
-            <ArrowLeft size={24} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
+            >
+              <ArrowLeft size={24} />
+            </Button>
+          </motion.div>
 
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Clock size={12} />
@@ -485,14 +498,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
             </span>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-full"
-          >
-            <Trash2 size={24} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-full"
+            >
+              <Trash2 size={24} />
+            </Button>
+          </motion.div>
         </header>
 
         {/* Zoom Breadcrumbs */}

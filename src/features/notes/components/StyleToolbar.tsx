@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Type,
@@ -75,14 +76,16 @@ export const StyleToolbar = ({
           )}
         >
           {/* Typography (Opens Full Sheet) */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsTypographyOpen(true)}
-            className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
-          >
-            <Type size={18} />
-          </Button>
+          <motion.div whileTap={{ scale: 0.85 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsTypographyOpen(true)}
+              className="text-slate-400 hover:text-white hover:bg-white/10 h-9 w-9"
+            >
+              <Type size={18} />
+            </Button>
+          </motion.div>
 
           <div className="w-px h-5 bg-white/10 mx-0.5" />
 
@@ -138,12 +141,14 @@ export const StyleToolbar = ({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                size="icon"
-                className="bg-white text-black hover:bg-slate-200 rounded-full h-10 w-10 shadow-lg shadow-violet-500/20 flex-shrink-0"
-              >
-                <Plus size={22} />
-              </Button>
+              <motion.div whileTap={{ scale: 0.9 }}>
+                <Button
+                  size="icon"
+                  className="bg-white text-black hover:bg-slate-200 rounded-full h-10 w-10 shadow-lg shadow-violet-500/20 flex-shrink-0"
+                >
+                  <Plus size={22} />
+                </Button>
+              </motion.div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"

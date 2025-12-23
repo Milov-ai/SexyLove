@@ -15,6 +15,9 @@ import {
   ChevronLeft,
   Folder as FolderIcon,
   Sparkles,
+  icons,
+  Pencil,
+  Image as ImageIcon,
 } from "lucide-react";
 import { App } from "@capacitor/app";
 import { format } from "date-fns";
@@ -47,7 +50,9 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/common/BrandLogo";
 import { IdentitySelectorDialog } from "@/features/chameleon/components/IdentitySelectorDialog";
+
 import { useEternitySync } from "@/features/proposal/hooks/useEternitySync";
+import { IconPicker } from "@/components/ui/IconPicker";
 
 const NotesDashboard = () => {
   const {
@@ -268,6 +273,46 @@ const NotesDashboard = () => {
     setIsEditAuraOpen(false);
     setItemToEdit(null);
     setSelectedColor("default");
+    setItemToEdit(null);
+    setSelectedColor("default");
+  };
+
+  // Icon Picker State
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const [iconTargetId, setIconTargetId] = useState<string | null>(null);
+
+  const handleOpenIconPicker = (folderId: string) => {
+    setIconTargetId(folderId);
+    setIsIconPickerOpen(true);
+  };
+
+  const handleIconSelect = async (iconName: string) => {
+    if (!iconTargetId) return;
+    await updateFolder(iconTargetId, { icon: iconName });
+    setIconTargetId(null);
+  };
+
+  // Renaming State
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editNameValue, setEditNameValue] = useState("");
+
+  const startRenaming = (folder: Folder) => {
+    setEditingFolderId(folder.id);
+    setEditNameValue(folder.name);
+  };
+
+  const saveRename = async () => {
+    if (!editingFolderId || !editNameValue.trim()) {
+      setEditingFolderId(null);
+      return;
+    }
+    await updateFolder(editingFolderId, { name: editNameValue.trim() });
+    setEditingFolderId(null);
+  };
+
+  const cancelRename = () => {
+    setEditingFolderId(null);
+    setEditNameValue("");
   };
 
   // Security State
@@ -366,6 +411,12 @@ const NotesDashboard = () => {
         onOpenChange={setIsChameleonOpen}
       />
 
+      <IconPicker
+        open={isIconPickerOpen}
+        onOpenChange={setIsIconPickerOpen}
+        onSelect={handleIconSelect}
+      />
+
       <Sheet open={isEditAuraOpen} onOpenChange={setIsEditAuraOpen}>
         <SheetContent
           side="bottom"
@@ -439,18 +490,22 @@ const NotesDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-full w-12 h-12 transition-all hover:scale-105"
-            >
-              {viewMode === "grid" ? (
-                <ListIcon size={24} />
-              ) : (
-                <Grid size={24} />
-              )}
-            </Button>
+            <motion.div whileTap={{ scale: 0.9 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() =>
+                  setViewMode(viewMode === "grid" ? "list" : "grid")
+                }
+                className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-full w-12 h-12 transition-all hover:scale-105"
+              >
+                {viewMode === "grid" ? (
+                  <ListIcon size={24} />
+                ) : (
+                  <Grid size={24} />
+                )}
+              </Button>
+            </motion.div>
           </div>
         </div>
 
@@ -488,7 +543,7 @@ const NotesDashboard = () => {
       {/* Main Content */}
       <main className="p-6 pb-24 max-w-7xl mx-auto">
         {/* Search */}
-        <div className="mb-6 relative">
+        <motion.div whileTap={{ scale: 0.99 }} className="mb-6 relative">
           <Search
             className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
             size={18}
@@ -507,7 +562,7 @@ const NotesDashboard = () => {
             placeholder="Buscar..."
             className="h-12 w-full bg-card border-border rounded-2xl pl-12 text-base focus:border-primary/50 focus:ring-primary/20"
           />
-        </div>
+        </motion.div>
 
         {/* Content Grid/List */}
         <div
@@ -522,6 +577,8 @@ const NotesDashboard = () => {
             <motion.div
               key={folder.id}
               layout
+              whileHover={{ scale: 1.01, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => handleFolderClick(folder)}
               className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[140px] ${
                 THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg
@@ -547,13 +604,36 @@ const NotesDashboard = () => {
                   >
                     {folder.is_locked ? (
                       <Lock size={20} />
+                    ) : folder.icon &&
+                      icons[folder.icon as keyof typeof icons] ? (
+                      (() => {
+                        const IconComp = icons[
+                          folder.icon as keyof typeof icons
+                        ] as unknown as React.ElementType;
+                        return <IconComp size={20} />;
+                      })()
                     ) : (
                       <FolderIcon size={20} />
                     )}
                   </div>
-                  <span className="font-medium text-lg tracking-tight text-white/90 line-clamp-2 leading-tight pt-1">
-                    {folder.name}
-                  </span>
+                  {editingFolderId === folder.id ? (
+                    <Input
+                      value={editNameValue}
+                      onChange={(e) => setEditNameValue(e.target.value)}
+                      onBlur={() => saveRename()}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveRename();
+                        if (e.key === "Escape") cancelRename();
+                      }}
+                      autoFocus
+                      className="h-8 text-lg font-medium bg-black/20 border-white/10 text-white min-w-0 w-full"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <span className="font-medium text-lg tracking-tight text-white/90 line-clamp-2 leading-tight pt-1">
+                      {folder.name}
+                    </span>
+                  )}
                 </div>
 
                 {/* Bottom: Actions */}
@@ -573,6 +653,26 @@ const NotesDashboard = () => {
                     >
                       <DropdownMenuLabel>Opciones</DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-slate-800" />
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startRenaming(folder);
+                        }}
+                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
+                      >
+                        <Pencil size={14} />
+                        <span>Renombrar</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenIconPicker(folder.id);
+                        }}
+                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
+                      >
+                        <ImageIcon size={14} />
+                        <span>Cambiar Icono</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation();
@@ -650,6 +750,8 @@ const NotesDashboard = () => {
               <motion.div
                 key={note.id}
                 layout
+                whileHover={{ scale: 1.01, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedNoteId(note.id)}
                 className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[160px] ${
                   THEMES[note.color as ThemeId]?.bg || THEMES.default.bg

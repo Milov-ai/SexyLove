@@ -1,6 +1,11 @@
 import { useState, useMemo } from "react";
 import { icons } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,15 +17,19 @@ interface IconPickerProps {
   onSelect: (iconName: string) => void;
 }
 
-export const IconPicker = ({ open, onOpenChange, onSelect }: IconPickerProps) => {
+export const IconPicker = ({
+  open,
+  onOpenChange,
+  onSelect,
+}: IconPickerProps) => {
   const [search, setSearch] = useState("");
 
   const filteredIcons = useMemo(() => {
     const term = search.toLowerCase().trim();
     const allIcons = Object.keys(icons);
-    
+
     if (!term) return allIcons.slice(0, 100); // Limit initial view
-    
+
     return allIcons
       .filter((iconName) => iconName.toLowerCase().includes(term))
       .slice(0, 100); // Limit search results
@@ -29,16 +38,18 @@ export const IconPicker = ({ open, onOpenChange, onSelect }: IconPickerProps) =>
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] md:max-w-[500px] bg-background/95 backdrop-blur-xl border-white/10 text-foreground p-0 gap-0 overflow-hidden rounded-3xl">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-2xl font-serif">Seleccionar Icono</DialogTitle>
-        </DialogHeader>
-        
         <div className="p-4 pt-0 space-y-4">
+          <DialogHeader className="p-6 pb-2 px-0">
+            <DialogTitle className="text-2xl font-serif">
+              Seleccionar Icono
+            </DialogTitle>
+          </DialogHeader>
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input 
-              placeholder="Buscar icono... (ej. home, work, star)" 
-              value={search} 
+            <Input
+              placeholder="Buscar icono... (ej. home, work, star)"
+              value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9 bg-secondary/50 border-white/5 rounded-xl"
             />
@@ -47,8 +58,9 @@ export const IconPicker = ({ open, onOpenChange, onSelect }: IconPickerProps) =>
           <ScrollArea className="h-[40vh] md:h-[300px] pr-4">
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pb-4">
               {filteredIcons.map((iconName) => {
-                // @ts-ignore - Lucide icons export
-                const IconComponent = icons[iconName];
+                const IconComponent = icons[
+                  iconName as keyof typeof icons
+                ] as unknown as React.ElementType;
                 return (
                   <Button
                     key={iconName}
