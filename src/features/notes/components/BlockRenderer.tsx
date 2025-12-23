@@ -1,6 +1,7 @@
 import type { Block } from "@/store/notes.store";
 import { LinkBlockSecure as LinkBlock } from "./blocks/LinkBlock";
 import { PolaroidBlock } from "./blocks/PolaroidBlock";
+import { CinePolaroidBlock } from "./blocks/CinePolaroidBlock";
 import { Button } from "@/components/ui/button";
 import {
   Check,
@@ -469,6 +470,11 @@ const BlockRendererInner = ({
           {/* Polaroid Block */}
           {block.type === "polaroid" && (
             <PolaroidBlock block={block} onChange={onChange} />
+          )}
+
+          {/* Cine Polaroid Block */}
+          {block.type === "cine_polaroid" && (
+            <CinePolaroidBlock block={block} onChange={onChange} />
           )}
 
           {/* Image Block */}

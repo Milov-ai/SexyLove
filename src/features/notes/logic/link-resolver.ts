@@ -1,10 +1,18 @@
 export interface LinkMetadata {
-  provider: "youtube" | "spotify" | "generic";
+  provider: "youtube" | "spotify" | "movie" | "generic";
   url: string;
   title: string;
   description?: string;
   image?: string;
   embedUrl?: string; // For iframes
+  movieProps?: {
+    year?: string;
+    genre?: string;
+    duration?: string;
+    director?: string;
+    starring?: string;
+    rating?: number;
+  };
 }
 
 export const LinkResolver = {
@@ -86,22 +94,48 @@ export const LinkResolver = {
         };
       }
 
-      // 3. Generic Links - Enhanced Fetch
-      try {
-        const microlinkRes = await fetch(
-          `https://api.microlink.io?url=${encodeURIComponent(cleanUrl)}`,
-        );
-        const microlinkData = await microlinkRes.json();
-        if (
-          microlinkData.status === "success" &&
-          microlinkData.data &&
-          microlinkData.data.title
-        ) {
-          metadata.title = microlinkData.data.title;
+      // 3. Movie Links (IMDb / Letterboxd)
+      const isImdb = cleanUrl.includes("imdb.com/title/");
+      const isLetterboxd = cleanUrl.includes("letterboxd.com/film/");
+
+      if (isImdb || isLetterboxd) {
+        try {
+          const microlinkRes = await fetch(
+            `https://api.microlink.io?url=${encodeURIComponent(cleanUrl)}`,
+          );
+          const microlinkData = await microlinkRes.json();
+
+          if (microlinkData.status === "success" && microlinkData.data) {
+            const data = microlinkData.data;
+
+            // Extract Year from Title if possible (e.g. "Sleepers (1996)")
+            const yearMatch = data.title?.match(/\((\d{4})\)/);
+            const year = yearMatch ? yearMatch[1] : undefined;
+            const cleanTitle = data.title
+              ?.replace(/\s\(\d{4}\).*/, "")
+              .replace(" - IMDb", "")
+              .replace(" • Letterboxd", "");
+
+            return {
+              ...metadata,
+              provider: "movie",
+              title: cleanTitle || metadata.title,
+              image: data.image?.url || metadata.image,
+              description: data.description,
+              movieProps: {
+                year,
+                director: data.author, // Microlink often maps director to author
+                genre: data.description?.split(".")[0], // Rough fallback
+                rating: data.publisher === "IMDb" ? 7.8 : undefined, // Potential mock or extraction
+              },
+            };
+          }
+        } catch {
+          // Fallback to generic if fetch fails
         }
-      } catch {
-        // Silently fail to default
       }
+
+      // 4. Generic Links - Enhanced Fetch
 
       return metadata;
     } catch (e) {

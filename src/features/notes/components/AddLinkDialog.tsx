@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { LinkResolver } from "@/features/notes/logic/link-resolver";
+import {
+  LinkResolver,
+  type LinkMetadata,
+} from "@/features/notes/logic/link-resolver";
 
 interface AddLinkDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (link: { url: string; title?: string }) => void;
+  onSubmit: (meta: LinkMetadata) => void;
   initialText?: string;
 }
 
@@ -40,7 +43,7 @@ export const AddLinkDialog = ({
     setLoading(true);
     try {
       const meta = await LinkResolver.resolve(url);
-      onSubmit({ url, title: meta.title || url }); // Assuming meta has a title property
+      onSubmit(meta);
       setUrl("");
       onClose();
       toast.success("Enlace añadido ✨");

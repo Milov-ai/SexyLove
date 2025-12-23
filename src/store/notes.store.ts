@@ -25,7 +25,8 @@ export type BlockType =
   | "bullet"
   | "table"
   | "link"
-  | "polaroid";
+  | "polaroid"
+  | "cine_polaroid";
 
 export interface BlockStyle {
   fontFamily?: "sans" | "serif" | "mono";
