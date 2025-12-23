@@ -111,18 +111,37 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
 
   useEffect(() => {
     if (note) {
-      setTitle(note.title);
+      const newTitle = note.title;
+      if (title !== newTitle) setTitle(newTitle);
+
       try {
         const parsedBlocks = note.content ? JSON.parse(note.content) : [];
-        if (Array.isArray(parsedBlocks) && parsedBlocks.length > 0) {
-          setBlocks(migrateBlocks(parsedBlocks));
-        } else {
-          setBlocks([{ id: uuidv4(), type: "text", content: "" }]);
+        const currentBlocksString = JSON.stringify(blocksRef.current);
+
+        // Only update if the content is actually different to avoid flicker
+        if (note.content !== currentBlocksString) {
+          if (Array.isArray(parsedBlocks) && parsedBlocks.length > 0) {
+            setBlocks(migrateBlocks(parsedBlocks));
+          } else if (
+            !parsedBlocks ||
+            (Array.isArray(parsedBlocks) && parsedBlocks.length === 0)
+          ) {
+            // If incoming is empty but local is not, we might be in a race condition.
+            // But if both are empty-ish or it's a new note, we reset.
+            if (
+              blocksRef.current.length === 0 ||
+              (blocksRef.current.length === 1 && !blocksRef.current[0].content)
+            ) {
+              setBlocks([{ id: uuidv4(), type: "text", content: "" }]);
+            }
+          }
         }
       } catch {
-        setBlocks([
-          { id: uuidv4(), type: "text", content: note.content || "" },
-        ]);
+        if (note.content !== blocksRef.current[0]?.content) {
+          setBlocks([
+            { id: uuidv4(), type: "text", content: note.content || "" },
+          ]);
+        }
       }
       setLastSaved(new Date(note.updated_at));
     }

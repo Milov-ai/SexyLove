@@ -86,15 +86,8 @@ export const CinePolaroidBlock = ({ block, onChange }: BlockProps) => {
     y.set(0);
   };
 
-  const randomRotation = useRef(
-    props.rotation || Math.random() * 4 - 2,
-  ).current;
-
-  useEffect(() => {
-    if (props.rotation === undefined) {
-      updateProps({ rotation: randomRotation });
-    }
-  }, [props.rotation, randomRotation, updateProps]);
+  // Stabilize Rotation (Local only to prevent update-loop flickering)
+  const localRotation = useRef(Math.random() * 4 - 2).current;
 
   // Device Orientation Tilt (Mobile First)
   useEffect(() => {
@@ -116,21 +109,41 @@ export const CinePolaroidBlock = ({ block, onChange }: BlockProps) => {
       window.removeEventListener("deviceorientation", handleOrientation);
   }, [isFlipped, x, y]);
 
+  // Handle Title Textarea Auto-height on Mount/Change
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustTitleHeight = useCallback(() => {
+    if (titleRef.current) {
+      titleRef.current.style.height = "auto";
+      titleRef.current.style.height = titleRef.current.scrollHeight + "px";
+    }
+  }, []);
+
+  useEffect(() => {
+    // Small delay to ensure styles are applied
+    const timer = setTimeout(adjustTitleHeight, 50);
+    return () => clearTimeout(timer);
+  }, [props.title, adjustTitleHeight]);
+
   return (
-    <div className="flex justify-center py-8 perspective-1000">
+    <div className="flex justify-center py-8 perspective-1000 will-change-transform">
       <motion.div
         ref={containerRef}
         className={cn(
-          "relative w-[320px] h-[460px] preserve-3d cursor-pointer select-none transition-shadow",
-          isFlipped ? "z-50 shadow-2xl" : "z-0 shadow-lg",
+          "relative w-[320px] h-[460px] preserve-3d cursor-pointer select-none ring-1 ring-black/5",
+          isFlipped ? "z-50" : "z-0",
         )}
         style={{
           rotateX: isFlipped ? 0 : rotateX,
           rotateY: isFlipped ? 180 : rotateY,
-          rotateZ: isFlipped ? 0 : randomRotation,
+          rotateZ: isFlipped ? 0 : localRotation,
         }}
-        whileHover={{ scale: 1.02 }}
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        animate={{
+          rotateY: isFlipped ? 180 : 0,
+          boxShadow: isFlipped
+            ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+            : "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+        }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -188,68 +201,89 @@ export const CinePolaroidBlock = ({ block, onChange }: BlockProps) => {
           </div>
 
           {/* Cinematic Metadata (The Chin) */}
-          <div className="mt-3 w-full flex flex-col gap-2 px-1">
-            <div className="flex items-baseline gap-2">
-              <input
-                value={props.title || ""}
-                onChange={(e) => updateProps({ title: e.target.value })}
-                placeholder="MOUTIE TITLE"
-                className="text-2xl font-black text-slate-900 bg-transparent border-none focus:ring-0 p-0 placeholder:text-slate-200 uppercase tracking-tight flex-1 min-w-0"
-                onClick={(e) => e.stopPropagation()}
-              />
+          <div className="mt-3 w-full flex flex-col gap-1.5 px-0.5">
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                <textarea
+                  ref={titleRef}
+                  value={props.title || ""}
+                  onChange={(e) => {
+                    adjustTitleHeight();
+                    updateProps({ title: e.target.value });
+                  }}
+                  onFocus={adjustTitleHeight}
+                  placeholder="MOVIE TITLE"
+                  rows={1}
+                  className="w-full text-[21px] font-black text-slate-900 bg-transparent border-none focus:ring-0 p-0 placeholder:text-slate-200 uppercase tracking-tighter leading-none resize-none overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
               <input
                 value={props.year || ""}
                 onChange={(e) => updateProps({ year: e.target.value })}
-                placeholder="1996"
-                className="text-sm font-bold text-slate-400 bg-transparent border-none focus:ring-0 p-0 w-12 text-right"
+                placeholder="YEAR"
+                className="text-sm font-bold text-slate-400 bg-transparent border-none focus:ring-0 p-0 w-12 text-right mt-1 shrink-0"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
 
-            <div className="flex flex-col gap-0.5 border-t border-slate-100 pt-2">
-              <div className="flex items-center gap-4">
-                <span className="text-[9px] font-bold text-slate-400 w-14 uppercase tracking-tighter">
+            <div className="flex flex-col gap-0 border-t border-slate-100 pt-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[8px] font-bold text-slate-300 w-12 uppercase tracking-tight shrink-0">
                   Genre
                 </span>
                 <input
                   value={props.genre || ""}
                   onChange={(e) => updateProps({ genre: e.target.value })}
-                  placeholder="CRIME/DRAMA"
-                  className="text-[11px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1"
+                  placeholder="GENRE"
+                  className="text-[10px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1 truncate"
                 />
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-[9px] font-bold text-slate-400 w-14 uppercase tracking-tighter">
+              <div className="flex items-center gap-2">
+                <span className="text-[8px] font-bold text-slate-300 w-12 uppercase tracking-tight shrink-0">
                   Duration
                 </span>
                 <input
-                  value={props.duration || ""}
+                  value={
+                    props.duration && props.duration !== "DURACI\u00D3N N/A"
+                      ? props.duration
+                      : ""
+                  }
                   onChange={(e) => updateProps({ duration: e.target.value })}
-                  placeholder="147 MINUTES"
-                  className="text-[11px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1"
+                  placeholder="DURATION"
+                  className="text-[10px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1 truncate"
                 />
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-[9px] font-bold text-slate-400 w-14 uppercase tracking-tighter">
+              <div className="flex items-center gap-2">
+                <span className="text-[8px] font-bold text-slate-300 w-12 uppercase tracking-tight shrink-0">
                   Director
                 </span>
                 <input
-                  value={props.director || ""}
+                  value={
+                    props.director &&
+                    props.director !== "Director no disponible"
+                      ? props.director
+                      : ""
+                  }
                   onChange={(e) => updateProps({ director: e.target.value })}
-                  placeholder="BARRY LEVINSON"
-                  className="text-[11px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1"
+                  placeholder="DIRECTOR"
+                  className="text-[10px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1 truncate"
                 />
               </div>
-              <div className="flex items-start gap-4">
-                <span className="text-[9px] font-bold text-slate-400 w-14 uppercase tracking-tighter mt-1">
+              <div className="flex items-start gap-2 mt-0.5">
+                <span className="text-[8px] font-bold text-slate-300 w-12 uppercase tracking-tight shrink-0 mt-0.5">
                   Starring
                 </span>
                 <textarea
-                  value={props.starring || ""}
+                  value={
+                    props.starring && props.starring !== "Reparto no disponible"
+                      ? props.starring
+                      : ""
+                  }
                   onChange={(e) => updateProps({ starring: e.target.value })}
-                  placeholder="BRAD PITT, ROBERT DE NIRO..."
+                  placeholder="STARRING"
                   rows={2}
-                  className="text-[11px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1 resize-none leading-tight"
+                  className="text-[10px] font-bold text-slate-700 bg-transparent border-none focus:ring-0 p-0 uppercase flex-1 resize-none leading-tight overflow-hidden"
                 />
               </div>
             </div>

@@ -253,6 +253,8 @@ export const StyleToolbar = ({
               year: meta.movieProps?.year,
               director: meta.movieProps?.director,
               genre: meta.movieProps?.genre,
+              duration: meta.movieProps?.duration,
+              starring: meta.movieProps?.starring,
               officialRating: meta.movieProps?.rating,
             });
           } else {
