@@ -242,11 +242,13 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
             if (!found) return prev;
 
             const { node } = found;
-            // Inherit type if it's a list item
-            const newType =
-              node.type === "todo" || node.type === "bullet"
-                ? node.type
-                : "text";
+            // Smart Type Resolution
+            let newType: BlockType = "text";
+
+            if (node.type === "todo") newType = "todo";
+            else if (node.type === "bullet") newType = "bullet";
+            else if (node.type === "heading") newType = "text";
+            else newType = node.type;
 
             const newBlock: Block = {
               id: newId,
@@ -292,8 +294,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
           if (!found) return prev;
 
           const { node } = found;
-          const newType =
-            node.type === "todo" || node.type === "bullet" ? node.type : "text";
+          // Smart Type Resolution
+          let newType: BlockType = "text";
+
+          if (node.type === "todo") newType = "todo";
+          else if (node.type === "bullet") newType = "bullet";
+          // Headings should implicitly revert to text for the next block (standard document flow)
+          else if (node.type === "heading") newType = "text";
+          else newType = node.type; // Default to same type for others if not specified
+
+          // If it was text, it stays text.
 
           const newBlock: Block = {
             id: newId,
@@ -307,6 +317,7 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
           return res.success ? res.tree : prev;
         });
 
+        // setTimeout 0 ensures the new block is rendered before we try to focus it
         setTimeout(() => setFocusedBlockId(newId), 0);
       }
     },

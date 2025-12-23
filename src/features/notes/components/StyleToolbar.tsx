@@ -13,6 +13,7 @@ import {
   IndentDecrease,
   Maximize2,
   Minimize2,
+  Camera,
 } from "lucide-react";
 import { AddLinkDialog } from "./AddLinkDialog";
 import { cn } from "@/lib/utils";
@@ -185,6 +186,12 @@ export const StyleToolbar = ({
               >
                 <ImageIcon size={16} /> Imagen
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onAddBlock("polaroid")}
+                className="gap-2"
+              >
+                <Camera size={16} /> Polaroid
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -224,9 +231,9 @@ export const StyleToolbar = ({
       </Sheet>
 
       <AddLinkDialog
-        open={isLinkDialogOpen}
-        onOpenChange={setIsLinkDialogOpen}
-        onAdd={(meta) => onAddBlock("link", { meta })}
+        isOpen={isLinkDialogOpen}
+        onClose={() => setIsLinkDialogOpen(false)}
+        onSubmit={(meta) => onAddBlock("link", { meta })}
       />
     </>
   );

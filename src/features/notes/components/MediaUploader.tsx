@@ -1,9 +1,8 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { Image as ImageIcon, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { useNotesStore } from "@/store/notes.store";
+import { useMediaUpload } from "../hooks/useMediaUpload";
 
 interface MediaUploaderProps {
   noteId: string;
@@ -11,39 +10,21 @@ interface MediaUploaderProps {
 
 const MediaUploader = ({ noteId }: MediaUploaderProps) => {
   const { addMedia } = useNotesStore();
-  const [isUploading, setIsUploading] = useState(false);
+  const { uploadMedia, isUploading } = useMediaUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-    try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${noteId}/${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+    const publicUrl = await uploadMedia(file, noteId);
 
-      const { error: uploadError } = await supabase.storage
-        .from("notes-media")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("notes-media").getPublicUrl(filePath);
-
+    if (publicUrl) {
       await addMedia({
         note_id: noteId,
         url: publicUrl,
         type: file.type.startsWith("video") ? "video" : "image",
       });
-    } catch (error) {
-      console.error("Error uploading media:", error);
-      toast.error("Error al subir la imagen");
-    } finally {
-      setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };

@@ -1,5 +1,6 @@
 import type { Block } from "@/store/notes.store";
 import { LinkBlockSecure as LinkBlock } from "./blocks/LinkBlock";
+import { PolaroidBlock } from "./blocks/PolaroidBlock";
 import { Button } from "@/components/ui/button";
 import {
   Check,
@@ -462,6 +463,11 @@ const BlockRendererInner = ({
           {/* Link Block */}
           {block.type === "link" && (
             <LinkBlock meta={block.props?.meta as LinkMetadata} />
+          )}
+
+          {/* Polaroid Block */}
+          {block.type === "polaroid" && (
+            <PolaroidBlock block={block} onChange={onChange} />
           )}
 
           {/* Image Block */}
