@@ -18,12 +18,14 @@ description: Execute the implementation of assigned tasks for a feature and sync
 2. Read the instructions in `agent-os/commands/implement-tasks/implement-tasks.md`.
 3. Identify pending tasks in `agent-os/specs/[feature-name]/tasks.md`.
 4. Implement the feature according to the `agent-os/standards/` and the technical spec.
-5. **Quality Assurance**:
+5. **Quality Assurance (Mandatory PREREQUISITE for Push)**:
+   - // turbo
    - Run `run_command` 'npm run lint'.
-   - Run `run_command` 'npm run build' to catch runtime and type errors early.
+   - // turbo
+   - Run `run_command` 'npm run build' - **CRITICAL**: You MUST run build and ensure it passes before pushing. This catches rendering and type errors that lint might miss. Resolve all errors first.
 
 6. **Github Sync (Implementation Phase)**:
-   - **Push**: Run `run_command` 'git push origin feature/[name]' (ensure upstream set).
+   - **Push**: ONLY IF `npm run build` passed. Run `run_command` 'git push origin feature/[name]' (ensure upstream set).
    - **Update Issue**:
      - Find the Tracking Issue: `mcp_github-mcp-server_search_issues` (query="[Feature Name] is:issue").
      - Update the issue body checkboxes to reflect completed tasks using `mcp_github-mcp-server_issue_write`.

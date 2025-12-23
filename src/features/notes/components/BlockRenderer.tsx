@@ -77,10 +77,11 @@ const BlockRendererInner = ({
 
   // Toggle Edit Mode: If selected, another tap enables editing.
   // If not selected, tap selects it (Silhouette).
-  const [isEditing, setIsEditing] = useState(false);
+  // Initialize to true if it's born for focus to avoid "jump" on mount
+  const [isEditing, setIsEditing] = useState(autoFocus);
 
   // Timestamp to prevent ghost clicks from immediately entering edit mode
-  const selectionTimeRef = useRef<number>(0);
+  const selectionTimeRef = useRef<number>(isSelected ? Date.now() : 0);
 
   // Reset editing state if focus changes
   useEffect(() => {
@@ -574,6 +575,7 @@ const BlockRendererInner = ({
                   onFocus={onFocus}
                   depth={depth + 1}
                   activeBlockId={activeBlockId}
+                  autoFocus={activeBlockId === child.id}
                 />
               ))}
             </SortableContext>
