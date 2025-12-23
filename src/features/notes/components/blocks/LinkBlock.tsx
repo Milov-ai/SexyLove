@@ -156,7 +156,17 @@ export const LinkBlockSecure = ({
           <span className={platform.className}>{platform.name}</span>
           <span className="text-white/20">•</span>
           <span className="text-white/40 font-mono font-normal">
-            {new URL(meta.url).hostname.replace("www.", "")}
+            {(() => {
+              try {
+                return new URL(
+                  meta.url.startsWith("http")
+                    ? meta.url
+                    : `https://${meta.url}`,
+                ).hostname.replace("www.", "");
+              } catch {
+                return meta.url.split("/")[0];
+              }
+            })()}
           </span>
         </div>
       </div>

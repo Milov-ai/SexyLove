@@ -15,6 +15,7 @@ import {
   Maximize2,
   Minimize2,
   Camera,
+  Clapperboard,
 } from "lucide-react";
 import { AddLinkDialog } from "./AddLinkDialog";
 import { cn } from "@/lib/utils";
@@ -197,6 +198,12 @@ export const StyleToolbar = ({
               >
                 <Camera size={16} /> Polaroid
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onAddBlock("cine_polaroid")}
+                className="gap-2"
+              >
+                <Clapperboard size={16} /> Movie Polaroid
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -238,7 +245,22 @@ export const StyleToolbar = ({
       <AddLinkDialog
         isOpen={isLinkDialogOpen}
         onClose={() => setIsLinkDialogOpen(false)}
-        onSubmit={(meta) => onAddBlock("link", { meta })}
+        onSubmit={(meta) => {
+          if (meta.provider === "movie") {
+            onAddBlock("cine_polaroid", {
+              title: meta.title,
+              imageUrl: meta.image,
+              year: meta.movieProps?.year,
+              director: meta.movieProps?.director,
+              genre: meta.movieProps?.genre,
+              duration: meta.movieProps?.duration,
+              starring: meta.movieProps?.starring,
+              officialRating: meta.movieProps?.rating,
+            });
+          } else {
+            onAddBlock("link", { meta });
+          }
+        }}
       />
     </>
   );
