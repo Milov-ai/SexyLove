@@ -38,13 +38,13 @@ export const IconPicker = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] md:max-w-[500px] bg-background/95 backdrop-blur-xl border-white/10 text-foreground p-0 gap-0 overflow-hidden rounded-3xl">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-2xl font-serif">
-            Seleccionar Icono
-          </DialogTitle>
-        </DialogHeader>
-
         <div className="p-4 pt-0 space-y-4">
+          <DialogHeader className="p-6 pb-2 px-0">
+            <DialogTitle className="text-2xl font-serif">
+              Seleccionar Icono
+            </DialogTitle>
+          </DialogHeader>
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
