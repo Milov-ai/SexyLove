@@ -1,0 +1,1 @@
+En las notas donde se identifique que hay un componente de movie polaroid debe agregarse un componente de filtros al inicio de la nota, que permita filtrar los polaroids por campos como nombre, género, año, director, calificación, si ya lo vimos o no.

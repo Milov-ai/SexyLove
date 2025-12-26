@@ -1,0 +1,62 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.1 [39m[90mC:/Users/theru/Downloads/LinguaFlow/SexyLove[39m
+
+[90mstdout[2m | src/features/notes/components/PolaroidFilterBar.test.tsx[2m > [22m[2mPolaroidFilterBar[2m > [22m[2mrenders when cine_polaroid blocks are present
+[22m[39mProcessing block: 1 Genre: Horror
+
+stderr | src/features/notes/components/PolaroidFilterBar.test.tsx > PolaroidFilterBar > renders when cine_polaroid blocks are present
+In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  <PolaroidFilterBar blocks={[...]} filters={{searchQuery:"", ...}} onFilterChange={function Mock}>
+    <div className="sticky top...">
+      <Collapsible open={false} onOpenChange={function bound dispatchSetState} className="w-full rel...">
+        <div data-testid="collapsible" data-open={false}>
+          <div className="flex items...">
+            <div>
+            <div className="flex items...">
+              <Badge>
+              <CollapsibleTrigger asChild={true}>
+>               <button onClick={undefined}>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-...">
+>                   <button
+>                     data-slot="button"
+>                     className={"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disab..."}
+>                   >
+          ...
+
+<button> cannot contain a nested <button>.
+See this log for the ancestor stack trace.
+
+[90mstdout[2m | src/features/notes/components/PolaroidFilterBar.test.tsx[2m > [22m[2mPolaroidFilterBar[2m > [22m[2mrenders filter controls when expanded
+[22m[39mProcessing block: 1 Genre: Horror
+
+ [31mΓ¥»[39m src/features/notes/components/PolaroidFilterBar.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 160[2mms[22m[39m
+[31m     [31m├ù[31m renders when cine_polaroid blocks are present[39m[32m 130[2mms[22m[39m
+     [32mΓ£ô[39m does not render when no cine_polaroid blocks are present[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m renders filter controls when expanded[39m[32m 25[2mms[22m[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 2 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/features/notes/components/PolaroidFilterBar.test.tsx > PolaroidFilterBar > renders when cine_polaroid blocks are present
+ FAIL  src/features/notes/components/PolaroidFilterBar.test.tsx > PolaroidFilterBar > renders filter controls when expanded
+ReferenceError: ResizeObserver is not defined
+ Γ¥» node_modules/.pnpm/@radix-ui+react-use-size@1._9e8b6d41506b7da3b14e8b54326df806/node_modules/@radix-ui/react-use-size/dist/index.mjs:9:30
+ Γ¥» Object.react_stack_bottom_frame node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20
+ Γ¥» runWithFiberInDEV node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:874:13
+ Γ¥» commitHookEffectListMount node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29
+ Γ¥» commitHookLayoutEffects node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:13213:11
+ Γ¥» commitLayoutEffectOnFiber node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:13951:13
+ Γ¥» recursivelyTraverseLayoutEffects node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:15159:11
+ Γ¥» commitLayoutEffectOnFiber node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:13949:11
+ Γ¥» recursivelyTraverseLayoutEffects node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:15159:11
+ Γ¥» commitLayoutEffectOnFiber node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.development.js:14165:11
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/2]ΓÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+[2m   Start at [22m 10:35:32
+[2m   Duration [22m 4.53s[2m (transform 283ms, setup 0ms, collect 1.34s, tests 160ms, environment 2.50s, prepare 20ms)[22m
+

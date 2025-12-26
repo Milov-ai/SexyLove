@@ -12,6 +12,11 @@ import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { BlockRenderer } from "./BlockRenderer";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { PolaroidFilterBar } from "./PolaroidFilterBar";
+import {
+  usePolaroidFilter,
+  type FilterState,
+} from "../hooks/usePolaroidFilter";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "@/lib/supabase";
 import {
@@ -63,6 +68,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
     blocksRef.current = blocks;
   }, [blocks]);
 
+  // Polaroid Filters State
+  const [polaroidFilters, setPolaroidFilters] = useState<FilterState>({
+    searchQuery: "",
+    selectedGenre: null,
+    selectedYear: null,
+    selectedDirector: null,
+    watchedStatus: "all",
+    minRating: 0,
+  });
+
   // Derived State for Zoom
   const breadcrumbs = zoomedBlockId ? getBlockChain(blocks, zoomedBlockId) : [];
   const zoomedBlock =
@@ -70,6 +85,12 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
       ? breadcrumbs[breadcrumbs.length - 1]
       : null;
   const displayedBlocks = zoomedBlock ? zoomedBlock.children || [] : blocks;
+
+  // Filter Logic
+  const hiddenBlockIds = usePolaroidFilter(displayedBlocks, polaroidFilters);
+  const visibleBlocks = displayedBlocks.filter(
+    (b) => !hiddenBlockIds.has(b.id),
+  );
 
   // DnD Sensors
   const sensors = useSensors(
@@ -592,6 +613,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
               </motion.div>
             )}
 
+            {/* Polaroid Filters */}
+            <PolaroidFilterBar
+              blocks={displayedBlocks}
+              filters={polaroidFilters}
+              onFilterChange={(updates) =>
+                setPolaroidFilters((prev) => ({ ...prev, ...updates }))
+              }
+              className="mb-4"
+            />
+
             {/* Blocks */}
             <DndContext
               sensors={sensors}
@@ -600,12 +631,12 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={displayedBlocks.map((b) => b.id)}
+                items={visibleBlocks.map((b) => b.id)}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-1">
-                  {displayedBlocks.length > 0 ? (
-                    displayedBlocks.map((block) => (
+                  {visibleBlocks.length > 0 ? (
+                    visibleBlocks.map((block) => (
                       <BlockRenderer
                         key={block.id}
                         block={block}

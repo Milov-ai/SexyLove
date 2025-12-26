@@ -12,7 +12,7 @@ interface BlockProps {
   onChange: (id: string, updates: Partial<Block>) => void;
 }
 
-interface CinePolaroidProps {
+export interface CinePolaroidProps {
   imageUrl?: string;
   title?: string;
   year?: string;
