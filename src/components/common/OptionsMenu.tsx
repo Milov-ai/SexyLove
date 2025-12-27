@@ -16,7 +16,9 @@ import {
   Building,
   Tag,
   Pencil,
+  Bell,
 } from "lucide-react";
+import { notificationService } from "../../services/NotificationService";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -58,6 +60,14 @@ const OptionsMenu = ({
       >
         <Sparkles className="mr-2 h-4 w-4" />
         Fantasies
+      </Button>
+      <Button
+        variant="ghost"
+        onClick={() => notificationService.scheduleTestNotification()}
+        className="justify-start text-pink-500 hover:text-pink-600 hover:bg-pink-50"
+      >
+        <Bell className="mr-2 h-4 w-4" />
+        Test Notification
       </Button>
       <div className="flex items-center justify-between rounded-lg border p-3">
         <div className="flex items-center space-x-2">

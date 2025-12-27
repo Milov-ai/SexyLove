@@ -12,7 +12,7 @@ Total Tasks: 9
 
 **Dependencies:** None
 
-- [/] 1.0 Decouple `NoteEditor` state
+- [x] 1.0 Decouple `NoteEditor` state
   - [x] 1.1 Write 2-8 focused tests for `NoteEditor` state logic
     - Test initial hydration from `note` prop.
     - Test that subsequent `note` prop updates (simulating auto-save echo) do NOT overwrite local state if `lastEdited` is recent.
@@ -23,7 +23,7 @@ Total Tasks: 9
     - Remove the dependency on `note.content` in the block hydration effect after the first render.
     - Implement a `isDirty` or `localLastModified` ref to track local changes.
     - Ensure `updateNote` is called only after the debounce period.
-  - [ ] 1.4 Ensure state tests pass
+  - [x] 1.4 Ensure state tests pass
     - Run ONLY the 2-8 tests written in 1.1.
     - Verify that rapid typing does not trigger re-renders from upstream props.
 
@@ -37,7 +37,7 @@ Total Tasks: 9
 
 **Dependencies:** Task Group 1
 
-- [/] 2.0 Optimize Block Rendering & Identity
+- [x] 2.0 Optimize Block Rendering & Identity
   - [x] 2.1 Write 2-8 focused tests for `BlockRenderer` stability
     - Test that creating a new block (Enter) generates a stable ID.
     - Test that `BlockRenderer` does not re-render siblings when one block updates its content.
@@ -53,7 +53,7 @@ Total Tasks: 9
     - Create new blocks with Enter.
     - Move blocks via drag-and-drop.
     - Confirm component stability (no disappearances).
-  - [ ] 2.5 Ensure rendering tests pass
+  - [x] 2.5 Ensure rendering tests pass
     - Run ONLY the 2-8 tests written in 2.1.
 
 **Acceptance Criteria:**
@@ -68,10 +68,10 @@ Total Tasks: 9
 
 **Dependencies:** Task Groups 1-2
 
-- [ ] 3.0 Final Regression Check
-  - [ ] 3.1 Analyze text input behavior on mobile
+- [x] 3.0 Final Regression Check
+  - [x] 3.1 Analyze text input behavior on mobile
     - Verify fix on the specific Android device (via browser or APK).
-  - [ ] 3.2 Verify legacy data compatibility
+  - [x] 3.2 Verify legacy data compatibility
     - Open an existing old note and ensure it loads/saves correctly without data loss.
 
 **Acceptance Criteria:**
