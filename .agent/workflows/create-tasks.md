@@ -1,31 +1,88 @@
 ---
-description: Generate the granular atomic checklist and Sync with GitHub Project Board.
+description: "Generate the granular atomic checklist and Sync with GitHub Project Board."
 ---
 
-1.  **Input Analysis**:
-    - **Read**: `agent-os/specs/[feature]/spec.md`.
-    - **Context**: Ensure you know the _current phase_ to set the correct Project Board status.
+# /create-tasks
 
-2.  **Brainstorming (Atomic Breakdown)**:
-    - **Tool**: `mcp_sequential-thinking_sequentialthinking`.
-    - **Constraint**: Tasks must be atomic (<1hr). Group by "Setup", "Backend", "Frontend", "Verify".
+> **Role**: Task Breakdown | **Phase**: 1
+> **Purpose**: Atomic task creation + GitHub Issue + Board sync
+> **Next**: `/orchestrate-tasks`
 
-3.  **Generation (`tasks.md`)**:
-    - **Write**: `agent-os/specs/[feature]/tasks.md`.
-    - **Format**: `-[ ] Task Description` (Markdown checkboxes).
+---
 
-4.  **GitHub Synchronization (Total Sync)**:
-    - **Issue Creation**:
-      ```bash
-      gh issue create --title "feat: [Feature Name]" --body-file agent-os/specs/[feature]/context.md
-      ```
-    - **Project Board**:
-      - **Action**: Link the new issue to the "Agent OS" (or active) Project Board.
-      - **Command**: `gh project item-create --owner [Owner] --project [Project] --format json` (or manual linkage instructions if ID unknown).
-    - **Branch**:
-      ```bash
-      git checkout -b feature/[feature-name]
-      git push -u origin feature/[feature-name]
-      ```
+## 📋 Detailed Instructions
 
-5.  **Notify**: "Tasks generated. Issue created & linked to Board. Branch pushed. Next: `/orchestrate-tasks` (The Manager) - Strictly following the specification in `.agent/workflows/orchestrate-tasks.md` ALONG WITH any specific instructions defined in the current task context."
+**For complete step-by-step execution, read:**
+
+```
+agent-os/commands/create-tasks/create-tasks.md
+```
+
+---
+
+## 🛠️ MCP Enhancement
+
+**Use Sequential Thinking for task breakdown:**
+
+```
+mcp_sequential-thinking_sequentialthinking
+  thought: "Breaking down [feature] into atomic tasks.
+            Rules: Each task < 1 hour, independently testable.
+            Groups: Setup, Backend, Frontend, Verify."
+  thoughtNumber: 1
+  totalThoughts: 5
+  nextThoughtNeeded: true
+```
+
+---
+
+## 🔄 GitHub Sync Protocol
+
+### 1. Create Issue
+
+```bash
+gh issue create \
+  --title "feat: [Feature Name]" \
+  --body-file agent-os/specs/[feature]/context.md \
+  --label "enhancement"
+```
+
+### 2. Link to Project Board
+
+```bash
+# Get issue URL
+ISSUE_URL=$(gh issue view [NUMBER] --json url -q '.url')
+
+# Add to project
+gh project item-add [PROJECT_NUMBER] --owner [OWNER] --url $ISSUE_URL
+```
+
+### 3. Create & Push Branch
+
+```bash
+git checkout -b feature/[feature-slug]
+git add agent-os/specs/[feature]/
+git commit -m "chore: initialize spec for [feature]"
+git push -u origin feature/[feature-slug]
+```
+
+---
+
+## ✅ Verification
+
+- [ ] `tasks.md` has atomic tasks grouped by category
+- [ ] GitHub Issue created
+- [ ] Issue linked to Project Board
+- [ ] Branch pushed to remote
+
+---
+
+## 🔗 Handoff
+
+```
+Tasks generated: [N] atomic tasks
+GitHub Issue: #[number]
+Branch: feature/[feature-slug]
+
+Next: /orchestrate-tasks
+```

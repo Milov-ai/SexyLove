@@ -27,9 +27,10 @@
 - [x] Update `src/plugins/CustomNotification.ts` with `SupremeNotificationOptions` interface
 - [x] Update `src/services/NotificationService.ts` implementation
   - _Context_: Add `scheduleSupremeNotification` method.
+- [x] Refine Supreme Notification (Dynamic background color support)
 
 ## Verification
 
-- [ ] Build Android Project
-- [ ] Visual Verification (Layout correctness)
-- [ ] Interaction Verification (Button clicks work)
+- [x] Build Android Project
+- [x] Visual Verification (Layout correctness)
+- [x] Interaction Verification (Button clicks work)

@@ -1,43 +1,64 @@
 ---
-description: Initialize the directory structure and Atomic Artifacts for a new feature.
+description: "Initialize the directory structure and Atomic Artifacts for a new feature."
 ---
 
-1.  **Input Analysis**:
-    - **Action**: Ask user for Feature Name (e.g., `auth-flow`).
-    - **Action**: Ask user for "Mission Goal" (to populate Context).
+# /shape-spec
 
-2.  **Scaffolding (Atomic Structure)**:
-    - **Directory**: `mkdir -p agent-os/specs/[YYYY-MM-DD]-[feature-name]/verifications`.
-    - **Files**:
-      - `touch agent-os/specs/[...]/spec.md` (Native).
-      - `touch agent-os/specs/[...]/tasks.md` (Native).
-      - `touch agent-os/specs/[...]/execution_log.md` (Atomic).
-      - `touch agent-os/specs/[...]/context.md` (Atomic).
-      - `touch agent-os/specs/[...]/decisions.md` (Atomic).
+> **Role**: Scaffolding | **Phase**: 1
+> **Purpose**: Create spec directory with atomic artifacts
+> **Next**: `/write-spec`
 
-3.  **Context Engineering (Seed the Brain)**:
-    - **Write `context.md`**:
+---
 
-      ```markdown
-      # Context: [Feature Name]
+## 📋 Detailed Instructions
 
-      ## Goal
+**For complete step-by-step execution, read:**
 
-      [User Goal]
+```
+agent-os/commands/shape-spec/shape-spec.md
+```
 
-      ## Definition of Done
+---
 
-      - [ ] All tasks in tasks.md completed.
-      - [ ] Build passes.
-      - [ ] Tests pass.
-      ```
+## 🚀 Quick Reference
 
-    - **Write `execution_log.md`**:
+### Required Inputs
 
-      ```markdown
-      # Execution Log
+| Input        | Description            | Example                 |
+| ------------ | ---------------------- | ----------------------- |
+| Feature Slug | kebab-case identifier  | `comment-reactions`     |
+| Mission Goal | 1-2 sentence objective | "Allow emoji reactions" |
 
-      [Timestamp] Spec shaped.
-      ```
+### Directory Structure Created
 
-4.  **Notify**: "Spec shaped at `agent-os/specs/[...]`. Context initialized. Next: `/write-spec` strictly following the specification in `.agent/workflows/write-spec.md` ALONG WITH any specific instructions defined in the current task context."
+```
+agent-os/specs/[YYYY-MM-DD]-[feature-slug]/
+├── context.md          # Goal, scope, constraints
+├── spec.md             # Technical design (empty)
+├── tasks.md            # Checklist (empty)
+├── decisions.md        # ADRs (empty)
+├── execution_log.md    # Action journal
+├── planning/
+│   ├── requirements.md
+│   └── visuals/
+└── verifications/
+```
+
+---
+
+## ✅ Verification
+
+- [ ] Spec directory created
+- [ ] `context.md` populated with goal
+- [ ] `execution_log.md` has initial entry
+
+---
+
+## 🔗 Handoff
+
+```
+Spec shaped at: agent-os/specs/[DATE]-[feature-slug]/
+Context initialized. Artifacts ready.
+
+Next: /write-spec
+```

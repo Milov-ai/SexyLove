@@ -112,12 +112,20 @@ class CustomNotificationPlugin : Plugin() {
                 val identityName = call.getString("identityName") ?: "SexyLove"
                 val emoji = call.getString("emoji") ?: "✨"
                 val heroImage = call.getString("heroImage") // URL or Path
-                val actions = call.getArray("actions") // JSON Array of actions
+                val backgroundColor = call.getString("backgroundColor") ?: "#FF69B4"
                 
                 Log.d(TAG, "Building Supreme Notification with Hero: $heroImage")
 
                 // 1. Prepare RemoteViews
                 val remoteViews = RemoteViews(context.packageName, R.layout.notification_supreme)
+                
+                // 1.1 Set Background Color
+                try {
+                    val bgColor = Color.parseColor(backgroundColor)
+                    remoteViews.setInt(R.id.notification_root, "setBackgroundColor", bgColor)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Invalid color: $backgroundColor", e)
+                }
                 
                 // 2. Bind Text
                 remoteViews.setTextViewText(R.id.notification_title, title)

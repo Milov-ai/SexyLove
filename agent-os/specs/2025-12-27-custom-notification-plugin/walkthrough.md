@@ -14,6 +14,7 @@ We have implemented a "Supreme" custom notification system for Android, enabling
   - Intercepts notification clicks (`ACTION_NOTIFICATION_CLICK`) and broadcasts them to the Capacitor plugin.
 - **Manifest**: Updated `AndroidManifest.xml`
   - Registered `<receiver android:name=".NotificationReceiver" ... />`.
+- **Supreme Refinement**: Added dynamic background color support to the root layout (`notification_root`).
 
 ### 2. Plugin Logic (`CustomNotificationPlugin.kt`)
 
@@ -31,7 +32,8 @@ We have implemented a "Supreme" custom notification system for Android, enabling
 
 ### Prerequisites
 
-> [!IMPORTANT] > **Java 11+ Required**: The Android build system (AGP 8.x) requires a Java 11 (or higher) JDK. The current environment is using Java 8, which prevents the build from completing.
+> [!IMPORTANT]
+> **Environment Resolved**: The build was successfully executed using the Android Studio bundled JDK 21 found at `C:\Program Files\Android\Android Studio\jbr`.
 
 ### 1. Build the Project
 

@@ -1,25 +1,107 @@
 ---
-description: Draft the technical specification using MCPs for validation.
+description: "Draft the technical specification using MCPs for validation."
 ---
 
-1.  **Context Loading**:
-    - **Read**: `agent-os/specs/[feature]/context.md`.
-    - **Read**: `agent-os/specs/[feature]/decisions.md`.
+# /write-spec
 
-2.  **Technical Discovery (MCPs)**:
-    - **UI**: `mcp_shadcn_search_items_in_registries` (Check availability).
-    - **DB**: `mcp_supabase-mcp-server_list_tables` (Check schema).
-    - **Logic**: `grep_search` (Check existing patterns).
+> **Role**: Technical Design | **Phase**: 1
+> **Purpose**: Create detailed technical spec with MCP discovery
+> **Next**: `/validate-spec`
 
-3.  **Drafting (`spec.md`)**:
-    - **Action**: Write to `agent-os/specs/[feature]/spec.md`.
-    - **Structure**:
-      - **Goal**: (From Context).
-      - **Schema Changes**: (SQL).
-      - **New Components**: (Shadcn names).
-      - **API Changes**: (Edge Functions).
+---
 
-4.  **Decision Recording**:
-    - **Action**: Update `decisions.md` with any new Architectural Decisions made during discovery (e.g., "Use Optimistic UI").
+## 📋 Detailed Instructions
 
-5.  **Notify**: "Spec drafted. Next: `/create-tasks` strictly following the specification in `.agent/workflows/create-tasks.md` ALONG WITH any specific instructions defined in the current task context."
+**For complete step-by-step execution, read:**
+
+```
+agent-os/commands/write-spec/write-spec.md
+```
+
+---
+
+## 🛠️ MCP Integration
+
+### Database Discovery (Supabase)
+
+```
+mcp_supabase-mcp-server_list_tables
+  project_id: [from context]
+  schemas: ["public"]
+```
+
+```
+mcp_supabase-mcp-server_execute_sql
+  project_id: [from context]
+  query: "SELECT column_name, data_type FROM information_schema.columns
+          WHERE table_name = '[table]'"
+```
+
+### UI Component Discovery (Shadcn)
+
+```
+mcp_shadcn_search_items_in_registries
+  registries: ["@shadcn"]
+  query: "[component type]"
+```
+
+### Strategic Planning
+
+```
+mcp_sequential-thinking_sequentialthinking
+  thought: "Planning implementation for [feature]..."
+  thoughtNumber: 1
+  totalThoughts: 5
+  nextThoughtNeeded: true
+```
+
+---
+
+## 📝 Spec Structure
+
+Write to `agent-os/specs/[feature]/spec.md`:
+
+```markdown
+# Specification: [Feature Name]
+
+## Goal
+
+[1-2 sentences]
+
+## User Stories
+
+- As a [user], I want to [action] so that [benefit]
+
+## Specific Requirements
+
+**Requirement Name**
+
+- [Sub-requirements]
+
+## Existing Code to Leverage
+
+**Code/Component**
+
+- [How to reuse]
+
+## Out of Scope
+
+- [Excluded items]
+```
+
+---
+
+## ✅ Verification
+
+- [ ] `spec.md` has all required sections
+- [ ] Database schema documented
+- [ ] Components identified
+
+---
+
+## 🔗 Handoff
+
+```
+Spec drafted at: agent-os/specs/[feature]/spec.md
+Next: /validate-spec
+```

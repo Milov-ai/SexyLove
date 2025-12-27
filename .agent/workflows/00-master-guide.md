@@ -2,136 +2,158 @@
 description: "MASTER GUIDE: The definitive Agent OS lifecycle with Atomic Specification, MCP Synergy, and Total GitHub Sync."
 ---
 
-# Agent OS v2.0: Atomic Workflow Lifecycle
+# Agent OS v2.0: Unified Workflow System
 
-> **Protocol ID**: #AgentOS_Atomic_Lifecycle_v2
+> **Protocol ID**: #AgentOS_Unified_v2
 > **Status**: ACTIVE | UNIVERSAL SPECIFICATION
-> **Total Workflows**: 15
+
+---
+
+## 🚀 AI Entry Point Protocol
+
+**CRITICAL**: When starting a new AI chat session, ALWAYS:
+
+1. **Read this file first** to understand the workflow system
+2. **Load active context** from `agent-os/specs/[most-recent-spec]/context.md`
+3. **Check status** with `/check-status` to understand current state
+4. **Reference detailed instructions** in `agent-os/commands/[command]/`
+
+---
+
+## 📂 Architecture Overview
+
+```
+.agent/workflows/           ← Quick-reference workflows (this directory)
+   └── Points to...
+
+agent-os/                   ← Detailed instructions & artifacts
+   ├── agent-connector.md   ← Command mapping reference
+   ├── commands/            ← DETAILED step-by-step instructions
+   │   ├── plan-product/
+   │   ├── shape-spec/
+   │   ├── write-spec/
+   │   ├── create-tasks/
+   │   ├── orchestrate-tasks/
+   │   └── implement-tasks/
+   ├── product/             ← Mission, roadmap, tech-stack
+   ├── specs/               ← Feature specifications
+   └── standards/           ← Coding standards
+```
 
 ---
 
 ## 🔒 Core Axioms
 
-1. **Atomic Precision**: Every step has explicit inputs, outputs, and verification.
-2. **MCP Synergy**: Sequential Thinking for ALL complex decisions. Supabase/Shadcn for discovery.
-3. **Total Sync**: Every completed action triggers Git push. No orphan work.
-4. **Strict Adherence**: Execute EXACTLY as specified. No shortcuts.
+1. **Context First**: Always load existing context before any action
+2. **Atomic Precision**: Every step has explicit inputs, outputs, verification
+3. **MCP Synergy**: Sequential Thinking for ALL complex decisions
+4. **Total Sync**: Every action triggers Git + GitHub sync
+5. **Reference Commands**: `.agent/workflows` → `agent-os/commands/`
 
 ---
 
 ## 🛠️ MCP Integration Matrix
 
-| MCP Server            | Primary Tools                                                          | Used In                                     |
-| --------------------- | ---------------------------------------------------------------------- | ------------------------------------------- |
-| `sequential-thinking` | `sequentialthinking`                                                   | ALL complex decisions                       |
-| `supabase-mcp-server` | `list_tables`, `execute_sql`, `apply_migration`, `get_advisors`        | write-spec, implement-tasks, verify-feature |
-| `shadcn`              | `search_items`, `view_items`, `get_add_command`, `get_audit_checklist` | write-spec, implement-tasks, verify-feature |
+| MCP Server            | Primary Tools                                                          | Usage                          |
+| --------------------- | ---------------------------------------------------------------------- | ------------------------------ |
+| `sequential-thinking` | `sequentialthinking`                                                   | All complex planning/debugging |
+| `supabase-mcp-server` | `list_tables`, `execute_sql`, `apply_migration`, `get_advisors`        | Schema, migrations, security   |
+| `shadcn`              | `search_items`, `view_items`, `get_add_command`, `get_audit_checklist` | UI components                  |
 
 ---
 
-## 🚀 The Execution Flow
+## 📋 Command Reference
 
-### Phase 0: Orientation 🧭
+### Phase 0: Orientation
 
-| Command         | Purpose                           |
-| --------------- | --------------------------------- |
-| `/check-status` | Verify branch, tasks, GitHub sync |
-| `/check-health` | Lint, build, test, DB advisors    |
+| Command         | Purpose              | Detailed Instructions              |
+| --------------- | -------------------- | ---------------------------------- |
+| `/check-status` | Verify current state | `.agent/workflows/check-status.md` |
+| `/check-health` | Lint, build, test    | `.agent/workflows/check-health.md` |
 
-### Phase 1: Inception & Context 📐
+### Phase 1: Inception
 
-| #   | Command          | Purpose                                 | Next                 |
-| --- | ---------------- | --------------------------------------- | -------------------- |
-| 1   | `/plan-product`  | Update roadmap, define vision           | `/shape-spec`        |
-| 2   | `/shape-spec`    | Scaffold directory + atomic artifacts   | `/write-spec`        |
-| 3   | `/write-spec`    | Technical design with MCP discovery     | `/validate-spec`     |
-| 4   | `/validate-spec` | Verify spec completeness                | `/create-tasks`      |
-| 5   | `/create-tasks`  | Atomic checklist + GitHub Issue + Board | `/orchestrate-tasks` |
+| Command          | Purpose           | Detailed Instructions                            |
+| ---------------- | ----------------- | ------------------------------------------------ |
+| `/plan-product`  | Vision & roadmap  | `agent-os/commands/plan-product/plan-product.md` |
+| `/shape-spec`    | Scaffold spec dir | `agent-os/commands/shape-spec/shape-spec.md`     |
+| `/write-spec`    | Technical design  | `agent-os/commands/write-spec/write-spec.md`     |
+| `/validate-spec` | Quality gate      | `.agent/workflows/validate-spec.md`              |
+| `/create-tasks`  | Task breakdown    | `agent-os/commands/create-tasks/create-tasks.md` |
 
-### Phase 2: Implementation Loop 🔄
+### Phase 2: Implementation
 
-```
-┌─────────────────────────────────────────────────────┐
-│                                                     │
-│  /orchestrate-tasks ──► /implement-tasks            │
-│         ▲                      │                    │
-│         │                      ▼                    │
-│         │              [Build/Test]                 │
-│         │                 │    │                    │
-│         │           PASS◄─┘    └─►FAIL              │
-│         │                           │               │
-│         │    /commit-sync           ▼               │
-│         │         │           /fix-error            │
-│         │         │                 │               │
-│         └─────────┴─────────────────┘               │
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
+| Command              | Purpose        | Detailed Instructions                                      |
+| -------------------- | -------------- | ---------------------------------------------------------- |
+| `/orchestrate-tasks` | Task selection | `agent-os/commands/orchestrate-tasks/orchestrate-tasks.md` |
+| `/implement-tasks`   | Code execution | `agent-os/commands/implement-tasks/implement-tasks.md`     |
+| `/fix-error`         | Error recovery | `.agent/workflows/fix-error.md`                            |
+| `/commit-sync`       | Git operations | `.agent/workflows/commit-sync.md`                          |
 
-### Phase 3: Finalization 🚢
+### Phase 3: Finalization
 
-| #   | Command             | Purpose                            | Next                |
-| --- | ------------------- | ---------------------------------- | ------------------- |
-| 1   | `/verify-feature`   | QA with artifacts + security check | `/finalize-feature` |
-| 2   | `/finalize-feature` | Merge PR, update board, cleanup    | DONE                |
-| E   | `/rollback`         | Emergency: revert changes          | Investigate         |
+| Command             | Purpose           | Detailed Instructions                  |
+| ------------------- | ----------------- | -------------------------------------- |
+| `/verify-feature`   | QA with artifacts | `.agent/workflows/verify-feature.md`   |
+| `/finalize-feature` | Merge & cleanup   | `.agent/workflows/finalize-feature.md` |
+| `/rollback`         | Emergency revert  | `.agent/workflows/rollback.md`         |
 
 ---
 
-## 📁 Spec Directory Structure
+## 🔄 GitHub Sync Protocol
 
+### Issue Linking to Project Board
+
+When creating tasks (`/create-tasks`):
+
+```bash
+# 1. Create issue
+gh issue create --title "feat: [Feature]" --body-file context.md
+
+# 2. Get issue URL
+ISSUE_URL=$(gh issue view [NUMBER] --json url -q '.url')
+
+# 3. Add to project board
+gh project item-add [PROJECT_NUMBER] --owner [OWNER] --url $ISSUE_URL
+
+# 4. Update status
+gh project item-edit --id [ITEM_ID] --field "Status" --value "In Progress"
 ```
-agent-os/specs/[YYYY-MM-DD]-[feature-name]/
-├── context.md          # Goal, scope, constraints
-├── spec.md             # Schema, components, APIs
-├── decisions.md        # Architectural decisions
-├── tasks.md            # Atomic task checklist
-├── execution_log.md    # Timestamped actions
-└── verifications/
-    ├── walkthrough.md
-    └── final-verification.md
-```
+
+### Continuous Sync
+
+- Every `/commit-sync` pushes to remote
+- Every task completion updates issue comments
+- `/finalize-feature` updates board to "Done"
 
 ---
 
-## 📋 Complete Workflow List (15)
+## 📁 Context Loading Protocol
 
-| #   | File                   | Role         | Phase |
-| --- | ---------------------- | ------------ | ----- |
-| 1   | `00-master-guide.md`   | Reference    | -     |
-| 2   | `check-status.md`      | Orientation  | 0     |
-| 3   | `check-health.md`      | Verification | 0     |
-| 4   | `plan-product.md`      | Strategic    | 1     |
-| 5   | `shape-spec.md`        | Scaffolding  | 1     |
-| 6   | `write-spec.md`        | Design       | 1     |
-| 7   | `validate-spec.md`     | Gate         | 1     |
-| 8   | `create-tasks.md`      | Breakdown    | 1     |
-| 9   | `orchestrate-tasks.md` | Manager      | 2     |
-| 10  | `implement-tasks.md`   | Worker       | 2     |
-| 11  | `fix-error.md`         | Healer       | 2     |
-| 12  | `commit-sync.md`       | Git Ops      | 2     |
-| 13  | `verify-feature.md`    | QA           | 3     |
-| 14  | `finalize-feature.md`  | Release      | 3     |
-| 15  | `rollback.md`          | Emergency    | E     |
+**At session start**, read in this order:
+
+1. `agent-os/product/mission.md` (product vision)
+2. `agent-os/product/roadmap.md` (current priorities)
+3. `agent-os/specs/[most-recent]/context.md` (active feature)
+4. `agent-os/specs/[most-recent]/tasks.md` (current progress)
+5. `agent-os/specs/[most-recent]/execution_log.md` (history)
 
 ---
 
-## 💡 Usage Example
+## 💡 Quick Start
 
 ```text
-User: "Add comment reactions"
+# New feature
+1. /check-status           → Understand current state
+2. /plan-product           → Update roadmap (if new vision)
+3. /shape-spec "feature"   → Create spec directory
+4. /write-spec             → Technical design
+5. /create-tasks           → Breakdown + GitHub sync
+6. /orchestrate-tasks      → Start implementation loop
 
-1.  /check-status           → Branch: main, clean state
-2.  /shape-spec "reactions" → Creates agent-os/specs/2025-12-27-reactions/
-3.  /write-spec             → Uses Supabase + Shadcn MCPs
-4.  /validate-spec          → Confirms completeness
-5.  /create-tasks           → Issue #45, Board link, Branch push
-6.  /orchestrate-tasks      → Picks first task
-7.  /implement-tasks        → Executes, logs, tests
-8.  /commit-sync            → Commits, pushes
-9.  (loop 6-8 until done)
-10. /verify-feature         → Security check, artifacts
-11. /finalize-feature       → Merge, board update
+# Resume work
+1. /check-status           → Find active spec
+2. /orchestrate-tasks      → Continue where left off
 ```
 
 ---
@@ -142,5 +164,5 @@ On ANY failure:
 
 1. **STOP** current action
 2. Log error to `execution_log.md`
-3. Run `/fix-error`
+3. Run `/fix-error` (uses Sequential Thinking)
 4. If unrecoverable, run `/rollback`
