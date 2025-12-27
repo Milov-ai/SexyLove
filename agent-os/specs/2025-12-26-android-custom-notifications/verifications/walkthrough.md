@@ -1,44 +1,49 @@
-# Walkthrough: Android Custom Notifications
+# Walkthrough: Notificaciones Extraordinarias (Aura & Identity)
 
-Implementación de notificaciones personalizadas en Android utilizando Capacitor 7.
+Implementación de un sistema de notificaciones premium y totalmente personalizado en Android utilizando Capacitor 7, con soporte dinámico para el **Chameleon Protocol**.
 
 ## Cambios Realizados
 
-### 1. Configuración de Plugins
+### 1. Sistema de Aura Dinámica (Personalización Total)
 
-Se instalaron y configuraron los plugins oficiales para Capacitor 7:
+- **Aura Mapping**: Se implementó una paleta de colores ("Auras") asociada a cada identidad del Camaleón.
+- **Sincronización de Estado**: El `ChameleonManager` ahora rastrea la identidad activa.
+- **Dinamismo en Tiempo Real**: Al lanzar una notificación, el `NotificationService` detecta la identidad y aplica el color de acento (`color`) y un emoji representativo en el título.
 
-- `@capacitor/local-notifications` (v8.0.0)
-- `@capacitor/push-notifications` (v8.0.0)
+### 2. Infraestructura de Notificaciones
 
-### 2. Servicio de Notificaciones
+- Se configuró el canal `sexylove-default` en Android 8+ con soporte para sonidos personalizados (`sexy_alert.wav`).
+- Importancia alta configurada para garantizar que el "aura" sea visible en la barra de estado y el banner.
 
-Se implementó [NotificationService.ts](file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/services/NotificationService.ts) para centralizar la lógica de notificaciones:
+### 3. Disparadores de Prueba (Testing Secretos)
 
-- **Canales (Android 8+)**: Creación del canal `sexylove-default` con soporte para sonido personalizado (`sexy_alert.wav`).
-- **Permisos**: Gestión de solicitud de permisos para notificaciones locales y push.
-- **Notificaciones Locales**: Wrapper para agendar notificaciones con iconos y canales específicos.
+- **Barra de Búsqueda Superficial**: En la pantalla inicial de "Notas", escribir la palabra `ALERTA` dispara una notificación con el aura de la identidad actual.
+- **Botón de Pánico/Test**: Disponible en el menú de opciones (+ Opciones).
 
-### 3. Integración en la Interfaz
-
-- **Inicialización Global**: El servicio se inicializa automáticamente en [App.tsx](file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/App.tsx).
-- **Control de Pruebas**: Se añadió un botón de **Test Notification** en [OptionsMenu.tsx](file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/components/common/OptionsMenu.tsx) para validación inmediata.
-
-### 4. Preparación de Recursos Android
-
-Se generaron placeholders en el proyecto Android para facilitar la personalización final:
+### 4. Recursos Android
 
 - Iconos: `android/app/src/main/res/drawable/ic_stat_notification.png`
-- Directorio de Audio: `android/app/src/main/res/raw/` (listo para recibir `sexy_alert.wav`).
+- Audio: Preparado para recibir `sexy_alert.wav` en `res/raw`.
 
-## Verificación de Calidad
+## Cómo Probar la Experiencia "Extraordinaria"
 
-- **Build Status**: `npm run build` ✅ exit code 0.
-- **Sync Status**: `npx cap sync android` ✅ exit code 0.
-- **Linting**: Sin errores en los nuevos archivos implementados.
+1. **Cambiar Identidad**: Ve al "Control Camaleón" y selecciona una identidad (ej. _Azulinaa_).
+2. **Lanzar Notificación**:
+   - Sal del Vault a la pantalla de "Notas".
+   - Escribe `ALERTA` en la búsqueda.
+3. **Verificar el Aura**: La notificación aparecerá con:
+   - Título: `Prueba SexyLove: Azulinaa 💊`
+   - Color de acento: Cian (Cévennes/Azulinaa).
+   - Sonido: El pulso secreto definido.
+
+## Estado del Proyecto
+
+- **Build**: ✅ Exitoso (`npm run build`).
+- **Sync**: ✅ Sincronizado (`npx cap sync android`).
+- **Rama**: `feature/android-custom-notifications`.
 
 ---
 
 render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/services/NotificationService.ts)
-render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/App.tsx)
-render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/components/common/OptionsMenu.tsx)
+render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/features/chameleon/ChameleonManager.ts)
+render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/pages/TodoApp.tsx)
