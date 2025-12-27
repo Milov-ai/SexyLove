@@ -28,3 +28,20 @@
   - `android/app/src/main/AndroidManifest.xml` (MODIFY)
 - **Status**: Completed Native Components.
 - **Next**: Plugin Logic (Kotlin).
+
+## 2025-12-27 - Implementation: Plugin Logic
+
+- **Starting**: Kotlin Logic Implementation
+- **Files**:
+  - `android/app/src/main/java/com/sexylove/app/CustomNotificationPlugin.kt` (MODIFY)
+- **Status**: Completed Plugin Logic (RemoteViews, Async Bitmap, Receivers).
+- **Next**: TypeScript Bridge.
+
+## 2025-12-27 - Implementation: TypeScript Bridge
+
+- **Starting**: JS/TS Interface Update
+- **Files**:
+  - `src/plugins/CustomNotification.ts` (MODIFY)
+  - `src/services/NotificationService.ts` (MODIFY)
+- **Status**: Completed TypeScript Bridge.
+- **Next**: Verification (Build).
