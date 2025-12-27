@@ -1,0 +1,1 @@
+Verificar posibilidad de integrar minecraft a la app, sin que sea invasivo o inseguro y que pueda jugar mi novia y yo en disferentes dispositivos en la misma app pero diferente dispositivo, sin registrarse o etc

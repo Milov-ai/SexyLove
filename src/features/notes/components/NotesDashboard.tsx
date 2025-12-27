@@ -54,6 +54,8 @@ import { IdentitySelectorDialog } from "@/features/chameleon/components/Identity
 import { useEternitySync } from "@/features/proposal/hooks/useEternitySync";
 import { IconPicker } from "@/components/ui/IconPicker";
 import { notificationService } from "@/services/NotificationService";
+import { MinecraftLauncher } from "@/features/minecraft";
+import { MinecraftGame } from "@/features/minecraft";
 
 const NotesDashboard = () => {
   const {
@@ -89,6 +91,12 @@ const NotesDashboard = () => {
   const [showAuthScreen, setShowAuthScreen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [isChameleonOpen, setIsChameleonOpen] = useState(false);
+  const [isMinecraftOpen, setIsMinecraftOpen] = useState(false);
+  const [isMinecraftPlaying, setIsMinecraftPlaying] = useState(false);
+  const [minecraftParams, setMinecraftParams] = useState<{
+    username: string;
+    server: string;
+  } | null>(null);
   const [lastClickTime, setLastClickTime] = useState(0);
 
   // ETERNITY PROTOCOL: Sync Hook
@@ -412,6 +420,27 @@ const NotesDashboard = () => {
         onOpenChange={setIsChameleonOpen}
       />
 
+      <MinecraftLauncher
+        open={isMinecraftOpen}
+        onOpenChange={setIsMinecraftOpen}
+        onPlay={(params) => {
+          setMinecraftParams(params);
+          setIsMinecraftPlaying(true);
+          setIsMinecraftOpen(false);
+        }}
+      />
+
+      {isMinecraftPlaying && minecraftParams && (
+        <MinecraftGame
+          username={minecraftParams.username}
+          server={minecraftParams.server}
+          onClose={() => {
+            setIsMinecraftPlaying(false);
+            setMinecraftParams(null);
+          }}
+        />
+      )}
+
       <IconPicker
         open={isIconPickerOpen}
         onOpenChange={setIsIconPickerOpen}
@@ -555,6 +584,9 @@ const NotesDashboard = () => {
               const val = e.target.value;
               if (val === "#CHAMELEON" || val === "#777") {
                 setIsChameleonOpen(true);
+                setSearchQuery("");
+              } else if (val.toLowerCase() === "minecraft") {
+                setIsMinecraftOpen(true);
                 setSearchQuery("");
               } else {
                 setSearchQuery(val);
