@@ -1,9 +1,25 @@
 ---
-description: Create or update a technical specification for a feature following Agent OS standards.
+description: Draft the technical specification using MCPs for validation.
 ---
 
-1. **Plan**: Use `mcp_sequential-thinking_sequentialthinking` to plan the specification content and identify potential Github links.
-2. Read the instructions in `agent-os/commands/write-spec/write-spec.md`.
-3. Identify the target feature and locate its folder in `agent-os/specs/[feature-name]/`.
-4. Ensure the `requirements.md` file reflects the desired functionality.
-5. Synthesize the specification according to the Agent OS Spec Writer profile.
+1.  **Context Loading**:
+    - **Read**: `agent-os/specs/[feature]/context.md`.
+    - **Read**: `agent-os/specs/[feature]/decisions.md`.
+
+2.  **Technical Discovery (MCPs)**:
+    - **UI**: `mcp_shadcn_search_items_in_registries` (Check availability).
+    - **DB**: `mcp_supabase-mcp-server_list_tables` (Check schema).
+    - **Logic**: `grep_search` (Check existing patterns).
+
+3.  **Drafting (`spec.md`)**:
+    - **Action**: Write to `agent-os/specs/[feature]/spec.md`.
+    - **Structure**:
+      - **Goal**: (From Context).
+      - **Schema Changes**: (SQL).
+      - **New Components**: (Shadcn names).
+      - **API Changes**: (Edge Functions).
+
+4.  **Decision Recording**:
+    - **Action**: Update `decisions.md` with any new Architectural Decisions made during discovery (e.g., "Use Optimistic UI").
+
+5.  **Notify**: "Spec drafted. Next: `/create-tasks` strictly following the specification in `.agent/workflows/create-tasks.md`."

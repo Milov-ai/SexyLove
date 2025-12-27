@@ -1,51 +1,33 @@
 ---
-description: Execute the implementation of assigned tasks for a feature and sync with Github.
+description: The Worker. Execute implementation loop with Continuous GitHub Sync.
 ---
 
-1. **Github Setup**:
-   - Use `mcp_sequential-thinking_sequentialthinking` to plan.
-   - Run `git remote -v`.
-   - **Branch**: Ensure you are on the correct branch `feature/[feature-name]`.
-     - Check: `git branch`
-     - Create/Switch: `mcp_github-mcp-server_create_branch` or `git checkout -b feature/[name]`.
-   - **Project Status (In Progress)**:
-     - Find the Tracking Issue in the Project Board using `gh project item-list [ProjectNumber] --owner [Owner]`.
-     - Move it to the **"In Progress"** column:
-       - Get Project ID: Use the Project Number from context or list projects.
-       - Get Field IDs: `gh project field-list [ProjectNumber] --owner [Owner]`.
-       - Update Item: `gh project item-edit --project-id [ProjectID] --id [ItemID] --field-id [StatusFieldID] --single-select-option-id [InProgressOptionID]`.
+1.  **Total Context Loading**:
+    - **Read**: `agent-os/specs/[feature]/context.md`, `decisions.md`, `tasks.md`.
+    - **Git Sync**: `git pull origin feature/[name]` (Ensure we are up to date).
+    - **Log**: Append `## Starting Task: [Name]` to `execution_log.md`.
 
-2. Read the instructions in `agent-os/commands/implement-tasks/implement-tasks.md`.
-3. Identify pending tasks in `agent-os/specs/[feature-name]/tasks.md`.
-4. Implement the feature according to the `agent-os/standards/` and the technical spec.
-5. **Quality Assurance (Mandatory PREREQUISITE for Push)**:
-   - // turbo
-   - Run `run_command` 'npm run lint'.
-   - // turbo
-   - Run `run_command` 'npm run build' - **CRITICAL**: You MUST run build and ensure it passes before pushing. This catches rendering and type errors that lint might miss. Resolve all errors first.
+2.  **Atomic Planning**:
+    - **Tool**: `mcp_sequential-thinking_sequentialthinking`.
+    - **Goal**: Plan the specific code change.
 
-6. **Github Sync (Implementation Phase)**:
-   - **Push**: ONLY IF `npm run build` passed. Run `run_command` 'git push origin feature/[name]' (ensure upstream set).
-   - **Update Issue**:
-     - Find the Tracking Issue: `mcp_github-mcp-server_search_issues` (query="[Feature Name] is:issue").
-     - Update the issue body checkboxes to reflect completed tasks using `mcp_github-mcp-server_issue_write`.
-   - **Project Status (Done/Review)**:
-     - Move the Project Item to **"Ready for Review"** (or "Done") using `gh project item-edit` as described above (requiring `--project-id`).
-   - **Pull Request**:
-     - Check for existing PR: `mcp_github-mcp-server_search_pull_requests`.
-     - IF Ready for Verify/Review and NO PR exists: Create one using `mcp_github-mcp-server_create_pull_request`:
-       - base: "main"
-       - head: "feature/[name]"
-       - title: "feat: [Feature Name]"
-       - body: "Closes #[TrackingIssueNumber]\n\n## Implementation Details\n..."
+3.  **Execution (Code)**:
+    - **Action**: `mcp_shadcn_get_add_command`, `replace_file_content`, etc.
+    - **Log**: Track changes in `execution_log.md`.
 
-7. Self-verify with tests/screenshots and mark tasks as complete `[x]`.
-8. **Final Verification & Close**:
-   - Ask the user: "Does the feature work well? Are there any errors?"
-   - **IF Verified/No Errors**:
-     - Move the Project Item to **"Done"**:
-       - `gh project item-edit --project-id [ProjectID] --id [ItemID] --field-id [StatusFieldID] --single-select-option-id [DoneOptionID]`.
-     - **Merge to Main**:
-       - **Prerequisite**: Ensure all CI/CD checks have passed.
-       - Execution: `gh pr merge --squash --delete-branch` (Preferred for clean history) OR `--merge`.
-       - _Note_: The "Closes #[IssueID]" in the PR body will automatically close the tracking issue.
+4.  **Safety Net (Build & Test)**:
+    - **Action**: `npm run build` && `npm test`.
+    - **Control de Errores**:
+      - **IF FAILURE**: 🛑 STOP. Run `/fix-error` strictly following the specification in `.agent/workflows/fix-error.md`.
+      - **IF SUCCESS**: Proceed to Sync.
+
+5.  **Total GitHub Sync (The Commit)**:
+    - **Local**:
+      - Mark `[x]` in `tasks.md`.
+      - `git commit -am "feat: [Task Name]"`
+    - **Remote**:
+      - `git push origin feature/[name]` (Continuous Backup).
+    - **Project Board / Issue**:
+      - _Optional_: `gh issue comment [IssueID] --body "Completed: [Task Name]"` to keep the board alive.
+
+6.  **Loop**: Return to `/orchestrate-tasks` strictly following the specification in `.agent/workflows/orchestrate-tasks.md`.

@@ -1,25 +1,31 @@
 ---
-description: Generate a detailed tasks.md checklist for a specific feature implementation and sync with Github.
+description: Generate the granular atomic checklist and Sync with GitHub Project Board.
 ---
 
-1. Read the instructions in `agent-os/commands/create-tasks/create-tasks.md`.
-2. Analyze the relevant `requirements.md` and technical specs for the feature.
-3. Breakdown the implementation into atomic, testable steps.
-4. Create or update `agent-os/specs/[feature-name]/tasks.md`.
-5. **Github Integration (Traceability & Planning)**:
-   - **Plan**: Use `mcp_sequential-thinking_sequentialthinking` to plan the Github sync strategy.
-   - **Identify Context**: Run `git remote -v` to confirm the Repository Owner and Name.
-   - **Sync Issue**:
-     - Search for an existing Tracking Issue: `mcp_github-mcp-server_search_issues` (query="[Feature Name] is:issue").
-     - **IF Found**: Update the issue body with the new checklist from `tasks.md` using `mcp_github-mcp-server_issue_write` (method="update").
-     - **IF Not Found**: Create a new Tracking Issue using `mcp_github-mcp-server_issue_write` (method="create") with:
-       - Title: "Feature: [Feature Name]"
-       - Body: content of `tasks.md`
-       - Labels: `enhancement`, `planned`
-   - **Branch Strategy**:
-     - Check if a feature branch exists (`git branch --list`).
-     - If not, create one remotely using `mcp_github-mcp-server_create_branch` (name="feature/[feature-name]", from_branch="main") OR locally (`git checkout -b ...`).
-   - **Github Projects (V2 Boards) Integration**:
-     - Run `run_command` 'gh project list --owner [Owner]' to identify the active project (e.g., "Roadmap", "Backlog").
-     - Get the Project Number.
-     - Add the confirmed Tracking Issue to the Project: `run_command` 'gh project item-add [ProjectNumber] --owner [Owner] --url [IssueURL]'.
+1.  **Input Analysis**:
+    - **Read**: `agent-os/specs/[feature]/spec.md`.
+    - **Context**: Ensure you know the _current phase_ to set the correct Project Board status.
+
+2.  **Brainstorming (Atomic Breakdown)**:
+    - **Tool**: `mcp_sequential-thinking_sequentialthinking`.
+    - **Constraint**: Tasks must be atomic (<1hr). Group by "Setup", "Backend", "Frontend", "Verify".
+
+3.  **Generation (`tasks.md`)**:
+    - **Write**: `agent-os/specs/[feature]/tasks.md`.
+    - **Format**: `-[ ] Task Description` (Markdown checkboxes).
+
+4.  **GitHub Synchronization (Total Sync)**:
+    - **Issue Creation**:
+      ```bash
+      gh issue create --title "feat: [Feature Name]" --body-file agent-os/specs/[feature]/context.md
+      ```
+    - **Project Board**:
+      - **Action**: Link the new issue to the "Agent OS" (or active) Project Board.
+      - **Command**: `gh project item-create --owner [Owner] --project [Project] --format json` (or manual linkage instructions if ID unknown).
+    - **Branch**:
+      ```bash
+      git checkout -b feature/[feature-name]
+      git push -u origin feature/[feature-name]
+      ```
+
+5.  **Notify**: "Tasks generated. Issue created & linked to Board. Branch pushed. Next: `/orchestrate-tasks` (The Manager) - Strictly following the specification in `.agent/workflows/orchestrate-tasks.md`."
