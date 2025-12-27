@@ -1,0 +1,4 @@
+// This is a placeholder for a custom notification sound implementation.
+// In a real scenario, we would place a .wav file in android/app/src/main/res/raw/
+// For the purpose of verification, we will use the system default sound if no file is provided, 
+// but we will configure the code to look for 'sexy_alert'.

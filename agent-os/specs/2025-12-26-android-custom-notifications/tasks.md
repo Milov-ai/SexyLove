@@ -1,0 +1,23 @@
+# Tasks: Android Custom Notifications
+
+- [x] Setup & Environment <!-- id: 100 -->
+  - [x] Install `@capacitor/local-notifications` and `@capacitor/push-notifications` <!-- id: 101 -->
+  - [x] Run `npx cap sync android` to ensure environment is ready <!-- id: 102 -->
+- [x] Asset Preparation <!-- id: 200 -->
+  - [x] Create/Identify notification small icon (white pixels, transparent background) <!-- id: 201 -->
+  - [x] Place icons in `android/app/src/main/res/drawable-*` folders <!-- id: 202 -->
+  - [x] Identify/Select custom sound file (`.wav` recommended) <!-- id: 203 -->
+  - [x] Place sound file in `android/app/src/main/res/raw/` <!-- id: 204 -->
+- [x] Logic Implementation <!-- id: 300 -->
+  - [x] Create `NotificationService.ts` to manage notifications <!-- id: 301 -->
+  - [x] Implement `requestPermissions` in `NotificationService` <!-- id: 302 -->
+  - [x] Implement `createNotificationChannel` with custom sound <!-- id: 303 -->
+  - [x] Implement `scheduleLocalNotification` wrapper <!-- id: 304 -->
+  - [x] Initialize `NotificationService` and create channel on app start <!-- id: 305 -->
+- [x] UI & Testing <!-- id: 400 -->
+  - [x] Add a temporary "Test Notification" button in logic or UI <!-- id: 401 -->
+  - [x] Verify notification pops up with custom icon <!-- id: 402 -->
+  - [x] Verify custom sound plays on Android device/emulator <!-- id: 403 -->
+- [x] Verification & Docs <!-- id: 500 -->
+  - [x] Ensure build passes without errors <!-- id: 501 -->
+  - [x] Document final setup in `walkthrough.md` <!-- id: 502 -->

@@ -7,12 +7,16 @@ import { useEffect } from "react";
 import { ChameleonRemote } from "./features/chameleon/logic/ChameleonRemote";
 import { ProposalOverlay } from "@/features/proposal/components/ProposalOverlay";
 import { useEternitySync } from "@/features/proposal/hooks/useEternitySync";
+import { notificationService } from "./services/NotificationService";
 
 function App() {
   const { isAuthenticated, initialize } = useVaultStore();
 
   useEffect(() => {
     initialize();
+
+    // Initialize Notifications (Android focus)
+    notificationService.initialize();
 
     // GLOBAL SYNC: Listen to Supabase for identity changes
     ChameleonRemote.subscribe();

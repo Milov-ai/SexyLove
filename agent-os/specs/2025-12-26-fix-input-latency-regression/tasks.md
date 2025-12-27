@@ -4,4 +4,4 @@
 - [x] Refactor `NoteEditor.tsx`: Implement `debouncedSave` using `useCallback` and the `debounce` utility, reading strictly from refs.
 - [x] Refactor `NoteEditor.tsx`: Update `useEffect` to trigger `debouncedSave` on changes, strictly decoupled from component rendering.
 - [x] Harden `NoteEditor.tsx` Hydration: Add `isDirty` ref and prevent external overwrites if user has unsaved changes.
-- [/] Verify fix: internal build and strict type check.
+- [x] Verify fix: internal build and strict type check.
