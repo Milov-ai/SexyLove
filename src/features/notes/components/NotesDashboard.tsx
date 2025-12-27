@@ -53,6 +53,7 @@ import { IdentitySelectorDialog } from "@/features/chameleon/components/Identity
 
 import { useEternitySync } from "@/features/proposal/hooks/useEternitySync";
 import { IconPicker } from "@/components/ui/IconPicker";
+import { notificationService } from "@/services/NotificationService";
 
 const NotesDashboard = () => {
   const {
@@ -557,6 +558,7 @@ const NotesDashboard = () => {
                 setSearchQuery("");
               } else {
                 setSearchQuery(val);
+                notificationService.checkKeyword(val);
               }
             }}
             placeholder="Buscar..."

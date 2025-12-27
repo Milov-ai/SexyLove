@@ -13,3 +13,4 @@
   [2025-12-26 23:52] Re-implemented keyword trigger `ALERTA` in the main search bar (`LugaresCollapsible.tsx`) as requested. Removed chat trigger.
   [2025-12-26 23:56] Implemented "Aura" system: notifications now sync color and emoji with Chameleon identities. Added state tracking to `ChameleonManager`.
   [2025-12-26 23:58] Moved trigger to the final superficial search bar in `TodoApp.tsx`.
+  [2025-12-27 00:15] BUG SQUASHED: The "superficial app" is actually `NotesDashboard.tsx`, not `TodoApp.tsx`. Implemented the `ALERTA` trigger in the correct file (`NotesDashboard`).

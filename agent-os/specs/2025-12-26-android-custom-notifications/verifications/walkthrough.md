@@ -17,7 +17,7 @@ Implementación de un sistema de notificaciones premium y totalmente personaliza
 
 ### 3. Disparadores de Prueba (Testing Secretos)
 
-- **Barra de Búsqueda Superficial**: En la pantalla inicial de "Notas", escribir la palabra `ALERTA` dispara una notificación con el aura de la identidad actual.
+- **Barra de Búsqueda Superficial**: En la pantalla inicial de "Notas" (Dashboard, donde ves las carpetas), escribir la palabra `ALERTA` dispara una notificación con el aura de la identidad actual.
 - **Botón de Pánico/Test**: Disponible en el menú de opciones (+ Opciones).
 
 ### 4. Recursos Android
@@ -46,4 +46,4 @@ Implementación de un sistema de notificaciones premium y totalmente personaliza
 
 render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/services/NotificationService.ts)
 render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/features/chameleon/ChameleonManager.ts)
-render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/pages/TodoApp.tsx)
+render_diffs(file:///c:/Users/theru/Downloads/LinguaFlow/SexyLove/src/features/notes/components/NotesDashboard.tsx)
