@@ -97,6 +97,15 @@ export class NotificationService {
       console.error("Error scheduling notification:", error);
     }
   }
+
+  /**
+   * Checks if a string contains the magic keyword to trigger a notification.
+   */
+  public checkKeyword(text: string) {
+    if (text.toUpperCase().includes("ALERTA")) {
+      this.scheduleTestNotification();
+    }
+  }
 }
 
 export const notificationService = NotificationService.getInstance();

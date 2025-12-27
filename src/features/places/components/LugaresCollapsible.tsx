@@ -19,6 +19,7 @@ import gsap from "gsap";
 import { Input } from "@/components/ui/input";
 import { useVaultStore } from "../../../store/vault.store";
 import EmptyState from "@/components/ui/EmptyState";
+import { notificationService } from "@/services/NotificationService";
 
 interface LugaresCollapsibleProps {
   lugares: Lugar[];
@@ -64,7 +65,11 @@ const LugaresCollapsible = ({
         <Input
           placeholder="Buscar..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSearchTerm(val);
+            notificationService.checkKeyword(val);
+          }}
           className="mb-4"
         />
         <div className="flex flex-col gap-4">
