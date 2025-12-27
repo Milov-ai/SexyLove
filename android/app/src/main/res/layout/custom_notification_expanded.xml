@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    PREMIUM EXPANDED NOTIFICATION LAYOUT
+    Vista expandida con toda la experiencia de identidad
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_root_expanded"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header: Identidad como marca -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Icono de identidad grande -->
+        <ImageView
+            android:id="@+id/identity_icon_big"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="Identity Icon" />
+
+        <!-- Info de identidad -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <!-- Nombre de identidad (como app name) -->
+            <TextView
+                android:id="@+id/identity_name_big"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.1"
+                android:alpha="0.8" />
+
+            <!-- Título principal -->
+            <TextView
+                android:id="@+id/notification_title_big"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Emoji grande decorativo -->
+        <TextView
+            android:id="@+id/aura_emoji_big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="36sp"
+            android:layout_marginStart="12dp"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Separador visual -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"
+        android:alpha="0.2"
+        android:background="@android:color/white" />
+
+    <!-- Cuerpo del mensaje -->
+    <TextView
+        android:id="@+id/notification_body_big"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:lineSpacingMultiplier="1.3"
+        android:maxLines="5"
+        android:ellipsize="end" />
+
+    <!-- Footer: Timestamp y branding -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/timestamp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="11sp"
+            android:alpha="0.6" />
+
+        <TextView
+            android:id="@+id/branding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textAllCaps="true"
+            android:letterSpacing="0.15"
+            android:alpha="0.5"
+            android:text="✦ SexyLove ✦" />
+
+    </LinearLayout>
+
+</LinearLayout>

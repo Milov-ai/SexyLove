@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    PREMIUM CUSTOM NOTIFICATION LAYOUT
+    Diseño tipo Temu/YouTube Music con identidad dinámica
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical">
+
+    <!-- Icono grande de identidad (el protagonista) -->
+    <ImageView
+        android:id="@+id/identity_icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:scaleType="centerCrop"
+        android:background="@android:color/transparent"
+        android:contentDescription="Identity Icon" />
+
+    <!-- Contenedor de texto -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="14dp"
+        android:orientation="vertical">
+
+        <!-- Nombre de la identidad (como si fuera el nombre de la app) -->
+        <TextView
+            android:id="@+id/identity_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:alpha="0.85" />
+
+        <!-- Título principal -->
+        <TextView
+            android:id="@+id/notification_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Mensaje / Body -->
+        <TextView
+            android:id="@+id/notification_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_marginTop="2dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:alpha="0.9" />
+
+    </LinearLayout>
+
+    <!-- Emoji decorativo (aura visual) -->
+    <TextView
+        android:id="@+id/aura_emoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:layout_marginStart="8dp"
+        android:gravity="center" />
+
+</LinearLayout>
