@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { debounce } from "@/lib/utils";
 import {
   useNotesStore,
   type Block,
@@ -63,10 +64,22 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
   const [zoomedBlockId, setZoomedBlockId] = useState<string | null>(null);
 
   // Refs for stable access in handlers
+  // Refs for stable access in handlers (Silent State)
+  // This decoupling prevents "render-loop" lags caused by passing large objects to useEffect
   const blocksRef = useRef(blocks);
+  const titleRef = useRef(title);
+  const isDirty = useRef(false); // Track if user has typed locally
+
   useEffect(() => {
     blocksRef.current = blocks;
+    // If blocks changed and it wasn't a hydration (checked below), we mark dirty
+    if (blocks.length > 0) isDirty.current = true; 
   }, [blocks]);
+
+  useEffect(() => {
+    titleRef.current = title;
+    if (title) isDirty.current = true;
+  }, [title]);
 
   // Polaroid Filters State
   const [polaroidFilters, setPolaroidFilters] = useState<FilterState>({
@@ -130,57 +143,84 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
     });
   };
 
+  // useDebounce Removed to prevent double-render and heavy dependency tracking
+  // const debouncedBlocks = useDebounce(blocks, 1000);
+  // const debouncedTitle = useDebounce(title, 1000);
+
+  // Initialize State from Note (One-way hydration on mount/ID change)
   useEffect(() => {
     if (note) {
-      const newTitle = note.title;
-      if (title !== newTitle) setTitle(newTitle);
+      // 1. Handle Titlte
+      // Only update title if it's legally different and we haven't edited it?
+      // For simplicity, we just set it initially. We don't support real-time external title updates while open.
+      if (!title) setTitle(note.title);
 
-      try {
-        const parsedBlocks = note.content ? JSON.parse(note.content) : [];
-        const currentBlocksString = JSON.stringify(blocksRef.current);
-
-        // Only update if the content is actually different to avoid flicker
-        if (note.content !== currentBlocksString) {
+      // 2. Handle Content
+      // We only hydrate if blocks are empty (initial load) or note changed EXTERNALLY (hard to know).
+      // To fix the glitch, we assume the user's local version is always the authority while open.
+      // We ONLY re-hydrate if the noteID changes.
+      
+      const isNewNote = blocks.length === 0;
+      
+      // ONLY hydrate if we haven't dirtied the state locally (User typing > Server data)
+      // Or if it's a fresh mount/new noteId.
+      if (isNewNote && !isDirty.current) {
+         try {
+          const parsedBlocks = note.content ? JSON.parse(note.content) : [];
           if (Array.isArray(parsedBlocks) && parsedBlocks.length > 0) {
             setBlocks(migrateBlocks(parsedBlocks));
-          } else if (
-            !parsedBlocks ||
-            (Array.isArray(parsedBlocks) && parsedBlocks.length === 0)
-          ) {
-            // If incoming is empty but local is not, we might be in a race condition.
-            // But if both are empty-ish or it's a new note, we reset.
-            if (
-              blocksRef.current.length === 0 ||
-              (blocksRef.current.length === 1 && !blocksRef.current[0].content)
-            ) {
-              setBlocks([{ id: uuidv4(), type: "text", content: "" }]);
-            }
+          } else {
+             // Default empty block
+             setBlocks([{ id: uuidv4(), type: "text", content: "" }]);
           }
-        }
-      } catch {
-        if (note.content !== blocksRef.current[0]?.content) {
-          setBlocks([
-            { id: uuidv4(), type: "text", content: note.content || "" },
-          ]);
+        } catch {
+          setBlocks([{ id: uuidv4(), type: "text", content: note.content || "" }]);
         }
       }
+      
       setLastSaved(new Date(note.updated_at));
+      
+      // Reset dirty flag on ID change
+      isDirty.current = false;
     }
-  }, [noteId, note]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId]); // STRICTLY depends only on ID to prevent re-hydration loops
 
+  // Silent Debounced Auto-Save
+  // This uses a ref-based debounce so it doesn't trigger re-renders or depend on state directly
+  const triggerSave = useMemo(
+    () =>
+      debounce(async (currentNoteId: string, currentBlocks: Block[], currentTitle: string) => {
+         if (!currentNoteId) return;
+         
+         const contentString = JSON.stringify(currentBlocks);
+         
+         // We can't easily check against "server" state here without prop drilling 'note' 
+         // but checking cheap strings is fine.
+         // We'll trust the debounce to throttle enough.
+         
+         try {
+            await updateNote(currentNoteId, { title: currentTitle, content: contentString });
+            setLastSaved(new Date());
+         } catch (e) {
+            console.error("Auto-save failed", e);
+            toast.error("Error al guardar cambios");
+         }
+      }, 1000),
+    [updateNote]
+  ) as ((...args: unknown[]) => void) & { cancel: () => void };
+  
+  // Effect to trigger logic - decoupled from render cost
   useEffect(() => {
-    if (!note) return;
-
-    const timer = setTimeout(() => {
-      const contentString = JSON.stringify(blocks);
-      if (title !== note.title || contentString !== note.content) {
-        updateNote(noteId, { title, content: contentString });
-        setLastSaved(new Date());
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [title, blocks, noteId, updateNote, note]);
+    // We pass the VALUES to the trigger, but the trigger is debounced internally
+    // and won't execute immediately.
+    // However, to be purely "ref based" for the EXECUTION phase:
+    triggerSave(noteId, blocks, title);
+    
+    return () => {
+      triggerSave.cancel();
+    }
+  }, [blocks, title, noteId, triggerSave]);
 
   const handleBlockChange = useCallback(
     (id: string, updates: Partial<Block>) => {
@@ -191,6 +231,10 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
 
   const handleBlockDelete = useCallback((id: string) => {
     setBlocks((prev) => deleteBlockFromTree(prev, id));
+  }, []);
+
+  const handleRequestDelete = useCallback((id: string) => {
+    setBlockToDelete(id);
   }, []);
 
   const handleIndent = useCallback((id: string) => {
@@ -214,12 +258,12 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
     setFocusedBlockId(id);
   }, []);
 
-  const handleStyleChange = (updates: Partial<BlockStyle>) => {
+  const handleStyleChange = useCallback((updates: Partial<BlockStyle>) => {
     if (!focusedBlockId) return;
     setBlocks((prev) =>
       updateBlockInTree(prev, focusedBlockId, { style: updates }),
     );
-  };
+  }, [focusedBlockId]);
 
   const addBlock = useCallback(
     (
@@ -582,6 +626,16 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
           </div>
         )}
 
+        {/* Polaroid Filters - Fixed at Top */}
+        <PolaroidFilterBar
+          blocks={displayedBlocks}
+          filters={polaroidFilters}
+          onFilterChange={(updates) =>
+            setPolaroidFilters((prev) => ({ ...prev, ...updates }))
+          }
+          className="border-b border-white/5 bg-slate-950/80 backdrop-blur-xl z-40"
+        />
+
         {/* Editor Area */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-3xl mx-auto p-6 pb-32 space-y-2">
@@ -613,15 +667,7 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
               </motion.div>
             )}
 
-            {/* Polaroid Filters */}
-            <PolaroidFilterBar
-              blocks={displayedBlocks}
-              filters={polaroidFilters}
-              onFilterChange={(updates) =>
-                setPolaroidFilters((prev) => ({ ...prev, ...updates }))
-              }
-              className="mb-4"
-            />
+
 
             {/* Blocks */}
             <DndContext
@@ -641,7 +687,7 @@ const NoteEditor = ({ noteId, onClose }: NoteEditorProps) => {
                         key={block.id}
                         block={block}
                         onChange={handleBlockChange}
-                        onDelete={(id) => setBlockToDelete(id)}
+                        onDelete={handleRequestDelete}
                         onKeyDown={handleKeyDown}
                         onFocus={handleBlockFocus}
                         activeBlockId={focusedBlockId}

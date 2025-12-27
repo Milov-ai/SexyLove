@@ -2,8 +2,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import * as matchers from "@testing-library/jest-dom/matchers";
-import { PolaroidFilterBar } from "./PolaroidFilterBar";
 import type { Block } from "@/store/notes.store";
+import { PolaroidFilterBar } from "./PolaroidFilterBar";
 
 expect.extend(matchers); // Extend vitest expect with jest-dom matchers
 

@@ -1,0 +1,1 @@
+Okay quiero que verifiques y arregles cuando escribo en los componentes, proincipalmente en el de y texto, cuando escribo se traba, a veces se vuela letras o corrige las palabras no se si las auto completa o que pero esta fallando o esta mal optimizado

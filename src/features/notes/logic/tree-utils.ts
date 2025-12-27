@@ -106,13 +106,41 @@ export const updateBlockInTree = (
   id: string,
   updates: Partial<Block>,
 ): Block[] => {
-  // Optimization: If deep tree, dragging might be slow with full clone every keystroke.
-  // For now, simple clone is safest.
-  const newTree = cloneTree(tree);
-  const found = findBlockPath(newTree, id);
-  if (found) {
-    Object.assign(found.node, updates);
+  const pathInfo = findBlockPath(tree, id);
+  if (!pathInfo) return tree;
+
+  const { path } = pathInfo;
+  
+  // Shallow clone root
+  const newTree = [...tree];
+  let currentLevel = newTree;
+  let currentOriginalLevel = tree;
+
+  for (let i = 0; i < path.length; i++) {
+    const index = path[i];
+    const originalNode = currentOriginalLevel[index];
+    
+    // Shallow clone the node at path
+    const newNode = { ...originalNode };
+
+    if (i === path.length - 1) {
+      // Target node: Apply updates
+      Object.assign(newNode, updates);
+    } else {
+      // Intermediate node: Clone children array for next step
+      newNode.children = [...(originalNode.children || [])];
+    }
+
+    // Update the pointer in the cloned array
+    currentLevel[index] = newNode;
+
+    // Descend
+    if (i < path.length - 1) {
+      currentLevel = newNode.children!;
+      currentOriginalLevel = originalNode.children!;
+    }
   }
+
   return newTree;
 };
 

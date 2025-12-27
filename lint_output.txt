@@ -1,11 +1,20 @@
 
-C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\components\ui\IconPicker.tsx
-  50:17  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\NoteEditor.state.test.tsx
+    8:15  error  'Block' is defined but never used         @typescript-eslint/no-unused-vars
+   17:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   25:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   31:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   69:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\NoteEditor.tsx
+  211:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\blocks\CinePolaroidBlock.tsx
+  53:9  warning  The 'props' logical expression could make the dependencies of useCallback Hook (at line 58) change on every render. To fix this, wrap the initialization of 'props' in its own useMemo() Hook  react-hooks/exhaustive-deps
 
 C:\Users\theru\Downloads\LinguaFlow\SexyLove\src\features\notes\components\blocks\PolaroidBlock.tsx
-  40:55  error    Unexpected any. Specify a different type                                                                                                                  @typescript-eslint/no-explicit-any
-  41:49  error    Unexpected any. Specify a different type                                                                                                                  @typescript-eslint/no-explicit-any
-  81:6   warning  React Hook useEffect has missing dependencies: 'props.rotation', 'randomRotation', and 'updateProps'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  56:9  warning  The 'props' logical expression could make the dependencies of useCallback Hook (at line 61) change on every render. To fix this, wrap the initialization of 'props' in its own useMemo() Hook  react-hooks/exhaustive-deps
 
-Γ£û 4 problems (3 errors, 1 warning)
+Γ£û 9 problems (7 errors, 2 warnings)
 

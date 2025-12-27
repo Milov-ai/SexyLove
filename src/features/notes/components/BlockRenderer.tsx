@@ -571,9 +571,9 @@ const BlockRendererInner = ({
               items={block.children!.map((c) => c.id)}
               strategy={verticalListSortingStrategy}
             >
-              {block.children!.map((child, idx) => (
+              {block.children!.map((child) => (
                 <BlockRenderer
-                  key={`${child.id}-${depth}-${idx}`}
+                  key={child.id}
                   block={child}
                   onChange={onChange}
                   onDelete={onDelete}

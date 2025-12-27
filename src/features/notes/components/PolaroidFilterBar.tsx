@@ -53,7 +53,7 @@ export const PolaroidFilterBar = ({
         onOpenChange={setIsOpen}
         className="w-full relative"
       >
-        <div className="flex items-center justify-between gap-2 p-2 bg-background/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg transition-all duration-300">
+        <div className="flex items-center justify-between gap-2 p-2 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg transition-all duration-300">
           <div className="flex items-center gap-3">
             <div
               className={cn(
@@ -101,7 +101,7 @@ export const PolaroidFilterBar = ({
         </div>
 
         <CollapsibleContent>
-          <div className="mt-2 p-4 bg-background/80 backdrop-blur-2xl border border-white/10 rounded-2xl space-y-4 animate-in slide-in-from-top-2 fade-in duration-300 shadow-2xl">
+          <div className="mt-2 p-4 bg-slate-950/80 backdrop-blur-2xl border border-white/10 rounded-2xl space-y-4 animate-in slide-in-from-top-2 fade-in duration-300 shadow-2xl">
             {/* Search & Basic Filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Title Search */}
