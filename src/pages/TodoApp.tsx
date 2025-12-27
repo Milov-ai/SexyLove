@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
-
 import AuthScreen from "../features/auth/components/AuthScreen";
+import { notificationService } from "@/services/NotificationService";
 
 const TodoApp = () => {
   const [tasks, setTasks] = useState([
@@ -78,7 +78,11 @@ const TodoApp = () => {
         <div className="flex gap-2 mb-6">
           <Input
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setInputValue(val);
+              notificationService.checkKeyword(val);
+            }}
             placeholder="Escribe una nota o un comando..."
             onKeyPress={(e) => e.key === "Enter" && handleAddTask()}
             className="bg-slate-800 border-slate-700 placeholder:text-slate-500 focus:ring-slate-600"
