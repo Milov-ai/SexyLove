@@ -11,3 +11,5 @@
   [2025-12-26 23:45] Implementation verified with `npm run build`. Changes committed and pushed to `feature/android-custom-notifications`.
   [2025-12-26 23:48] Added keyword trigger `ALERTA` in `EphemeralChat` and updated `walkthrough.md` with notification inventory.
   [2025-12-26 23:52] Re-implemented keyword trigger `ALERTA` in the main search bar (`LugaresCollapsible.tsx`) as requested. Removed chat trigger.
+  [2025-12-26 23:56] Implemented "Aura" system: notifications now sync color and emoji with Chameleon identities. Added state tracking to `ChameleonManager`.
+  [2025-12-26 23:58] Moved trigger to the final superficial search bar in `TodoApp.tsx`.

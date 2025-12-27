@@ -22,7 +22,16 @@ export const ALIASES = [
 
 export type AliasType = (typeof ALIASES)[number];
 
+let currentIdentity: AliasType = "AliasPideUnDeseo"; // Default fallback
+
 export const ChameleonManager = {
+  /**
+   * Returns the currently active identity.
+   */
+  getCurrentIdentity: (): AliasType => {
+    return currentIdentity;
+  },
+
   /**
    * Switches the App Icon and Name using Native Android Activity Aliases.
    * @param aliasName The name of the alias to enable (e.g., 'AliasAzulinaa')
@@ -31,9 +40,11 @@ export const ChameleonManager = {
     try {
       if (Capacitor.isNativePlatform()) {
         console.log(`[Chameleon] Switching identity to: ${aliasName}`);
+        currentIdentity = aliasName;
         await Chameleon.setAlias({ alias: aliasName });
         console.log(`[Chameleon] Identity switch successful.`);
       } else {
+        currentIdentity = aliasName;
         console.log(
           `[Chameleon] Web platform detected. Skipping native icon switch (Simulated: ${aliasName}).`,
         );
