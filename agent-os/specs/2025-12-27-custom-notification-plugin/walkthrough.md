@@ -66,3 +66,12 @@ cd android
 - **Build Fails**: Check `JAVA_HOME` points to JDK 17.
 - **Image not showing**: Ensure the URL is accessible and valid.
 - **Clicks not registered**: Verify `AndroidManifest.xml` has the receiver with `exported="true"`.
+
+---
+
+### Agent Verification (2025-12-27)
+
+- **Build Status**: ✅ PASS
+- **Environment**: Windows, JDK 21 (Android Studio JBR), Gradle 8.x
+- **Command**: `.\gradlew.bat assembleDebug`
+- **Result**: The project builds successfully with the new custom notification logic and layout.
