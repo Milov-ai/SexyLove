@@ -18,6 +18,12 @@
             android:exported="true">
         </activity>
 
+        <receiver android:name=".NotificationReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.sexylove.app.ACTION_NOTIFICATION_CLICK" />
+            </intent-filter>
+        </receiver>
+
         <!-- CHAMELEON PROTOCOL: 5 Personalities -->
         <!-- Note to User: Using NANO VECTOR DRAWABLES (XML) for infinite resolution -->
 

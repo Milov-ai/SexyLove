@@ -2,16 +2,16 @@
 
 ## Setup
 
-- [ ] Create feature branch `feature/custom-notification-plugin`
-- [ ] Verify `AndroidManifest.xml` is writable
+- [x] Create feature branch `feature/custom-notification-plugin`
+- [x] Verify `AndroidManifest.xml` is writable
 
 ## Native Android (Layouts & Manifest)
 
-- [ ] Create `notification_supreme.xml` in `android/app/src/main/res/layout/`
+- [x] Create `notification_supreme.xml` in `android/app/src/main/res/layout/`
   - _Context_: Custom RemoteViews layout with Header, Body, Image, Action Grid.
-- [ ] Create `NotificationReceiver.kt` in `android/app/src/main/java/com/sexylove/app/`
+- [x] Create `NotificationReceiver.kt` in `android/app/src/main/java/com/sexylove/app/`
   - _Context_: BroadcastReceiver to intercept clicks.
-- [ ] Register `NotificationReceiver` in `AndroidManifest.xml`
+- [x] Register `NotificationReceiver` in `AndroidManifest.xml`
 
 ## Native Android (Plugin Logic)
 
