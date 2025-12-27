@@ -11,4 +11,4 @@ description: High-level product planning and roadmap update.
     - **Action**: Add new high-level feature to Roadmap.
 
 3.  **Handoff**:
-    - **Notify**: "Roadmap updated. To start this feature, run `/shape-spec [feature-name]` strictly following the specification in `.agent/workflows/shape-spec.md`."
+    - **Notify**: "Roadmap updated. To start this feature, run `/shape-spec [feature-name]` strictly following the specification in `.agent/workflows/shape-spec.md` ALONG WITH any specific instructions defined in the current task context."

@@ -28,4 +28,4 @@ description: Generate the granular atomic checklist and Sync with GitHub Project
       git push -u origin feature/[feature-name]
       ```
 
-5.  **Notify**: "Tasks generated. Issue created & linked to Board. Branch pushed. Next: `/orchestrate-tasks` (The Manager) - Strictly following the specification in `.agent/workflows/orchestrate-tasks.md`."
+5.  **Notify**: "Tasks generated. Issue created & linked to Board. Branch pushed. Next: `/orchestrate-tasks` (The Manager) - Strictly following the specification in `.agent/workflows/orchestrate-tasks.md` ALONG WITH any specific instructions defined in the current task context."

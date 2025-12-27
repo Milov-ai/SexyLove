@@ -21,4 +21,4 @@ description: The Healer. Diagnose and fix errors without losing context.
       - **Pass**: Return to `/implement-tasks`.
       - **Fail**: **REPEAT STEP 2** (Loop).
 
-5.  **Return**: Notify user to resume `/implement-tasks` strictly following the specification in `.agent/workflows/implement-tasks.md`.
+5.  **Return**: Notify user to resume `/implement-tasks` strictly following the specification in `.agent/workflows/implement-tasks.md` ALONG WITH any specific instructions defined in the current task context.

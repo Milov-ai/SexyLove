@@ -3,7 +3,7 @@ description: Ship it. Merge, Update Board, and Cleanup.
 ---
 
 1.  **Sync Gate (Strict)**:
-    - **Check Verification**: Has `/verify-feature` been run (strictly following `.agent/workflows/verify-feature.md`)?
+    - **Check Verification**: Has `/verify-feature` been run (strictly following `.agent/workflows/verify-feature.md` ALONG WITH any specific instructions defined in the current task context)?
     - **Check State**: `git status` must be clean.
     - **Check Remote**: `git fetch` && `git status`. Ensure no divergence.
 

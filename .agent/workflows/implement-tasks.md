@@ -18,7 +18,7 @@ description: The Worker. Execute implementation loop with Continuous GitHub Sync
 4.  **Safety Net (Build & Test)**:
     - **Action**: `npm run build` && `npm test`.
     - **Control de Errores**:
-      - **IF FAILURE**: 🛑 STOP. Run `/fix-error` strictly following the specification in `.agent/workflows/fix-error.md`.
+      - **IF FAILURE**: 🛑 STOP. Run `/fix-error` strictly following the specification in `.agent/workflows/fix-error.md` ALONG WITH any specific instructions defined in the current task context.
       - **IF SUCCESS**: Proceed to Sync.
 
 5.  **Total GitHub Sync (The Commit)**:
@@ -30,4 +30,4 @@ description: The Worker. Execute implementation loop with Continuous GitHub Sync
     - **Project Board / Issue**:
       - _Optional_: `gh issue comment [IssueID] --body "Completed: [Task Name]"` to keep the board alive.
 
-6.  **Loop**: Return to `/orchestrate-tasks` strictly following the specification in `.agent/workflows/orchestrate-tasks.md`.
+6.  **Loop**: Return to `/orchestrate-tasks` strictly following the specification in `.agent/workflows/orchestrate-tasks.md` ALONG WITH any specific instructions defined in the current task context.

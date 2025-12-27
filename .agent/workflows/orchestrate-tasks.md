@@ -9,7 +9,7 @@ description: The Manager. Decides which task group to implement next.
 2.  **Delegation**:
     - **Action**: Call `/implement-tasks`.
     - **Context**: Pass the specific Task Name/ID.
-    - **Constraint**: Execute strictly following the specification in `.agent/workflows/implement-tasks.md`.
+    - **Constraint**: Execute strictly following the specification in `.agent/workflows/implement-tasks.md` ALONG WITH any specific instructions defined in the current task context.
 
 3.  **Loop Management**:
     - **Condition**: If `implement-tasks` returns success, check `tasks.md` again.
@@ -17,4 +17,4 @@ description: The Manager. Decides which task group to implement next.
 
 4.  **Completion**:
     - **Condition**: All tasks `[x]`.
-    - **Action**: Notify user to run `/verify-feature` strictly following the specification in `.agent/workflows/verify-feature.md`.
+    - **Action**: Notify user to run `/verify-feature` strictly following the specification in `.agent/workflows/verify-feature.md` ALONG WITH any specific instructions defined in the current task context.

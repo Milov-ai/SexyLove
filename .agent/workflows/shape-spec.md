@@ -40,4 +40,4 @@ description: Initialize the directory structure and Atomic Artifacts for a new f
       [Timestamp] Spec shaped.
       ```
 
-4.  **Notify**: "Spec shaped at `agent-os/specs/[...]`. Context initialized. Next: `/write-spec` strictly following the specification in `.agent/workflows/write-spec.md`."
+4.  **Notify**: "Spec shaped at `agent-os/specs/[...]`. Context initialized. Next: `/write-spec` strictly following the specification in `.agent/workflows/write-spec.md` ALONG WITH any specific instructions defined in the current task context."

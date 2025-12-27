@@ -22,4 +22,4 @@ description: Draft the technical specification using MCPs for validation.
 4.  **Decision Recording**:
     - **Action**: Update `decisions.md` with any new Architectural Decisions made during discovery (e.g., "Use Optimistic UI").
 
-5.  **Notify**: "Spec drafted. Next: `/create-tasks` strictly following the specification in `.agent/workflows/create-tasks.md`."
+5.  **Notify**: "Spec drafted. Next: `/create-tasks` strictly following the specification in `.agent/workflows/create-tasks.md` ALONG WITH any specific instructions defined in the current task context."

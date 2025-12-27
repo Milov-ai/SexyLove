@@ -17,4 +17,4 @@ description: Quality Assurance. Generate proof of work and Push Artifacts.
     - **Identify**: Run `gh pr list` to see if a PR exists. If not, note this for `/finalize-feature`.
 
 4.  **Handoff**:
-    - **Notify**: "Feature verified and artifacts PUSHED to remote. Ready to ship. Run `/finalize-feature` strictly following the specification in `.agent/workflows/finalize-feature.md`."
+    - **Notify**: "Feature verified and artifacts PUSHED to remote. Ready to ship. Run `/finalize-feature` strictly following the specification in `.agent/workflows/finalize-feature.md` ALONG WITH any specific instructions defined in the current task context."

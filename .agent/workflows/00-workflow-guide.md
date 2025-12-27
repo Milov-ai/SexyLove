@@ -11,7 +11,7 @@ This guide defines the **Total Context Engineering** process. It uses the **Nati
 1.  **Always Push**: Every completed task triggers a `git push`.
 2.  **Always Link**: Issues and Project Boards are linked immediately.
 3.  **Atomic State**: No skipping steps. Context must be preserved.
-4.  **Strict Adherence**: Every Agent OS command must be executed **strictly following the specification** in its corresponding `.agent/workflows/[command].md` file.
+4.  **Strict Adherence**: Every Agent OS command must be executed **strictly following the specification** in its corresponding `.agent/workflows/[command].md` file, **PLUS** adhering to any additional instructions provided in the current task context.
 
 ---
 
