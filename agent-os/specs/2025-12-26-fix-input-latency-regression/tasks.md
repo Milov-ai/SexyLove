@@ -1,0 +1,7 @@
+- [x] Check/Create `src/lib/utils.ts` for a generic `debounce` function (avoiding new dependencies).
+- [ ] Refactor `NoteEditor.tsx`: Remove `useDebounce` import and hook call to stop per-keystroke renders.
+- [ ] Refactor `NoteEditor.tsx`: Implement `blocksRef` and `titleRef` to track latest state without triggering re-renders.
+- [ ] Refactor `NoteEditor.tsx`: Implement `debouncedSave` using `useCallback` and the `debounce` utility, reading strictly from refs.
+- [ ] Refactor `NoteEditor.tsx`: Update `useEffect` to trigger `debouncedSave` on changes, strictly decoupled from component rendering.
+- [ ] Harden `NoteEditor.tsx` Hydration: Add `isDirty` ref and prevent external overwrites if user has unsaved changes.
+- [ ] Verify fix: internal build and strict type check.
