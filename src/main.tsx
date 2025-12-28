@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
 // Asumiendo que ThemeProvider se creará en esta ruta
 // import { ThemeProvider } from "./components/theme-provider.tsx";
-import "./core/lib/i18n.ts"; // Asumiendo que este archivo existe
+
 import "./index.css";
 
 const router = createBrowserRouter([

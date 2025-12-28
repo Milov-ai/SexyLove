@@ -858,8 +858,8 @@ const NotesDashboard = () => {
         )}
       </main>
 
-      {/* Floating Action Button */}
-      {!selectedNoteId && (
+      {/* Floating Action Button - Hidden during Minecraft */}
+      {!selectedNoteId && !isMinecraftPlaying && (
         <div className="fixed bottom-6 right-6 z-50">
           <Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <SheetTrigger asChild>
