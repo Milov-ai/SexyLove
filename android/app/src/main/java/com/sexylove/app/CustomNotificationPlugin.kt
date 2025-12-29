@@ -202,4 +202,82 @@ class CustomNotificationPlugin : Plugin() {
             null
         }
     }
+
+    // ============================================
+    // RITUAL ALARM METHODS
+    // ============================================
+
+    @PluginMethod
+    fun scheduleRitualAlarm(call: PluginCall) {
+        val ritualId = call.getString("ritualId") ?: run {
+            call.reject("ritualId is required")
+            return
+        }
+        val hour = call.getInt("hour") ?: 8
+        val minute = call.getInt("minute") ?: 0
+        val title = call.getString("title") ?: "Ritual"
+        val emoji = call.getString("emoji") ?: "✨"
+        val color = call.getString("color") ?: "#FF69B4"
+
+        Log.d(TAG, "Scheduling ritual alarm: $ritualId at $hour:$minute")
+
+        try {
+            RitualScheduler.scheduleRitual(
+                context = context,
+                ritualId = ritualId,
+                hour = hour,
+                minute = minute,
+                title = title,
+                emoji = emoji,
+                color = color
+            )
+            call.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error scheduling ritual alarm", e)
+            call.reject("Failed to schedule alarm: ${e.message}")
+        }
+    }
+
+    @PluginMethod
+    fun cancelRitualAlarm(call: PluginCall) {
+        val ritualId = call.getString("ritualId") ?: run {
+            call.reject("ritualId is required")
+            return
+        }
+
+        Log.d(TAG, "Cancelling ritual alarm: $ritualId")
+
+        try {
+            RitualScheduler.cancelRitual(context, ritualId)
+            call.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cancelling ritual alarm", e)
+            call.reject("Failed to cancel alarm: ${e.message}")
+        }
+    }
+
+    @PluginMethod
+    fun getScheduledRituals(call: PluginCall) {
+        try {
+            val rituals = RitualScheduler.getAllScheduledRituals(context)
+            val result = JSObject()
+            
+            rituals.forEach { (id, data) ->
+                val ritualObj = JSObject().apply {
+                    put("hour", data.hour)
+                    put("minute", data.minute)
+                    put("title", data.title)
+                    put("emoji", data.emoji)
+                    put("color", data.color)
+                }
+                result.put(id, ritualObj)
+            }
+            
+            call.resolve(result)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting scheduled rituals", e)
+            call.reject("Failed to get scheduled rituals: ${e.message}")
+        }
+    }
 }
+

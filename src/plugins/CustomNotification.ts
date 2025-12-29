@@ -15,8 +15,31 @@ export interface CustomNotificationOptions {
   actions?: { id: string; label: string }[];
 }
 
+// Ritual Alarm Options
+export interface RitualAlarmOptions {
+  ritualId: string;
+  hour: number;
+  minute: number;
+  title: string;
+  emoji: string;
+  color: string;
+}
+
+export interface ScheduledRitualInfo {
+  hour: number;
+  minute: number;
+  title: string;
+  emoji: string;
+  color: string;
+}
+
 export interface CustomNotificationPlugin {
   showCustomNotification(options: CustomNotificationOptions): Promise<void>;
+
+  // Ritual Alarm Methods
+  scheduleRitualAlarm(options: RitualAlarmOptions): Promise<void>;
+  cancelRitualAlarm(options: { ritualId: string }): Promise<void>;
+  getScheduledRituals(): Promise<Record<string, ScheduledRitualInfo>>;
 }
 
 const CustomNotification =
