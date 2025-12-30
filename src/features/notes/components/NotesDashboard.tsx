@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNotesStore, type Folder } from "@/store/notes.store";
+import { RitualsTab } from "@/features/rituals";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,6 +74,7 @@ const NotesDashboard = () => {
   } = useNotesStore();
 
   // UI State
+  const [activeTab, setActiveTab] = useState<"notes" | "rituals">("notes");
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
@@ -539,327 +541,361 @@ const NotesDashboard = () => {
           </div>
         </div>
 
-        {/* Breadcrumb / Navigation */}
-        <div className="px-6 pb-4 flex items-center gap-2 overflow-x-auto">
-          {currentFolderId ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                setCurrentFolderId(currentFolder?.parent_id || null)
-              }
-              className="bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white px-3 py-1.5 h-auto rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-105 flex items-center gap-1.5 group"
-            >
-              <ChevronLeft
-                size={16}
-                className="group-hover:-translate-x-0.5 transition-transform"
-              />
-              <span className="text-sm font-medium">Atrás</span>
-            </Button>
-          ) : (
-            <span className="text-sm font-medium text-slate-500">Inicio</span>
-          )}
-          {currentFolder && (
-            <>
-              <span className="text-slate-600">/</span>
-              <span className="text-sm font-medium text-slate-200">
-                {currentFolder.name}
-              </span>
-            </>
-          )}
+        {/* Tab Navigation */}
+        <div className="relative z-10 px-6 pb-2 flex items-center gap-3">
+          <button
+            onClick={() => setActiveTab("notes")}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "notes"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card/50 text-muted-foreground hover:bg-card/80"
+            }`}
+          >
+            📝 Notas
+          </button>
+          <button
+            onClick={() => setActiveTab("rituals")}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "rituals"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card/50 text-muted-foreground hover:bg-card/80"
+            }`}
+          >
+            ☀️ Mi Día
+          </button>
         </div>
+
+        {/* Breadcrumb / Navigation (Notes only) */}
+        {activeTab === "notes" && (
+          <div className="px-6 pb-4 flex items-center gap-2 overflow-x-auto">
+            {currentFolderId ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setCurrentFolderId(currentFolder?.parent_id || null)
+                }
+                className="bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white px-3 py-1.5 h-auto rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-105 flex items-center gap-1.5 group"
+              >
+                <ChevronLeft
+                  size={16}
+                  className="group-hover:-translate-x-0.5 transition-transform"
+                />
+                <span className="text-sm font-medium">Atrás</span>
+              </Button>
+            ) : (
+              <span className="text-sm font-medium text-slate-500">Inicio</span>
+            )}
+            {currentFolder && (
+              <>
+                <span className="text-slate-600">/</span>
+                <span className="text-sm font-medium text-slate-200">
+                  {currentFolder.name}
+                </span>
+              </>
+            )}
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main className="p-6 pb-24 max-w-7xl mx-auto">
-        {/* Search */}
-        <motion.div whileTap={{ scale: 0.99 }} className="mb-6 relative">
-          <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-            size={18}
-          />
-          <Input
-            value={searchQuery}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === "#CHAMELEON" || val === "#777") {
-                setIsChameleonOpen(true);
-                setSearchQuery("");
-              } else if (val.toLowerCase() === "minecraft") {
-                setIsMinecraftOpen(true);
-                setSearchQuery("");
-              } else {
-                setSearchQuery(val);
-                notificationService.checkKeyword(val);
-              }
-            }}
-            placeholder="Buscar..."
-            className="h-12 w-full bg-card border-border rounded-2xl pl-12 text-base focus:border-primary/50 focus:ring-primary/20"
-          />
-        </motion.div>
-
-        {/* Content Grid/List */}
-        <div
-          className={
-            viewMode === "grid"
-              ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-              : "flex flex-col gap-3"
-          }
-        >
-          {/* Folders */}
-          {filteredFolders.map((folder) => (
-            <motion.div
-              key={folder.id}
-              layout
-              whileHover={{ scale: 1.01, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleFolderClick(folder)}
-              className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[140px] ${
-                THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg
-              } ${
-                THEMES[folder.color as ThemeId]?.border || THEMES.default.border
-              } hover:bg-white/5 hover:border-primary/30`}
-              style={{
-                boxShadow: THEMES[folder.color as ThemeId]?.glow
-                  ? `0 0 20px -5px ${THEMES[folder.color as ThemeId].glow.match(/rgba\(([^)]+)\)/)?.[1] || "transparent"}`
-                  : "none",
+      {activeTab === "rituals" ? (
+        <main className="flex-1 overflow-hidden">
+          <RitualsTab />
+        </main>
+      ) : (
+        <main className="p-6 pb-24 max-w-7xl mx-auto">
+          {/* Search */}
+          <motion.div whileTap={{ scale: 0.99 }} className="mb-6 relative">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+              size={18}
+            />
+            <Input
+              value={searchQuery}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "#CHAMELEON" || val === "#777") {
+                  setIsChameleonOpen(true);
+                  setSearchQuery("");
+                } else if (val.toLowerCase() === "minecraft") {
+                  setIsMinecraftOpen(true);
+                  setSearchQuery("");
+                } else {
+                  setSearchQuery(val);
+                  notificationService.checkKeyword(val);
+                }
               }}
-            >
-              {/* Glow Effect */}
-              <div
-                className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg}`}
-              />
+              placeholder="Buscar..."
+              className="h-12 w-full bg-card border-border rounded-2xl pl-12 text-base focus:border-primary/50 focus:ring-primary/20"
+            />
+          </motion.div>
 
-              <div className="flex flex-col justify-between h-full relative z-10">
-                {/* Top: Icon & Name */}
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`p-2.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex-shrink-0 ${THEMES[folder.color as ThemeId]?.icon || THEMES.default.icon}`}
-                  >
-                    {folder.is_locked ? (
-                      <Lock size={20} />
-                    ) : folder.icon &&
-                      icons[folder.icon as keyof typeof icons] ? (
-                      (() => {
-                        const IconComp = icons[
-                          folder.icon as keyof typeof icons
-                        ] as unknown as React.ElementType;
-                        return <IconComp size={20} />;
-                      })()
-                    ) : (
-                      <FolderIcon size={20} />
-                    )}
-                  </div>
-                  {editingFolderId === folder.id ? (
-                    <Input
-                      value={editNameValue}
-                      onChange={(e) => setEditNameValue(e.target.value)}
-                      onBlur={() => saveRename()}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveRename();
-                        if (e.key === "Escape") cancelRename();
-                      }}
-                      autoFocus
-                      className="h-8 text-lg font-medium bg-black/20 border-white/10 text-white min-w-0 w-full"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  ) : (
-                    <span className="font-medium text-lg tracking-tight text-white/90 line-clamp-2 leading-tight pt-1">
-                      {folder.name}
-                    </span>
-                  )}
-                </div>
-
-                {/* Bottom: Actions */}
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-2 -ml-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors outline-none"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="start"
-                      className="w-48 glass-dirty border-white/10 text-foreground"
-                    >
-                      <DropdownMenuLabel>Opciones</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-slate-800" />
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          startRenaming(folder);
-                        }}
-                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
-                      >
-                        <Pencil size={14} />
-                        <span>Renombrar</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenIconPicker(folder.id);
-                        }}
-                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
-                      >
-                        <ImageIcon size={14} />
-                        <span>Cambiar Icono</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditAura({
-                            id: folder.id,
-                            type: "folder",
-                            color: folder.color,
-                          });
-                        }}
-                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
-                      >
-                        <Sparkles size={14} />
-                        <span>Cambiar Aura</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSecurityAction(folder);
-                        }}
-                        className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
-                      >
-                        {folder.is_locked ? (
-                          <Lock size={14} className="text-pink-500" />
-                        ) : (
-                          <Lock size={14} />
-                        )}
-                        <span>
-                          {folder.is_locked ? "Desbloquear" : "Bloquear"}
-                        </span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 -mr-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSecureDelete(folder);
-                    }}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-
-          {/* Notes */}
-          {filteredNotes.map((note) => {
-            const getNotePreview = (content: string) => {
-              try {
-                const blocks = JSON.parse(content);
-                if (!Array.isArray(blocks) || blocks.length === 0)
-                  return "Nota vacía";
-
-                const firstContentBlock = blocks.find(
-                  (b) => b.content && b.content.trim().length > 0,
-                );
-
-                if (!firstContentBlock) return "Nota vacía";
-
-                if (firstContentBlock.type === "image") return "📷 Imagen";
-                if (firstContentBlock.type === "table") return "📊 Tabla";
-
-                // For text-based blocks
-                return firstContentBlock.content.slice(0, 100);
-              } catch {
-                return "Nota...";
-              }
-            };
-
-            return (
+          {/* Content Grid/List */}
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                : "flex flex-col gap-3"
+            }
+          >
+            {/* Folders */}
+            {filteredFolders.map((folder) => (
               <motion.div
-                key={note.id}
+                key={folder.id}
                 layout
                 whileHover={{ scale: 1.01, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedNoteId(note.id)}
-                className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[160px] ${
-                  THEMES[note.color as ThemeId]?.bg || THEMES.default.bg
+                onClick={() => handleFolderClick(folder)}
+                className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[140px] ${
+                  THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg
                 } ${
-                  THEMES[note.color as ThemeId]?.border || THEMES.default.border
-                } hover:shadow-lg hover:scale-[1.02]`}
+                  THEMES[folder.color as ThemeId]?.border ||
+                  THEMES.default.border
+                } hover:bg-white/5 hover:border-primary/30`}
+                style={{
+                  boxShadow: THEMES[folder.color as ThemeId]?.glow
+                    ? `0 0 20px -5px ${THEMES[folder.color as ThemeId].glow.match(/rgba\(([^)]+)\)/)?.[1] || "transparent"}`
+                    : "none",
+                }}
               >
+                {/* Glow Effect */}
+                <div
+                  className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${THEMES[folder.color as ThemeId]?.bg || THEMES.default.bg}`}
+                />
+
                 <div className="flex flex-col justify-between h-full relative z-10">
-                  {/* Top: Title & Preview */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-lg text-white/90 line-clamp-2 leading-tight mb-2">
-                      {note.title || "Sin título"}
-                    </h3>
-                    <p className="text-xs text-slate-500 line-clamp-3 whitespace-pre-wrap break-words">
-                      {getNotePreview(note.content)}
-                    </p>
+                  {/* Top: Icon & Name */}
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`p-2.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex-shrink-0 ${THEMES[folder.color as ThemeId]?.icon || THEMES.default.icon}`}
+                    >
+                      {folder.is_locked ? (
+                        <Lock size={20} />
+                      ) : folder.icon &&
+                        icons[folder.icon as keyof typeof icons] ? (
+                        (() => {
+                          const IconComp = icons[
+                            folder.icon as keyof typeof icons
+                          ] as unknown as React.ElementType;
+                          return <IconComp size={20} />;
+                        })()
+                      ) : (
+                        <FolderIcon size={20} />
+                      )}
+                    </div>
+                    {editingFolderId === folder.id ? (
+                      <Input
+                        value={editNameValue}
+                        onChange={(e) => setEditNameValue(e.target.value)}
+                        onBlur={() => saveRename()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") saveRename();
+                          if (e.key === "Escape") cancelRename();
+                        }}
+                        autoFocus
+                        className="h-8 text-lg font-medium bg-black/20 border-white/10 text-white min-w-0 w-full"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className="font-medium text-lg tracking-tight text-white/90 line-clamp-2 leading-tight pt-1">
+                        {folder.name}
+                      </span>
+                    )}
                   </div>
 
-                  {/* Bottom: Meta & Actions */}
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-wider font-medium text-slate-600">
-                        {format(new Date(note.updated_at), "MMM d")}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditAura({
-                            id: note.id,
-                            type: "note",
-                            color: note.color,
-                          });
-                        }}
-                        className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                  {/* Bottom: Actions */}
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2 -ml-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors outline-none"
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-48 glass-dirty border-white/10 text-foreground"
                       >
-                        <MoreVertical size={14} />
-                      </button>
-                    </div>
+                        <DropdownMenuLabel>Opciones</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-slate-800" />
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startRenaming(folder);
+                          }}
+                          className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
+                        >
+                          <Pencil size={14} />
+                          <span>Renombrar</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenIconPicker(folder.id);
+                          }}
+                          className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
+                        >
+                          <ImageIcon size={14} />
+                          <span>Cambiar Icono</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditAura({
+                              id: folder.id,
+                              type: "folder",
+                              color: folder.color,
+                            });
+                          }}
+                          className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
+                        >
+                          <Sparkles size={14} />
+                          <span>Cambiar Aura</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSecurityAction(folder);
+                          }}
+                          className="gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
+                        >
+                          {folder.is_locked ? (
+                            <Lock size={14} className="text-pink-500" />
+                          ) : (
+                            <Lock size={14} />
+                          )}
+                          <span>
+                            {folder.is_locked ? "Desbloquear" : "Bloquear"}
+                          </span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 -mr-1 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+                      className="h-8 w-8 -mr-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setDeleteTarget({
-                          type: "note",
-                          id: note.id,
-                          name: note.title || "Nota sin título",
-                        });
+                        handleSecureDelete(folder);
                       }}
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={16} />
                     </Button>
                   </div>
                 </div>
               </motion.div>
-            );
-          })}
-        </div>
+            ))}
 
-        {filteredFolders.length === 0 && filteredNotes.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-600">
-            <div className="w-20 h-20 rounded-full bg-slate-900 flex items-center justify-center mb-4">
-              <FolderPlus size={32} className="opacity-50" />
-            </div>
-            <p className="text-lg font-medium">Carpeta vacía</p>
-            <p className="text-sm">Agrega notas o subcarpetas</p>
+            {/* Notes */}
+            {filteredNotes.map((note) => {
+              const getNotePreview = (content: string) => {
+                try {
+                  const blocks = JSON.parse(content);
+                  if (!Array.isArray(blocks) || blocks.length === 0)
+                    return "Nota vacía";
+
+                  const firstContentBlock = blocks.find(
+                    (b) => b.content && b.content.trim().length > 0,
+                  );
+
+                  if (!firstContentBlock) return "Nota vacía";
+
+                  if (firstContentBlock.type === "image") return "📷 Imagen";
+                  if (firstContentBlock.type === "table") return "📊 Tabla";
+
+                  // For text-based blocks
+                  return firstContentBlock.content.slice(0, 100);
+                } catch {
+                  return "Nota...";
+                }
+              };
+
+              return (
+                <motion.div
+                  key={note.id}
+                  layout
+                  whileHover={{ scale: 1.01, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedNoteId(note.id)}
+                  className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm p-4 transition-all cursor-pointer flex flex-col justify-between min-h-[160px] ${
+                    THEMES[note.color as ThemeId]?.bg || THEMES.default.bg
+                  } ${
+                    THEMES[note.color as ThemeId]?.border ||
+                    THEMES.default.border
+                  } hover:shadow-lg hover:scale-[1.02]`}
+                >
+                  <div className="flex flex-col justify-between h-full relative z-10">
+                    {/* Top: Title & Preview */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-lg text-white/90 line-clamp-2 leading-tight mb-2">
+                        {note.title || "Sin título"}
+                      </h3>
+                      <p className="text-xs text-slate-500 line-clamp-3 whitespace-pre-wrap break-words">
+                        {getNotePreview(note.content)}
+                      </p>
+                    </div>
+
+                    {/* Bottom: Meta & Actions */}
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] uppercase tracking-wider font-medium text-slate-600">
+                          {format(new Date(note.updated_at), "MMM d")}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditAura({
+                              id: note.id,
+                              type: "note",
+                              color: note.color,
+                            });
+                          }}
+                          className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                        >
+                          <MoreVertical size={14} />
+                        </button>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 -mr-1 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteTarget({
+                            type: "note",
+                            id: note.id,
+                            name: note.title || "Nota sin título",
+                          });
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-        )}
-      </main>
 
-      {/* Floating Action Button - Hidden during Minecraft */}
-      {!selectedNoteId && !isMinecraftPlaying && (
+          {filteredFolders.length === 0 && filteredNotes.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+              <div className="w-20 h-20 rounded-full bg-slate-900 flex items-center justify-center mb-4">
+                <FolderPlus size={32} className="opacity-50" />
+              </div>
+              <p className="text-lg font-medium">Carpeta vacía</p>
+              <p className="text-sm">Agrega notas o subcarpetas</p>
+            </div>
+          )}
+        </main>
+      )}
+
+      {/* Floating Action Button - Hidden during Minecraft and on Rituals tab */}
+      {!selectedNoteId && activeTab === "notes" && !isMinecraftPlaying && (
         <div className="fixed bottom-6 right-6 z-50">
           <Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <SheetTrigger asChild>

@@ -68,13 +68,13 @@
     </LinearLayout>
 
     <!-- Separador visual -->
-    <View
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="14dp"
         android:alpha="0.2"
-        android:background="@android:color/white" />
+        android:src="@android:color/white" />
 
     <!-- Cuerpo del mensaje -->
     <TextView

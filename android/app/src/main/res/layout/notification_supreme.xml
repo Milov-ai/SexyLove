@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/notification_root"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
+    android:minHeight="80dp"
+    android:padding="12dp"
     android:background="#FFFFFFFF">
     <!-- Note: RemoteViews limit specific ViewGroups. RelativeLayout is safe. -->
 
@@ -17,8 +19,8 @@
         android:scaleType="centerCrop"
         android:src="@android:drawable/sym_def_app_icon" />
 
-    <!-- Text Area -->
     <LinearLayout
+        android:id="@+id/notification_text_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/notification_icon"
@@ -29,27 +31,40 @@
 
         <TextView
             android:id="@+id/notification_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Title"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:ellipsize="end"
             android:maxLines="1" />
 
         <TextView
             android:id="@+id/notification_body"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Body text goes here..."
-            android:textColor="#555555"
-            android:textSize="12sp"
+            android:text="Body text..."
+            android:textColor="#EEFFFFFF"
+            android:textSize="14sp"
             android:ellipsize="end"
             android:maxLines="1" />
+            
+        <!-- Action Button (Hidden by default, shown if action exists) -->
+        <Button
+            android:id="@+id/notification_action_button"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/white"
+            android:text="Acción"
+            android:textColor="#FF000000"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:textAllCaps="false"
+            style="?android:attr/borderlessButtonStyle" />
     </LinearLayout>
 
-    <!-- Emoji / Right Decor -->
     <TextView
         android:id="@+id/notification_emoji"
         android:layout_width="wrap_content"
@@ -58,6 +73,6 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="12dp"
         android:text="✨"
-        android:textSize="24sp" />
+        android:textSize="32sp" />
 
 </RelativeLayout>

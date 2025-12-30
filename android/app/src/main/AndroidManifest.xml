@@ -21,8 +21,24 @@
         <receiver android:name=".NotificationReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="com.sexylove.app.ACTION_NOTIFICATION_CLICK" />
+                <action android:name="com.sexylove.app.RITUAL_ACTION" />
             </intent-filter>
         </receiver>
+
+        <!-- RITUAL ALARM SYSTEM -->
+        <receiver 
+            android:name=".RitualAlarmReceiver"
+            android:exported="false" />
+        
+        <receiver 
+            android:name=".RitualBootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
 
         <!-- CHAMELEON PROTOCOL: 5 Personalities -->
         <!-- Note to User: Using NANO VECTOR DRAWABLES (XML) for infinite resolution -->
@@ -208,4 +224,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Ritual Alarm System Permissions -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 </manifest>

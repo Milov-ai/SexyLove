@@ -29,8 +29,15 @@ class NotificationReceiver : BroadcastReceiver() {
             jsObject.put("actionId", actionId)
             jsObject.put("notificationId", notificationId)
             
+            val ritualId = intent.getStringExtra("ritualId")
+            if (ritualId != null) {
+                val notificationData = JSObject()
+                notificationData.put("ritualId", ritualId)
+                jsObject.put("notification", notificationData)
+            }
+            
             // Helper method in Plugin to emit event
-            CustomNotificationPlugin.notifyListenersStatic("notificationAction", jsObject)
+            CustomNotificationPlugin.notifyListenersStatic("notificationActionPerformed", jsObject)
             
             // Close notification panel
             val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
