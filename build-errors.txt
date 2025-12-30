@@ -1,7 +1,0 @@
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(4,1): error TS6133: 'Button' is declared but its value is never read.
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(5,1): error TS6133: 'Input' is declared but its value is never read.
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(9,12): error TS6133: 'ImageIcon' is declared but its value is never read.
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(10,3): error TS6133: 'RotateCw' is declared but its value is never read.
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(13,3): error TS6133: 'Clock' is declared but its value is never read.
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(14,3): error TS6133: 'User' is declared but its value is never read.
-src/features/notes/components/blocks/CinePolaroidBlock.tsx(15,3): error TS6133: 'Tags' is declared but its value is never read.
