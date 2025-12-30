@@ -8,6 +8,7 @@ import { DailyProgress } from "./DailyProgress";
 import { RitualList } from "./RitualList";
 import { RitualEditor } from "./RitualEditor";
 import { ritualScheduler } from "../services/RitualScheduler";
+import { DebugLoggerUI } from "@/components/DebugLoggerUI";
 import type { Ritual, RitualWithStatus } from "../types";
 
 export function RitualsTab() {
@@ -53,7 +54,7 @@ export function RitualsTab() {
             className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full"
           />
           <span className="text-sm text-muted-foreground">
-            Cargando rituales...
+            Cargando tareas...
           </span>
         </motion.div>
       </div>
@@ -85,6 +86,8 @@ export function RitualsTab() {
         onOpenChange={setEditorOpen}
         editingRitual={editingRitual}
       />
+
+      <DebugLoggerUI />
     </motion.div>
   );
 }

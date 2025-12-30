@@ -25,8 +25,8 @@ import java.util.concurrent.Executors
 class CustomNotificationPlugin : Plugin() {
 
     private val TAG = "CustomNotification"
-    private val channelId = "sexylove-premium"
-    private val channelName = "SexyLove Premium Alerts"
+    private val channelId = "sexylove-premium-v3"
+    private val channelName = "SexyLove Premium"
     private val executor = Executors.newCachedThreadPool()
 
     companion object {
@@ -47,13 +47,13 @@ class CustomNotificationPlugin : Plugin() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             
-            // Premium Channel (High Priority)
+            // Premium Channel (High Importance for Peeking/Pop-up)
             val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "Notificaciones premium de SexyLove"
                 enableLights(true)
                 enableVibration(true)
                 setShowBadge(true)
-                setBypassDnd(true) // Aggressive setting for "Supreme" experience
+                // Note: setBypassDnd removed as it requires extra system permissions
             }
             notificationManager.createNotificationChannel(channel)
             Log.d(TAG, "Channel created: $channelId")
@@ -62,19 +62,104 @@ class CustomNotificationPlugin : Plugin() {
 
     @PluginMethod
     fun showCustomNotification(call: PluginCall) {
-        val title = call.getString("title") ?: "SexyLove"
-        val body = call.getString("body") ?: ""
-        val identityName = call.getString("identityName") ?: "SexyLove"
-        val emoji = call.getString("emoji") ?: "✨"
-        val backgroundColor = call.getString("backgroundColor") ?: "#FF69B4"
-        val iconName = call.getString("icon") ?: "ic_notif_pide_un_deseo"
         val style = call.getString("style") ?: "standard"
         
-        if (style == "supreme") {
-            showSupremeNotification(call)
+        if (style == "premium" || style == "supreme") {
+            showPremiumNotification(call)
         } else {
-            // Legacy / Standard implementation
+            val title = call.getString("title") ?: "SexyLove"
+            val body = call.getString("body") ?: ""
+            val identityName = call.getString("identityName") ?: "SexyLove"
+            val emoji = call.getString("emoji") ?: "✨"
+            val backgroundColor = call.getString("backgroundColor") ?: "#FF69B4"
+            val iconName = call.getString("icon") ?: "ic_notif_pide_un_deseo"
             showStandardNotification(call, title, body, identityName, emoji, backgroundColor, iconName)
+        }
+    }
+
+    private fun showPremiumNotification(call: PluginCall) {
+        executor.execute {
+            try {
+                val title = call.getString("title") ?: "SexyLove"
+                val body = call.getString("body") ?: ""
+                val identityName = call.getString("identityName") ?: "SexyLove"
+                val emoji = call.getString("emoji") ?: "✨"
+                val backgroundColor = call.getString("backgroundColor") ?: "#FF69B4"
+                val iconName = call.getString("icon") ?: "ic_notif_pide_un_deseo"
+                val ritualId = call.getString("ritualId")
+                val textColorStr = call.getString("textColor") ?: "#FFFFFF"
+                
+                Log.d(TAG, "Building PREMIUM Notification: $identityName")
+
+                val remoteViews = RemoteViews(context.packageName, R.layout.custom_notification)
+                val bigRemoteViews = RemoteViews(context.packageName, R.layout.custom_notification_expanded)
+                
+                val bgColor = Color.parseColor(backgroundColor)
+                val textColor = Color.parseColor(textColorStr)
+
+                // 1. Collapsed View
+                remoteViews.setInt(R.id.notification_root, "setBackgroundColor", bgColor)
+                remoteViews.setTextViewText(R.id.identity_name, identityName)
+                remoteViews.setTextColor(R.id.identity_name, textColor)
+                remoteViews.setTextViewText(R.id.notification_title, title)
+                remoteViews.setTextColor(R.id.notification_title, textColor)
+                remoteViews.setTextViewText(R.id.notification_body, body)
+                remoteViews.setTextColor(R.id.notification_body, textColor)
+                remoteViews.setTextViewText(R.id.aura_emoji, emoji)
+                
+                // Big Icon Slot (Using Small Icon resource as requested)
+                val iconResId = getIconResId(iconName)
+                remoteViews.setImageViewResource(R.id.identity_icon, iconResId)
+
+                // 2. Expanded View
+                bigRemoteViews.setInt(R.id.notification_root_expanded, "setBackgroundColor", bgColor)
+                bigRemoteViews.setTextViewText(R.id.identity_name_big, identityName)
+                bigRemoteViews.setTextColor(R.id.identity_name_big, textColor)
+                bigRemoteViews.setTextViewText(R.id.notification_title_big, title)
+                bigRemoteViews.setTextColor(R.id.notification_title_big, textColor)
+                bigRemoteViews.setTextViewText(R.id.notification_body_big, body)
+                bigRemoteViews.setTextColor(R.id.notification_body_big, textColor)
+                bigRemoteViews.setTextViewText(R.id.aura_emoji_big, emoji)
+                bigRemoteViews.setImageViewResource(R.id.identity_icon_big, iconResId)
+                bigRemoteViews.setTextColor(R.id.branding, textColor)
+
+                // 3. Intents (Body click only for now to keep it clean)
+                val intent = Intent(context, NotificationReceiver::class.java).apply {
+                    action = "com.sexylove.app.ACTION_NOTIFICATION_CLICK"
+                    putExtra("actionId", "body_click")
+                    putExtra("notificationId", ritualId.hashCode())
+                    putExtra("ritualId", ritualId)
+                }
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context, 
+                    System.currentTimeMillis().toInt(), 
+                    intent, 
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                remoteViews.setOnClickPendingIntent(R.id.notification_root, pendingIntent)
+                bigRemoteViews.setOnClickPendingIntent(R.id.notification_root_expanded, pendingIntent)
+
+                // 4. Build & Notify
+                val notificationId = ritualId?.hashCode() ?: System.currentTimeMillis().toInt()
+                val builder = NotificationCompat.Builder(context, channelId)
+                    .setSmallIcon(getIconResId(iconName))
+                    .setCustomContentView(remoteViews)
+                    .setCustomBigContentView(bigRemoteViews)
+                    .setContentTitle(title) // Standard fallback
+                    .setContentText(body)  // Standard fallback
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setAutoCancel(true)
+
+                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.notify(notificationId, builder.build())
+                
+                call.resolve()
+            } catch (e: Exception) {
+                Log.e(TAG, "Premium Error", e)
+                call.reject(e.message)
+            }
         }
     }
 
@@ -84,7 +169,7 @@ class CustomNotificationPlugin : Plugin() {
             val notificationId = System.currentTimeMillis().toInt()
             val smallIconResId = getIconResId(iconName)
             
-            // Standard Builder
+            // Standard Builder with colorization
             val builder = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(smallIconResId)
                 .setContentTitle("$identityName $emoji")
@@ -100,87 +185,6 @@ class CustomNotificationPlugin : Plugin() {
             call.resolve()
         } catch (e: Exception) {
             call.reject(e.message)
-        }
-    }
-
-    private fun showSupremeNotification(call: PluginCall) {
-        // Run on background thread for bitmap loading
-        executor.execute {
-            try {
-                val title = call.getString("title") ?: "Special Alert"
-                val body = call.getString("body") ?: "You have a new message"
-                val identityName = call.getString("identityName") ?: "SexyLove"
-                val emoji = call.getString("emoji") ?: "✨"
-                val heroImage = call.getString("heroImage") // URL or Path
-                val backgroundColor = call.getString("backgroundColor") ?: "#FF69B4"
-                
-                Log.d(TAG, "Building Supreme Notification with Hero: $heroImage")
-
-                // 1. Prepare RemoteViews
-                val remoteViews = RemoteViews(context.packageName, R.layout.notification_supreme)
-                
-                // 1.1 Set Background Color
-                try {
-                    val bgColor = Color.parseColor(backgroundColor)
-                    remoteViews.setInt(R.id.notification_root, "setBackgroundColor", bgColor)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Invalid color: $backgroundColor", e)
-                }
-                
-                // 2. Bind Text
-                remoteViews.setTextViewText(R.id.notification_title, title)
-                remoteViews.setTextViewText(R.id.notification_body, body)
-                remoteViews.setTextViewText(R.id.notification_emoji, emoji)
-                
-                // 3. Bind Images (Hero)
-                if (heroImage != null && heroImage.startsWith("http")) {
-                    val bitmap = loadBitmapFromUrl(heroImage)
-                    if (bitmap != null) {
-                        // Assuming we might have a hero slot or just reuse icon slot for now
-                        // For Supreme, let's set the main icon to this bitmap
-                        remoteViews.setImageViewBitmap(R.id.notification_icon, bitmap)
-                    }
-                } else {
-                    // Fallback to static icon
-                    remoteViews.setImageViewResource(R.id.notification_icon, android.R.drawable.sym_def_app_icon)
-                }
-
-                // 4. Bind Actions (Dynamic PendingIntents)
-                // This would be loop-based if we had dynamic button IDs. 
-                // For now, let's assume clicking the whole notification body is the action.
-                val clickIntent = Intent(context, NotificationReceiver::class.java).apply {
-                    action = "com.sexylove.app.ACTION_NOTIFICATION_CLICK"
-                    putExtra("actionId", "body_click")
-                    putExtra("notificationId", 1337)
-                }
-                val pendingIntent = PendingIntent.getBroadcast(
-                    context, 
-                    0, 
-                    clickIntent, 
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-                remoteViews.setOnClickPendingIntent(R.id.notification_title, pendingIntent)
-                remoteViews.setOnClickPendingIntent(R.id.notification_body, pendingIntent)
-
-                // 5. Build
-                val notificationId = System.currentTimeMillis().toInt()
-                val builder = NotificationCompat.Builder(context, channelId)
-                    .setSmallIcon(android.R.drawable.ic_dialog_info)
-                    .setCustomContentView(remoteViews)
-                    .setCustomBigContentView(remoteViews) // Expandable
-                    .setStyle(NotificationCompat.DecoratedCustomViewStyle()) // Helps with compatibility
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setAutoCancel(true)
-                    .setOnlyAlertOnce(true)
-
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.notify(notificationId, builder.build())
-                
-                call.resolve()
-            } catch (e: Exception) {
-                Log.e(TAG, "Supreme Error", e)
-                call.reject(e.message)
-            }
         }
     }
 

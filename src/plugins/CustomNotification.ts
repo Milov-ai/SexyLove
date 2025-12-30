@@ -8,9 +8,11 @@ export interface CustomNotificationOptions {
   backgroundColor: string; // Color de fondo (#RRGGBB)
   textColor?: string; // Color del texto (#RRGGBB)
   icon?: string;
+  ritualId?: string;
+  payload?: unknown;
 
   // Supreme Options
-  style?: "standard" | "supreme";
+  style?: "standard" | "supreme" | "premium";
   heroImage?: string; // URL o Ruta
   actions?: { id: string; label: string }[];
 }

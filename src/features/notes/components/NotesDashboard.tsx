@@ -513,7 +513,7 @@ const NotesDashboard = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 pb-2 flex items-center gap-3">
+        <div className="relative z-10 px-6 pb-2 flex items-center gap-3">
           <button
             onClick={() => setActiveTab("notes")}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -532,7 +532,7 @@ const NotesDashboard = () => {
                 : "bg-card/50 text-muted-foreground hover:bg-card/80"
             }`}
           >
-            ✨ Rituales
+            ☀️ Mi Día
           </button>
         </div>
 

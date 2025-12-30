@@ -3,10 +3,20 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Clock, MoreHorizontal, Bell, SkipForward } from "lucide-react";
+import {
+  Check,
+  Clock,
+  MoreHorizontal,
+  Bell,
+  CalendarDays,
+  RotateCcw,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RitualWithStatus } from "../types";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
 import { useRitualsStore } from "../store/rituals.store";
+import { notificationService } from "@/services/NotificationService";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { THEMES, HEX_TO_THEME_ID, type ThemeId } from "@/lib/theme-constants";
 
 interface RitualCardProps {
   ritual: RitualWithStatus;
@@ -32,13 +43,13 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
     try {
       if (ritual.completed_today) {
         await uncompleteRitual(ritual.id);
-        toast.info("Ritual desmarcado");
+        toast.info("Tarea desmarcada");
       } else {
         await completeRitual(ritual.id);
-        toast.success(`${ritual.emoji} ¡Ritual completado!`);
+        toast.success(`${ritual.emoji} ¡Tarea completada!`);
       }
     } catch {
-      toast.error("Error al actualizar ritual");
+      toast.error("Error al actualizar tarea");
     } finally {
       setIsCompleting(false);
     }
@@ -51,6 +62,15 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
       ? "due"
       : "pending";
 
+  // Resolve theme and color (supports both legacy Hex and new ThemeId storage)
+  const isHex = ritual.color.startsWith("#");
+  const themeId = isHex
+    ? (HEX_TO_THEME_ID[ritual.color] as ThemeId)
+    : (ritual.color as ThemeId);
+
+  const theme = themeId ? THEMES[themeId] : null;
+  const displayColor = theme ? theme.hex : ritual.color;
+
   return (
     <motion.div
       layout
@@ -59,28 +79,49 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "group relative rounded-2xl p-4 transition-all duration-300",
-        "glass-dirty overflow-hidden",
+        "group relative rounded-2xl p-4 transition-all duration-500",
+        "glass-dirty overflow-hidden border",
+        // Base styles
+        theme ? theme.border : "border-white/5",
+
         // State-based styling
-        cardState === "pending" && "opacity-80",
-        cardState === "due" && "border-glow animate-pulse-glow",
-        cardState === "completed" && "opacity-60",
+        // REMOVED opacity-80 from pending to make colors pop
+        cardState === "pending" && "hover:scale-[1.01]",
+        cardState === "due" && [
+          "border-glow animate-pulse-glow z-10",
+          theme ? theme.glow : "shadow-[0_0_20px_rgba(255,255,255,0.1)]",
+          "scale-[1.02]",
+        ],
+        cardState === "completed" && "opacity-60 grayscale-[0.5]",
       )}
       style={{
-        // Dynamic border color based on ritual color when due
-        borderColor: cardState === "due" ? ritual.color : undefined,
-        // Subtle tint based on ritual color
-        background:
-          cardState === "completed"
-            ? `linear-gradient(135deg, oklch(0.8 0.2 140 / 0.1), transparent)`
-            : undefined,
+        // Use theme gradient if available, otherwise fallback
+        borderTopColor: cardState === "due" ? displayColor : undefined,
+        borderRightColor: cardState === "due" ? displayColor : undefined,
+        borderBottomColor: cardState === "due" ? displayColor : undefined,
+        // Always show a subtle border color if theme exists
+        borderLeftColor: displayColor,
+        borderLeftWidth: theme ? "4px" : undefined,
       }}
     >
+      {/* Background Aura (Gradient) - INCREASED OPACITY */}
+      {theme && cardState !== "completed" && (
+        <div
+          className={cn(
+            "absolute inset-0 transition-opacity duration-500",
+            theme.bg,
+            // Much stronger opacity
+            "opacity-50",
+            cardState === "due" && "opacity-70",
+          )}
+        />
+      )}
+
       {/* Background Aura Glow (when due) */}
       {cardState === "due" && (
         <div
-          className="absolute inset-0 opacity-20 blur-xl"
-          style={{ backgroundColor: ritual.color }}
+          className="absolute inset-0 opacity-20 blur-xl transition-all duration-1000"
+          style={{ backgroundColor: displayColor }}
         />
       )}
 
@@ -99,7 +140,9 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
           )}
           style={{
             boxShadow:
-              cardState === "due" ? `0 0 20px ${ritual.color}40` : undefined,
+              cardState === "due" ? `0 0 20px ${displayColor}40` : undefined,
+            borderColor: theme ? `${displayColor}40` : undefined,
+            borderWidth: theme ? "1px" : "0px",
           }}
         >
           <AnimatePresence mode="wait">
@@ -138,33 +181,99 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
               {ritual.title}
             </h3>
 
-            {/* Time Badge */}
+            {/* Time Badge (Mobile Optimized) */}
             <div
               className={cn(
-                "flex items-center gap-1 px-2 py-1 rounded-lg",
-                "bg-card/50 text-xs font-mono",
-                cardState === "due" && "text-primary",
+                "flex items-center gap-1 px-2 py-1 rounded-lg shrink-0",
+                "bg-card/50 text-xs font-mono border border-transparent",
+                cardState === "due" && "text-primary font-bold",
+                theme && !ritual.completed_today && [theme.icon, theme.border],
               )}
             >
-              <Clock className="h-3 w-3" />
-              {ritual.time}
+              <Clock
+                className={cn(
+                  "h-3 w-3",
+                  theme && !ritual.completed_today && theme.icon,
+                )}
+              />
+              {ritual.type === "one-time"
+                ? ritual.scheduled_time || "12:00"
+                : ritual.time}
             </div>
           </div>
 
-          {/* Description (if exists) */}
+          {/* Description */}
           {ritual.description && (
             <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
               {ritual.description}
             </p>
           )}
 
-          {/* Recurrence & Streak Info */}
-          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-            <span className="capitalize">{ritual.recurrence}</span>
+          {/* Metadata Row: Recurrence/Date + Streak */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-xs">
+            {/* Type & Schedule */}
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/5 box-content">
+              {ritual.type === "one-time" && ritual.scheduled_date ? (
+                <>
+                  <CalendarDays className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-foreground/80">
+                    {format(parseISO(ritual.scheduled_date), "d MMM yyyy", {
+                      locale: es,
+                    })}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-foreground/80 lowercase first-letter:capitalize">
+                    {(() => {
+                      const days = ritual.days_of_week;
+                      if (!days || days.length === 0) return "Sín días";
+                      if (days.length === 7) return "Todos los días";
+                      if (
+                        days.length === 5 &&
+                        !days.includes(0) &&
+                        !days.includes(6)
+                      )
+                        return "Lun - Vie";
+                      if (
+                        days.length === 2 &&
+                        days.includes(0) &&
+                        days.includes(6)
+                      )
+                        return "Fin de semana";
+
+                      const dayNames = [
+                        "Dom",
+                        "Lun",
+                        "Mar",
+                        "Mié",
+                        "Jue",
+                        "Vie",
+                        "Sáb",
+                      ];
+                      return days.map((d) => dayNames[d]).join(", ");
+                    })()}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Streak Badge */}
             {ritual.streak_count > 0 && (
-              <span className="flex items-center gap-1 text-orange-400">
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 font-medium">
                 🔥 {ritual.streak_count}
-              </span>
+              </div>
+            )}
+
+            {/* Reminder Indicator */}
+            {ritual.reminders && ritual.reminders.length > 0 && (
+              <div
+                className="flex items-center gap-1 text-primary/70"
+                title="Recordatorios activos"
+              >
+                <Bell className="h-3 w-3 fill-current" />
+              </div>
             )}
           </div>
         </div>
@@ -174,9 +283,9 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
           <DropdownMenuTrigger asChild>
             <button
               className={cn(
-                "p-2 rounded-lg opacity-0 group-hover:opacity-100",
+                "p-2 rounded-lg",
                 "transition-opacity duration-200",
-                "hover:bg-card/80 focus:opacity-100",
+                "hover:bg-card/80 active:bg-card",
               )}
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -184,15 +293,13 @@ export function RitualCard({ ritual, onEdit, onDelete }: RitualCardProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={() => onEdit?.(ritual)}>
-              ✏️ Editar Ritual
+              ✏️ Editar Tarea
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => notificationService.testRitualNotification(ritual)}
+            >
               <Bell className="h-4 w-4 mr-2" />
-              Snooze 10 min
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <SkipForward className="h-4 w-4 mr-2" />
-              Saltar Hoy
+              Probar Notificación
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"

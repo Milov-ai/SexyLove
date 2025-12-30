@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { supabase } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
-import { startOfDay, parseISO, isSameDay } from "date-fns";
+import { startOfDay, parseISO, isSameDay, format } from "date-fns";
 import type {
   Ritual,
   RitualCompletion,
@@ -13,9 +13,17 @@ import type {
 // --- Helper Functions ---
 
 /**
- * Check if a ritual should be active today based on recurrence
+ * Check if a ritual should be active today based on type and recurrence
  */
 function isRitualActiveToday(ritual: Ritual): boolean {
+  if (ritual.type === "one-time") {
+    // For one-time tasks, check if scheduled_date is today
+    if (!ritual.scheduled_date) return false;
+    const today = format(new Date(), "yyyy-MM-dd");
+    return ritual.scheduled_date === today;
+  }
+
+  // For recurring tasks, check days_of_week
   const today = new Date().getDay(); // 0-6
   return ritual.days_of_week.includes(today);
 }
@@ -25,7 +33,9 @@ function isRitualActiveToday(ritual: Ritual): boolean {
  */
 function isRitualDue(ritual: Ritual): boolean {
   const now = new Date();
-  const [hours, minutes] = ritual.time.split(":").map(Number);
+  const timeStr =
+    ritual.type === "one-time" ? ritual.scheduled_time || "12:00" : ritual.time;
+  const [hours, minutes] = timeStr.split(":").map(Number);
   const scheduledTime = new Date();
   scheduledTime.setHours(hours, minutes, 0, 0);
   return now >= scheduledTime;
@@ -93,6 +103,7 @@ interface RitualsState {
 
   // Computed Getters
   getTodaysRituals: () => RitualWithStatus[];
+  getUpcomingTasks: () => Ritual[];
   getActiveRituals: () => Ritual[];
   getDailyProgress: () => {
     completed: number;
@@ -156,6 +167,8 @@ export const useRitualsStore = create<RitualsState>((set, get) => ({
     } catch (error) {
       console.error("Rituals sync error:", error);
       set({
+        rituals: [],
+        completions: [],
         error: error instanceof Error ? error.message : "Sync failed",
         isLoading: false,
       });
@@ -168,15 +181,18 @@ export const useRitualsStore = create<RitualsState>((set, get) => ({
 
     const newRitual: Ritual = {
       id,
-      user_id: "", // Will be set by RLS
+      user_id: "", // Will be omitted in DB insert
       title: input.title,
       description: input.description,
       emoji: input.emoji || "✨",
       color: input.color || "#FF69B4",
-      time: input.time,
+      type: input.type || "recurring",
+      time: input.time || "08:00",
       recurrence: input.recurrence || "daily",
       days_of_week: input.days_of_week || [0, 1, 2, 3, 4, 5, 6],
       snooze_minutes: input.snooze_minutes || 10,
+      scheduled_date: input.scheduled_date,
+      scheduled_time: input.scheduled_time,
       is_active: true,
       streak_count: 0,
       best_streak: 0,
@@ -189,11 +205,9 @@ export const useRitualsStore = create<RitualsState>((set, get) => ({
     set((state) => ({ rituals: [...state.rituals, newRitual] }));
 
     try {
-      const { error } = await supabase.from("rituals").insert({
-        ...newRitual,
-        user_id: undefined, // Let DB set via auth.uid()
-      });
-
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { user_id, ...ritualForDb } = newRitual;
+      const { error } = await supabase.from("rituals").insert(ritualForDb);
       if (error) throw error;
     } catch (error) {
       // Rollback
@@ -309,26 +323,40 @@ export const useRitualsStore = create<RitualsState>((set, get) => ({
   },
 
   uncompleteRitual: async (ritualId) => {
-    const today = startOfDay(new Date());
-    const todayCompletion = get().completions.find(
-      (c) =>
-        c.ritual_id === ritualId && isSameDay(parseISO(c.completed_at), today),
-    );
+    // Find the most recent completion for this ritual
+    const completions = get()
+      .completions.filter((c) => c.ritual_id === ritualId)
+      .sort(
+        (a, b) =>
+          new Date(b.completed_at).getTime() -
+          new Date(a.completed_at).getTime(),
+      );
 
-    if (!todayCompletion) return;
+    const recentCompletion = completions[0];
+
+    // Only allow uncompleting if it was done today (security/logic check)
+    // OR if it's the specific one we just likely made?
+    // Let's just stick to "if we found one, and it's from today relative to client time"
+    if (!recentCompletion) return;
+
+    // Allow deleting the most recent completion regardless of date
+    // This supports unchecking tasks that were completed on a different day (past or future)
+    const completionToDelete = recentCompletion;
 
     const originalCompletions = get().completions;
 
     // Optimistic Update
     set((state) => ({
-      completions: state.completions.filter((c) => c.id !== todayCompletion.id),
+      completions: state.completions.filter(
+        (c) => c.id !== completionToDelete.id,
+      ),
     }));
 
     try {
       const { error } = await supabase
         .from("ritual_completions")
         .delete()
-        .eq("id", todayCompletion.id);
+        .eq("id", completionToDelete.id);
 
       if (error) throw error;
     } catch (error) {
@@ -351,17 +379,28 @@ export const useRitualsStore = create<RitualsState>((set, get) => ({
     return rituals
       .filter((r) => r.is_active && isRitualActiveToday(r))
       .map((ritual): RitualWithStatus => {
-        const todayCompletion = completions.find(
-          (c) =>
-            c.ritual_id === ritual.id &&
-            isSameDay(parseISO(c.completed_at), today),
-        );
+        const isOneTime = ritual.type === "one-time";
+
+        // Find suitable completion: Any record for One-Time, Today's record for Recurring
+        const completion = isOneTime
+          ? completions
+              .filter((c) => c.ritual_id === ritual.id)
+              .sort(
+                (a, b) =>
+                  new Date(b.completed_at).getTime() -
+                  new Date(a.completed_at).getTime(),
+              )[0]
+          : completions.find(
+              (c) =>
+                c.ritual_id === ritual.id &&
+                isSameDay(parseISO(c.completed_at), today),
+            );
 
         return {
           ...ritual,
-          completed_today: !!todayCompletion,
+          completed_today: !!completion,
           is_due: isRitualDue(ritual),
-          today_completion: todayCompletion,
+          today_completion: completion,
         };
       })
       .sort((a, b) => {
@@ -380,6 +419,22 @@ export const useRitualsStore = create<RitualsState>((set, get) => ({
 
   getActiveRituals: () => {
     return get().rituals.filter((r) => r.is_active);
+  },
+
+  getUpcomingTasks: () => {
+    const today = format(new Date(), "yyyy-MM-dd");
+    return get()
+      .rituals.filter(
+        (r) =>
+          r.is_active &&
+          r.type === "one-time" &&
+          r.scheduled_date &&
+          // Strict string comparison (YYYY-MM-DD)
+          r.scheduled_date.split("T")[0] > today,
+      )
+      .sort((a, b) =>
+        (a.scheduled_date || "").localeCompare(b.scheduled_date || ""),
+      );
   },
 
   getDailyProgress: () => {

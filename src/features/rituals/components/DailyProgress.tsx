@@ -89,10 +89,10 @@ export function DailyProgress() {
       {/* Status text */}
       <p className="text-sm text-muted-foreground text-center">
         {progress.percentage === 100
-          ? "¡Todos los rituales completados! 🎉"
+          ? "¡Todas las tareas completadas! 🎉"
           : progress.completed === 0
-            ? "Comienza tu día con un ritual"
-            : `${progress.total - progress.completed} rituales pendientes`}
+            ? "Comienza tu día con una tarea"
+            : `${progress.total - progress.completed} tareas pendientes`}
       </p>
     </div>
   );
