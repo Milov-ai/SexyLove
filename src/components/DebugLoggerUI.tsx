@@ -89,9 +89,9 @@ export const DebugLoggerUI = () => {
                     <span className="uppercase">{log.level}</span>
                   </div>
                   <div className="break-words font-bold">{log.message}</div>
-                  {log.data && (
+                  {log.data != null && (
                     <pre className="mt-1 overflow-x-auto p-1 bg-black/30 rounded text-[9px]">
-                      {JSON.stringify(log.data, null, 2)}
+                      {String(JSON.stringify(log.data, null, 2))}
                     </pre>
                   )}
                 </div>

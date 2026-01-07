@@ -153,15 +153,24 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  /* Glassmorphism 3.0 "Dirty Glass" simulated with noise */
+  /* Glassmorphism 3.0 "Dirty Glass" simulated with noise - Theme Aware */
   .glass-dirty {
     @apply backdrop-blur-[20px] bg-[length:200px_200px] relative overflow-hidden;
-    background-color: rgba(30, 10, 50, 0.4); /* Fallback/Tint */
+    background-color: rgba(255, 255, 255, 0.7); /* Light Mode: Frost */
+    border: 1px solid rgba(0, 0, 0, 0.05); /* Light Mode: Subtle Border */
+    box-shadow:
+      0 4px 30px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+  
+  :is(.dark *) .glass-dirty {
+    background-color: rgba(30, 10, 50, 0.4); /* Dark Mode: Void Tint */
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
       0 4px 30px rgba(0, 0, 0, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
+
   .glass-dirty::before {
     content: "";
     @apply absolute inset-0 opacity-[0.03] pointer-events-none;
@@ -176,6 +185,10 @@
 
   .text-glow-white {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+  
+  :is(.light *) .text-glow-white { /* Invert for light mode legibility if needed, or keep glow */
+     text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
 
   .border-glow {
@@ -240,17 +253,19 @@
   animation: seduce-enter 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Custom Scrollbar for the "Premium" Feel */
+/* Custom Scrollbar for the "Premium" Feel - Theme Aware */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: oklch(0.05 0.01 280);
+  background: var(--background); /* Use theme variable */
 }
+
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.2 0.02 280);
+  background: var(--muted-foreground); /* Use theme variable */
+  opacity: 0.5;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.6 0.25 300);
+  background: var(--primary);
 }

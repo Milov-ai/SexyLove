@@ -210,7 +210,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-black/20 border-white/10 focus:border-primary/50"
+                  className="bg-muted border-border focus:border-primary/50"
                   required
                 />
               </div>
@@ -221,7 +221,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-black/20 border-white/10 focus:border-primary/50"
+                  className="bg-muted border-border focus:border-primary/50"
                   required
                 />
               </div>
@@ -261,7 +261,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="Código secreto"
                   value={accessCode}
                   onChange={(e) => setAccessCode(e.target.value)}
-                  className="bg-black/20 border-white/10 focus:border-primary/50"
+                  className="bg-muted border-border focus:border-primary/50"
                   required
                 />
               </div>
@@ -273,7 +273,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="Usuario"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="bg-black/20 border-white/10 focus:border-secondary/50"
+                  className="bg-muted border-border focus:border-secondary/50"
                   required
                 />
               </div>
@@ -285,7 +285,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-black/20 border-white/10 focus:border-secondary/50"
+                  className="bg-muted border-border focus:border-secondary/50"
                   required
                 />
               </div>
@@ -296,7 +296,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-black/20 border-white/10 focus:border-secondary/50"
+                  className="bg-muted border-border focus:border-secondary/50"
                   required
                 />
               </div>

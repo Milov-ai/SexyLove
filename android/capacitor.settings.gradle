@@ -10,3 +10,6 @@ project(':capacitor-local-notifications').projectDir = new File('../node_modules
 
 include ':capacitor-push-notifications'
 project(':capacitor-push-notifications').projectDir = new File('../node_modules/.pnpm/@capacitor+push-notifications@8.0.0_@capacitor+core@7.4.4/node_modules/@capacitor/push-notifications/android')
+
+include ':capacitor-native-biometric'
+project(':capacitor-native-biometric').projectDir = new File('../node_modules/.pnpm/capacitor-native-biometric@4.2.2/node_modules/capacitor-native-biometric/android')

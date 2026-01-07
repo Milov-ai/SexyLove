@@ -25,19 +25,19 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center glass-dirty border-b border-white/10 transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center glass-dirty border-b border-border transition-all duration-300">
       <div className="inline-block relative group">
         <div
           onClick={handleTitleClick}
           className="cursor-pointer flex items-center gap-3 select-none group"
         >
           <BrandLogo size={42} />
-          <h1 className="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 drop-shadow-sm group-hover:scale-105 transition-transform duration-300 hidden md:block">
+          <h1 className="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 group-hover:scale-105 transition-transform duration-300 hidden md:block">
             Sex&Love
           </h1>
         </div>
         {user && (
-          <Badge className="absolute -bottom-2 -right-4 rotate-[-5deg] border-white/20 bg-gradient-to-r from-indigo-500 to-pink-500 shadow-lg animate-pulse pointer-events-none">
+          <Badge className="absolute -bottom-2 -right-4 rotate-[-5deg] border-primary/30 bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg animate-pulse pointer-events-none">
             {user.username}
           </Badge>
         )}

@@ -110,8 +110,13 @@ interface VaultState {
   addFantasy: (fantasy: Fantasy) => Promise<void>;
   updateFantasy: (fantasy: Fantasy) => Promise<void>;
   deleteFantasy: (fantasyId: string) => Promise<void>;
-  /** Locks the vault and signs the user out */
-  lockVault: () => Promise<void>;
+
+  // Biometric/Lock State
+  isLocked: boolean;
+  showLockPrompt: boolean;
+  unlockVault: () => void;
+  /** Locks the vault (sets isLocked=true). If silent=true, no prompt is shown initially (facade mode) */
+  lockVault: (silent?: boolean) => Promise<void>;
 }
 
 /**
@@ -121,6 +126,8 @@ interface VaultState {
  * ```ts
  * const { isAuthenticated, lockVault } = useVaultStore();
  * ```
+ *
+ * @type {import('zustand').UseBoundStore<import('zustand').StoreApi<VaultState>>}
  */
 export const useVaultStore = create<VaultState>((set, get) => ({
   isAuthenticated: false,
@@ -133,6 +140,11 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   justAddedLugarId: null,
   lugarToCenter: null,
   shouldFitBounds: false,
+
+  // Biometric Lock State (volatile - resets on app restart)
+  isLocked: false,
+  showLockPrompt: false,
+  unlockVault: () => set({ isLocked: false }),
   unlockedAchievements: [],
   profiles: [],
   userProfile: null,
@@ -865,8 +877,9 @@ export const useVaultStore = create<VaultState>((set, get) => ({
     );
   },
 
-  lockVault: async () => {
-    await supabase.auth.signOut();
-    set({ isAuthenticated: false, user: null, decryptedVault: null });
+  lockVault: async (silent = false) => {
+    // Lock the vault without signing out (Biometric/PIN required to re-enter)
+    set({ isLocked: true, showLockPrompt: !silent });
+    // Note: We deliberately DO NOT signOut() so session persists for PIN
   },
 }));

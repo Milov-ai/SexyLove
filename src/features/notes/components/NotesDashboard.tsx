@@ -503,17 +503,17 @@ const NotesDashboard = () => {
               </div>
 
               {/* Vertical Separator */}
-              <div className="w-px h-10 md:h-24 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
+              <div className="w-px h-10 md:h-24 bg-gradient-to-b from-transparent via-foreground/30 to-transparent" />
 
               {/* Typographic Stack */}
               <div className="flex flex-col items-start text-left -space-y-0.5 md:-space-y-1 pr-12 pb-4 overflow-visible">
-                <span className="font-sans text-[10px] md:text-sm font-bold tracking-[0.2em] md:tracking-[0.6em] uppercase text-slate-400 group-hover:text-white transition-colors duration-300 ml-0.5">
+                <span className="font-sans text-[10px] md:text-sm font-bold tracking-[0.2em] md:tracking-[0.6em] uppercase text-muted-foreground group-hover:text-foreground transition-colors duration-300 ml-0.5">
                   PIDE UN
                 </span>
 
                 <h1 className="font-sans text-4xl md:text-7xl font-black tracking-tighter leading-none overflow-visible drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] md:drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
                   {/* Liquid Metal + Neon Gradient */}
-                  <span className="bg-gradient-to-b from-white via-slate-200 to-slate-400 bg-clip-text text-transparent pr-2">
+                  <span className="bg-gradient-to-b from-foreground via-muted-foreground to-muted-foreground/60 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent pr-2">
                     DESEO
                   </span>
                 </h1>
@@ -529,7 +529,7 @@ const NotesDashboard = () => {
                 onClick={() =>
                   setViewMode(viewMode === "grid" ? "list" : "grid")
                 }
-                className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-full w-12 h-12 transition-all hover:scale-105"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full w-12 h-12 transition-all hover:scale-105"
               >
                 {viewMode === "grid" ? (
                   <ListIcon size={24} />
@@ -575,7 +575,7 @@ const NotesDashboard = () => {
                 onClick={() =>
                   setCurrentFolderId(currentFolder?.parent_id || null)
                 }
-                className="bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white px-3 py-1.5 h-auto rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-105 flex items-center gap-1.5 group"
+                className="bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground px-3 py-1.5 h-auto rounded-full backdrop-blur-md border border-border transition-all hover:scale-105 flex items-center gap-1.5 group"
               >
                 <ChevronLeft
                   size={16}
@@ -589,7 +589,7 @@ const NotesDashboard = () => {
             {currentFolder && (
               <>
                 <span className="text-slate-600">/</span>
-                <span className="text-sm font-medium text-slate-200">
+                <span className="text-sm font-medium text-foreground">
                   {currentFolder.name}
                 </span>
               </>

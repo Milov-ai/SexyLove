@@ -91,12 +91,12 @@ export function CrudModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-background/95 backdrop-blur-xl border-white/10">
+      <DialogContent className="sm:max-w-[425px] bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-slate-200 dark:border-white/10 shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
             {title}
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogDescription className="text-slate-500 dark:text-muted-foreground">
             Gestiona tus opciones personalizadas para {title.toLowerCase()}.
           </DialogDescription>
         </DialogHeader>
@@ -107,7 +107,7 @@ export function CrudModal({
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
               placeholder="Nuevo elemento..."
-              className="bg-white/5 border-white/10 focus:border-primary/50"
+              className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary/50"
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               disabled={isSubmitting}
             />
@@ -125,21 +125,21 @@ export function CrudModal({
 
           <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
             {items.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-sm italic">
+              <div className="text-center py-8 text-slate-500 dark:text-muted-foreground text-sm italic">
                 No hay elementos. ¡Añade uno!
               </div>
             ) : (
               items.map((item) => (
                 <div
                   key={item}
-                  className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 group hover:border-primary/20 transition-all"
+                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 group hover:border-primary/20 transition-all"
                 >
                   {editingItem === item ? (
                     <div className="flex gap-2 flex-1 mr-2">
                       <Input
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="h-8 bg-black/20"
+                        className="h-8 bg-white dark:bg-black/20 text-slate-900 dark:text-white border-slate-200 dark:border-transparent"
                         autoFocus
                         onKeyDown={(e) => e.key === "Enter" && handleEdit(item)}
                       />
@@ -164,12 +164,14 @@ export function CrudModal({
                     </div>
                   ) : (
                     <>
-                      <span className="text-sm font-medium">{item}</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                        {item}
+                      </span>
                       <div className="flex gap-1">
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          className="h-8 w-8 text-slate-400 dark:text-muted-foreground hover:text-primary"
                           onClick={() => {
                             setEditingItem(item);
                             setEditValue(item);
@@ -180,7 +182,7 @@ export function CrudModal({
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="h-8 w-8 text-slate-400 dark:text-muted-foreground hover:text-destructive"
                           onClick={() => handleDelete(item)}
                         >
                           <Trash2 className="h-3 w-3" />
