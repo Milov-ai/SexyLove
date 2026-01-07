@@ -202,7 +202,7 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl w-full h-[90vh] flex flex-col p-0 gap-0 bg-white dark:bg-slate-950 border-slate-200 dark:border-white/10">
+        <DialogContent className="max-w-4xl w-full h-[90vh] flex flex-col p-0 gap-0 bg-background border-border">
           <DialogTitle className="sr-only">Editar Lugar</DialogTitle>
           <DialogDescription className="sr-only">
             Formulario para editar los detalles del lugar
@@ -214,7 +214,7 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
                   Editar Lugar
                 </h2>
-                <p className="text-slate-500 dark:text-muted-foreground">
+                <p className="text-muted-foreground">
                   Refina los detalles de tu santuario.
                 </p>
               </div>
@@ -230,22 +230,22 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
 
             <div className="flex-1 overflow-hidden">
               <Tabs defaultValue="basic" className="h-full flex flex-col">
-                <TabsList className="grid w-full grid-cols-4 bg-slate-900/50 p-1 rounded-xl mb-6">
+                <TabsList className="grid w-full grid-cols-4 bg-muted/50 p-1 rounded-xl mb-6">
                   <TabsTrigger
                     value="basic"
-                    className="data-[state=active]:bg-pink-600 data-[state=active]:text-white rounded-lg"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
                   >
                     Esencia
                   </TabsTrigger>
                   <TabsTrigger
                     value="location"
-                    className="data-[state=active]:bg-pink-600 data-[state=active]:text-white rounded-lg"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
                   >
                     Ubicación
                   </TabsTrigger>
                   <TabsTrigger
                     value="vibe"
-                    className="data-[state=active]:bg-pink-600 data-[state=active]:text-white rounded-lg"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
                   >
                     Vibe
                   </TabsTrigger>
@@ -266,7 +266,7 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                       <Input
                         id="nombre"
                         {...register("nombre")}
-                        className="text-xl p-6 bg-slate-900/50 border-slate-700 focus:border-pink-500"
+                        className="text-xl p-6 bg-muted/30 border-border focus:ring-1 focus:ring-primary"
                       />
                       {errors.nombre && (
                         <p className="text-red-500 text-sm">
@@ -281,7 +281,7 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                       <Textarea
                         id="description"
                         {...register("description")}
-                        className="min-h-[200px] text-lg p-4 bg-slate-900/50 border-slate-700 focus:border-pink-500 resize-none"
+                        className="min-h-[200px] text-lg p-4 bg-muted/30 border-border focus:ring-1 focus:ring-primary resize-none"
                       />
                     </div>
                   </TabsContent>
@@ -292,7 +292,7 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                         Dirección
                       </Label>
                       <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                         <Input
                           id="direccion"
                           {...register("direccion")}
@@ -307,15 +307,15 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                       onClick={() => setIsMapPickerOpen(true)}
                       className={`h-64 w-full rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all ${
                         values.coordinates
-                          ? "border-green-500/50 bg-green-500/5"
-                          : "border-slate-700 bg-slate-900/30 hover:border-pink-500/50"
+                          ? "border-primary/50 bg-primary/5"
+                          : "border-border bg-muted/30 hover:border-primary/50"
                       }`}
                     >
                       <MapPin
                         className={`w-12 h-12 ${
                           values.coordinates
-                            ? "text-green-500"
-                            : "text-slate-500"
+                            ? "text-primary"
+                            : "text-muted-foreground/60"
                         }`}
                       />
                       {values.coordinates &&
@@ -334,7 +334,7 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                           </p>
                         </div>
                       ) : (
-                        <p className="text-slate-400">
+                        <p className="text-muted-foreground">
                           Toca para seleccionar en el mapa
                         </p>
                       )}
@@ -368,8 +368,8 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                             }
                             className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${
                               values.privacy === option.value
-                                ? "border-pink-500 bg-pink-500/10 text-pink-500"
-                                : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-600"
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border bg-muted/50 text-muted-foreground hover:border-muted-foreground/30"
                             }`}
                           >
                             <option.icon className="w-8 h-8 mb-2" />
@@ -415,8 +415,8 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                               }}
                               className={`px-4 py-2 rounded-full border transition-all ${
                                 values.precio?.includes(p)
-                                  ? "bg-green-500/20 border-green-500 text-green-500"
-                                  : "bg-slate-900 border-slate-700 text-slate-400"
+                                  ? "bg-primary/20 border-primary text-primary"
+                                  : "bg-muted border-border text-muted-foreground"
                               }`}
                             >
                               {p}
@@ -487,9 +487,11 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
                         </div>
                       ))}
 
-                      <label className="aspect-square rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center cursor-pointer hover:border-pink-500 hover:bg-pink-500/5 transition-all">
-                        <ImageIcon className="w-10 h-10 text-slate-500 mb-2" />
-                        <span className="text-sm text-slate-500">Añadir</span>
+                      <label className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all">
+                        <ImageIcon className="w-10 h-10 text-muted-foreground/60 mb-2" />
+                        <span className="text-sm text-muted-foreground/60">
+                          Añadir
+                        </span>
                         <input
                           type="file"
                           accept="image/*"
@@ -504,12 +506,12 @@ const LugarEditModal = ({ open, onOpenChange, lugar }: LugarEditModalProps) => {
               </Tabs>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-800 flex justify-end">
+            <div className="mt-6 pt-4 border-t border-border flex justify-end">
               <Button
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onClick={handleSubmit(onSubmit as any)}
                 disabled={isSubmitting}
-                className="bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-700 hover:to-violet-700 text-white px-8"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 shadow-lg shadow-primary/20"
               >
                 {isSubmitting ? "Guardando..." : "Guardar Cambios"}
                 {!isSubmitting && <Save className="ml-2 h-4 w-4" />}

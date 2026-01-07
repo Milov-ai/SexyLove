@@ -114,6 +114,8 @@ interface VaultState {
   // Biometric/Lock State
   isLocked: boolean;
   showLockPrompt: boolean;
+  requestPinEntry: boolean;
+  ignoreInteractionsUntil: number;
   unlockVault: () => void;
   /** Locks the vault (sets isLocked=true). If silent=true, no prompt is shown initially (facade mode) */
   lockVault: (silent?: boolean) => Promise<void>;
@@ -144,7 +146,9 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   // Biometric Lock State (volatile - resets on app restart)
   isLocked: false,
   showLockPrompt: false,
-  unlockVault: () => set({ isLocked: false }),
+  requestPinEntry: false, // When true, BiometricGuard shows PIN directly
+  ignoreInteractionsUntil: 0, // Timestamp until which interactions should be ignored
+  unlockVault: () => set({ isLocked: false, requestPinEntry: false }),
   unlockedAchievements: [],
   profiles: [],
   userProfile: null,
@@ -164,6 +168,10 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       set({
         isAuthenticated: true,
         user: { username, mainPin: "", duressPin: "" },
+        // SECURITY CRITICAL: Always lock on session initialization/reload
+        // This ensures the user must verify identity when opening the app
+        isLocked: true,
+        showLockPrompt: true,
       });
 
       const {

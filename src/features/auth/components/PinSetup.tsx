@@ -107,12 +107,12 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="h-16 w-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-white/10 flex items-center justify-center mb-6"
+              className="h-16 w-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-border flex items-center justify-center mb-6"
             >
-              <ShieldCheck className="h-8 w-8 text-white" />
+              <ShieldCheck className="h-8 w-8 text-foreground" />
             </motion.div>
 
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               {step === "enter" ? "Configura tu PIN" : "Confirma tu PIN"}
             </h2>
             <p className="text-muted-foreground text-sm mb-8 text-center">
@@ -129,8 +129,8 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                   className={cn(
                     "w-4 h-4 rounded-full border-2 transition-all duration-300",
                     (step === "enter" ? pin.length > i : confirmPin.length > i)
-                      ? "bg-white border-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                      : "border-white/20 bg-transparent",
+                      ? "bg-primary border-primary shadow-[0_0_10px_rgba(var(--neon-primary-rgb),0.5)]"
+                      : "border-border bg-transparent",
                   )}
                 />
               ))}
@@ -143,7 +143,7 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="text-red-400 text-sm mb-4 font-medium"
+                  className="text-destructive text-sm mb-4 font-medium"
                 >
                   {error}
                 </motion.p>
@@ -159,8 +159,8 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                   onClick={() => handleDigit(String(num))}
                   disabled={isProcessing}
                   className={cn(
-                    "h-16 rounded-2xl flex items-center justify-center text-2xl font-light text-white",
-                    "bg-white/5 hover:bg-white/10 border border-white/5 transition-colors",
+                    "h-16 rounded-2xl flex items-center justify-center text-2xl font-light text-foreground",
+                    "bg-muted/30 hover:bg-muted/50 border border-border transition-colors",
                   )}
                 >
                   {num}
@@ -172,8 +172,8 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                 onClick={() => handleDigit("0")}
                 disabled={isProcessing}
                 className={cn(
-                  "h-16 rounded-2xl flex items-center justify-center text-2xl font-light text-white",
-                  "bg-white/5 hover:bg-white/10 border border-white/5 transition-colors",
+                  "h-16 rounded-2xl flex items-center justify-center text-2xl font-light text-foreground",
+                  "bg-muted/30 hover:bg-muted/50 border border-border transition-colors",
                 )}
               >
                 0
@@ -182,7 +182,7 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                 whileTap={{ scale: 0.95 }}
                 onClick={handleBackspace}
                 disabled={isProcessing}
-                className="h-16 rounded-2xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                className="h-16 rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
               >
                 ⌫
               </motion.button>
@@ -199,7 +199,7 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                     setConfirmPin("");
                     setError("");
                   }}
-                  className="text-muted-foreground hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" /> Volver
                 </Button>
@@ -208,7 +208,7 @@ const PinSetup = ({ onSuccess, onCancel }: PinSetupProps) => {
                   <Button
                     variant="ghost"
                     onClick={onCancel}
-                    className="text-muted-foreground hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancelar
                   </Button>

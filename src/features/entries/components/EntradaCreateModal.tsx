@@ -155,7 +155,7 @@ const EntradaCreateModal = ({
               placeholder="Ej: Una noche inolvidable..."
             />
             {errors.title && (
-              <p className="text-red-500 text-xs">{errors.title.message}</p>
+              <p className="text-destructive text-xs">{errors.title.message}</p>
             )}
           </div>
 
@@ -263,7 +263,7 @@ const EntradaCreateModal = ({
               {imagePreviews.map((src, index) => (
                 <div
                   key={index}
-                  className="relative w-24 h-24 group rounded-md overflow-hidden border border-slate-700"
+                  className="relative w-24 h-24 group rounded-md overflow-hidden border border-border"
                 >
                   <img
                     src={src}
@@ -282,8 +282,8 @@ const EntradaCreateModal = ({
                   </button>
                 </div>
               ))}
-              <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-slate-700 rounded-md cursor-pointer hover:border-pink-500 hover:bg-pink-500/5 transition-colors">
-                <span className="text-xs text-slate-500">Añadir</span>
+              <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-md cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                <span className="text-xs text-muted-foreground">Añadir</span>
                 <Input
                   type="file"
                   multiple
@@ -296,7 +296,7 @@ const EntradaCreateModal = ({
           </div>
         </form>
 
-        <DialogFooter className="pt-4 border-t border-slate-800">
+        <DialogFooter className="pt-4 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
@@ -304,7 +304,7 @@ const EntradaCreateModal = ({
             type="submit"
             form="entrada-create-form"
             disabled={isSubmitting}
-            className="bg-pink-600 hover:bg-pink-700 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

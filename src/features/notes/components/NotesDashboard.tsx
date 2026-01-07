@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNotesStore, type Folder } from "@/store/notes.store";
+import { useVaultStore } from "@/store/vault.store";
 import { RitualsTab } from "@/features/rituals";
 
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,11 @@ import { notificationService } from "@/services/NotificationService";
 import { MinecraftLauncher } from "@/features/minecraft";
 import { MinecraftGame } from "@/features/minecraft";
 
-const NotesDashboard = () => {
+interface NotesDashboardProps {
+  isFacade?: boolean;
+}
+
+const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
   const {
     folders,
     notes,
@@ -106,7 +111,10 @@ const NotesDashboard = () => {
 
   useEffect(() => {
     initialize();
-  }, [initialize]);
+    if (isFacade) {
+      console.log("[NotesDashboard] Running in Facade Mode (Locked)");
+    }
+  }, [initialize, isFacade]);
 
   // ETERNITY PROTOCOL: Trigger Check
   useEffect(() => {
@@ -227,7 +235,19 @@ const NotesDashboard = () => {
       const newCount = clickCount + 1;
       setClickCount(newCount);
       if (newCount >= 3) {
-        setShowAuthScreen(true);
+        // Smart Trigger: Check if we are just locked or need full login
+        const { isAuthenticated, isLocked } = useVaultStore.getState();
+
+        if (isAuthenticated && isLocked) {
+          console.log("[NotesDashboard] 3-Click: Requesting PIN Unlock");
+          useVaultStore.setState({
+            showLockPrompt: true,
+            requestPinEntry: true,
+          });
+        } else {
+          console.log("[NotesDashboard] 3-Click: Requesting Auth Screen");
+          setShowAuthScreen(true);
+        }
         setClickCount(0);
       }
     } else {

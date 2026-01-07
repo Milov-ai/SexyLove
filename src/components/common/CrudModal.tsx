@@ -96,7 +96,7 @@ export function CrudModal({
           <DialogTitle className="text-xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
             {title}
           </DialogTitle>
-          <DialogDescription className="text-slate-500 dark:text-muted-foreground">
+          <DialogDescription className="text-muted-foreground">
             Gestiona tus opciones personalizadas para {title.toLowerCase()}.
           </DialogDescription>
         </DialogHeader>
@@ -107,7 +107,7 @@ export function CrudModal({
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
               placeholder="Nuevo elemento..."
-              className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary/50"
+              className="bg-card border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               disabled={isSubmitting}
             />
@@ -125,7 +125,7 @@ export function CrudModal({
 
           <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
             {items.length === 0 ? (
-              <div className="text-center py-8 text-slate-500 dark:text-muted-foreground text-sm italic">
+              <div className="text-center py-8 text-muted-foreground text-sm italic">
                 No hay elementos. ¡Añade uno!
               </div>
             ) : (
@@ -139,7 +139,7 @@ export function CrudModal({
                       <Input
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="h-8 bg-white dark:bg-black/20 text-slate-900 dark:text-white border-slate-200 dark:border-transparent"
+                        className="h-8 bg-background text-foreground border-border"
                         autoFocus
                         onKeyDown={(e) => e.key === "Enter" && handleEdit(item)}
                       />
@@ -164,7 +164,7 @@ export function CrudModal({
                     </div>
                   ) : (
                     <>
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      <span className="text-sm font-medium text-foreground">
                         {item}
                       </span>
                       <div className="flex gap-1">

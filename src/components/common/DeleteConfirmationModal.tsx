@@ -40,15 +40,15 @@ const DeleteConfirmationModal = ({
             <div className="p-3 rounded-full bg-red-500/10 dark:bg-red-500/20 text-red-500 mb-2">
               <AlertTriangle className="h-8 w-8" />
             </div>
-            <span className="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100">
+            <span className="text-2xl font-black tracking-tight text-foreground">
               {title}
             </span>
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-4 text-center px-4">
-              <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-base text-muted-foreground leading-relaxed">
                 Estás a punto de eliminar {itemType}{" "}
-                <span className="font-bold text-slate-900 dark:text-white px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 mx-1">
+                <span className="font-bold text-foreground px-1.5 py-0.5 rounded bg-muted mx-1">
                   "{itemName}"
                 </span>
               </p>
@@ -69,7 +69,7 @@ const DeleteConfirmationModal = ({
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   Esta acción es irreversible y los datos no podrán recuperarse.
                 </p>
               )}
@@ -83,7 +83,7 @@ const DeleteConfirmationModal = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="p-6 bg-slate-50/50 dark:bg-black/20 mt-4 gap-3 sm:gap-4">
-          <AlertDialogCancel className="w-full sm:w-auto h-11 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 font-medium transition-all">
+          <AlertDialogCancel className="w-full sm:w-auto h-11 rounded-xl border-border hover:bg-accent text-muted-foreground hover:text-accent-foreground font-medium transition-all">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction

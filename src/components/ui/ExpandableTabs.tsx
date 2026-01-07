@@ -56,10 +56,10 @@ const ExpandableTabs = ({
     <Tabs
       value={activeTab}
       onValueChange={handleTabChange}
-      className="gap-4"
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 overflow-visible"
       ref={container}
     >
-      <TabsList className="h-auto gap-2 rounded-xl p-1">
+      <TabsList className="h-14 gap-2 rounded-full p-2 glass-dirty border border-white/10 shadow-2xl backdrop-blur-2xl bg-white/5 dark:bg-black/20">
         {tabs.map(({ icon: Icon, name, value }) => {
           const isActive = activeTab === value;
 
@@ -68,16 +68,21 @@ const ExpandableTabs = ({
               key={value}
               data-value={value}
               className={cn(
-                "flex h-8 items-center justify-center overflow-hidden rounded-md",
-                isActive ? "flex-1" : "flex-none",
+                "flex h-10 items-center justify-center overflow-hidden rounded-full transition-all duration-300",
+                isActive ? "bg-white/10 dark:bg-white/5" : "hover:bg-white/5",
               )}
               onClick={() => handleTabChange(value)}
             >
               <TabsTrigger value={value} asChild>
-                <div className="flex h-8 w-full items-center justify-center">
-                  <Icon className="aspect-square size-4 flex-shrink-0" />
+                <div className="flex h-10 w-full items-center justify-center px-4">
+                  <Icon
+                    className={cn(
+                      "aspect-square size-4 flex-shrink-0 transition-colors duration-300",
+                      isActive ? "text-neon-primary" : "text-muted-foreground",
+                    )}
+                  />
                   {isActive && (
-                    <span className="font-medium max-sm:hidden ml-2">
+                    <span className="font-bold text-xs tracking-widest uppercase ml-2 text-foreground dark:text-white">
                       {name}
                     </span>
                   )}

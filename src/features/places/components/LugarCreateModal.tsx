@@ -216,7 +216,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
                 Nuevo Lugar
               </h2>
               <p className="text-muted-foreground">
@@ -227,7 +227,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
               {steps.map((s, i) => (
                 <div
                   key={s.id}
-                  className={`h-2 w-8 rounded-full transition-colors duration-300 ${i <= step ? "bg-pink-500" : "bg-slate-800"}`}
+                  className={`h-2 w-8 rounded-full transition-colors duration-300 ${i <= step ? "bg-primary" : "bg-muted"}`}
                 />
               ))}
             </div>
@@ -256,7 +256,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                         id="nombre"
                         {...register("nombre")}
                         placeholder="Ej: El Nido de Amor, Hotel X, Mi Coche..."
-                        className="text-xl p-6 bg-slate-900/50 border-slate-700 focus:border-pink-500 transition-all"
+                        className="text-xl p-6 bg-muted/30 border-border focus:ring-1 focus:ring-primary transition-all"
                         autoFocus
                       />
                       {errors.nombre && (
@@ -273,7 +273,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                         id="description"
                         {...register("description")}
                         placeholder="¿Es romántico, salvaje, público, acogedor? Cuéntanos más..."
-                        className="min-h-[150px] text-lg p-4 bg-slate-900/50 border-slate-700 focus:border-pink-500 transition-all resize-none"
+                        className="min-h-[150px] text-lg p-4 bg-muted/30 border-border focus:ring-1 focus:ring-primary transition-all resize-none"
                       />
                     </div>
                   </div>
@@ -286,12 +286,12 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                         ¿Dónde está ubicado?
                       </Label>
                       <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <Input
                           id="direccion"
                           {...register("direccion")}
                           placeholder="Dirección o coordenadas..."
-                          className="pl-12 text-xl p-6 bg-slate-900/50 border-slate-700 focus:border-pink-500 transition-all"
+                          className="pl-12 text-xl p-6 bg-muted/30 border-border focus:ring-1 focus:ring-primary transition-all"
                         />
                       </div>
                       <p className="text-sm text-muted-foreground">
@@ -299,7 +299,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                       </p>
                     </div>
                     {/* Placeholder for Map Component if we want to add it later */}
-                    <div className="h-64 bg-slate-900/30 rounded-xl border border-slate-800 flex items-center justify-center text-slate-500">
+                    <div className="h-64 bg-muted/20 rounded-xl border border-border flex items-center justify-center text-muted-foreground">
                       <MapPin className="w-12 h-12 mb-2 opacity-20" />
                       <span className="sr-only">Mapa preview</span>
                     </div>
@@ -334,8 +334,8 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                             }
                             className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${
                               values.privacy === option.value
-                                ? "border-pink-500 bg-pink-500/10 text-pink-500"
-                                : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-600"
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border bg-muted/50 text-muted-foreground hover:border-muted-foreground/30"
                             }`}
                           >
                             <option.icon className="w-8 h-8 mb-2" />
@@ -380,8 +380,8 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                               }}
                               className={`px-4 py-2 rounded-full border transition-all ${
                                 values.precio?.includes(p)
-                                  ? "bg-green-500/20 border-green-500 text-green-500"
-                                  : "bg-slate-900 border-slate-700 text-slate-400"
+                                  ? "bg-primary/20 border-primary text-primary"
+                                  : "bg-muted border-border text-muted-foreground"
                               }`}
                             >
                               {p}
@@ -417,9 +417,9 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                             </button>
                           </div>
                         ))}
-                        <label className="aspect-square rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center cursor-pointer hover:border-pink-500 hover:bg-pink-500/5 transition-all">
-                          <ImageIcon className="w-10 h-10 text-slate-500 mb-2" />
-                          <span className="text-sm text-slate-500">
+                        <label className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all">
+                          <ImageIcon className="w-10 h-10 text-muted-foreground/60 mb-2" />
+                          <span className="text-sm text-muted-foreground/60">
                             Añadir Foto
                           </span>
                           <input
@@ -439,12 +439,12 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
           </div>
 
           {/* Footer */}
-          <div className="mt-8 flex justify-between items-center pt-4 border-t border-slate-800">
+          <div className="mt-8 flex justify-between items-center pt-4 border-t border-border">
             <Button
               variant="ghost"
               onClick={handleBack}
               disabled={step === 0 || isSubmitting}
-              className="text-slate-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Atrás
@@ -453,7 +453,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
             {step < steps.length - 1 ? (
               <Button
                 onClick={handleNext}
-                className="bg-pink-600 hover:bg-pink-700 text-white px-8"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
               >
                 Siguiente
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -463,7 +463,7 @@ const LugarCreateModal = ({ open, onOpenChange }: LugarCreateModalProps) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onClick={handleSubmit(onSubmit as any)}
                 disabled={isSubmitting}
-                className="bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-700 hover:to-violet-700 text-white px-8"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 shadow-lg shadow-primary/20"
               >
                 {isSubmitting ? "Guardando..." : "Crear Lugar"}
                 {!isSubmitting && <Save className="ml-2 h-4 w-4" />}

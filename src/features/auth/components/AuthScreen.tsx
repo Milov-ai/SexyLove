@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import {
   Dialog,
@@ -12,7 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowLeft, Stars } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BrandLogo } from "@/components/common/BrandLogo";
 
 interface AuthScreenProps {
   open: boolean;
@@ -20,7 +22,6 @@ interface AuthScreenProps {
 }
 
 const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
-  // const { initialize } = useVaultStore();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,11 +29,26 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
   const [accessCode, setAccessCode] = useState("");
   const [showResend, setShowResend] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState("login");
+
+  // Reset state on open
+  useEffect(() => {
+    if (open) {
+      setIsSuccess(false);
+      setShowResend(false);
+      setActiveTab("login");
+      setError(null);
+    }
+  }, [open]);
+
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setShowResend(false);
+    setError(null);
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -40,24 +56,33 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
       });
       if (error) throw error;
 
-      // initialize() is called automatically by the onAuthStateChange listener in the store
-      // But we can call it here to be safe if the listener is slow
-      // await initialize();
+      // Force vault store to re-initialize after login
+      const { initialize } = await import("@/store/vault.store").then((m) => ({
+        initialize: m.useVaultStore.getState().initialize,
+      }));
+      await initialize();
+
       onOpenChange(false);
-      toast.success("¡Bienvenido de nuevo!");
+      toast.success("¡Bienvenido de nuevo!", {
+        icon: "✨",
+        style: {
+          background: "#0f0f12",
+          border: "1px solid rgba(255,255,255,0.1)",
+          color: "#fff",
+        },
+      });
     } catch (error: unknown) {
       console.error(error);
       const err = error as { message?: string; status?: number };
       if (err.message?.includes("Email not confirmed")) {
-        toast.error(
-          "Correo no confirmado. Por favor revisa tu bandeja de entrada.",
-        );
+        setError("Correo no confirmado. Por favor revisa tu bandeja.");
         setShowResend(true);
       } else if (err.status === 429) {
-        toast.error("Demasiados intentos. Por favor espera un momento.");
+        setError("Demasiados intentos. Espera un momento.");
       } else {
-        toast.error(err.message || "Error al iniciar sesión");
+        setError("Credenciales incorrectas.");
       }
+      toast.error("Error de acceso");
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +91,8 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
+
     try {
       // Verify Access Code
       const { data: codes, error: codeError } = await supabase
@@ -76,7 +103,7 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
         .single();
 
       if (codeError || !codes) {
-        toast.error("Código de acceso inválido.");
+        setError("Código de acceso inválido.");
         setIsLoading(false);
         return;
       }
@@ -92,36 +119,22 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
       });
       if (error) throw error;
 
-      // ... profile creation ...
-
       if (data.user) {
-        // We can't insert if the trigger already did it, so we upsert or update.
-        // Ideally, we rely on the metadata passed in options.data if we have a trigger setup to use it.
-        // Let's assume for now we might need to manually ensure it's set if no trigger exists.
-        // Checking if we can write to profiles:
         const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
           username: username,
           updated_at: new Date().toISOString(),
         });
-        if (profileError) {
-          console.error("Error saving profile:", profileError);
-          // Don't block success if profile fails, but log it.
-        }
+        if (profileError) console.error("Error saving profile:", profileError);
       }
 
       setIsSuccess(true);
-      toast.success("¡Cuenta creada exitosamente!");
+      toast.success("¡Cuenta creada!", { icon: "🥂" });
     } catch (error: unknown) {
       console.error(error);
       const err = error as { message?: string; status?: number };
-      if (err.status === 429) {
-        toast.error(
-          "Demasiados intentos de registro. Por favor espera un momento.",
-        );
-      } else {
-        toast.error(err.message || "Error al registrarse");
-      }
+      setError(err.message || "Error al registrarse");
+      toast.error("Error de registro");
     } finally {
       setIsLoading(false);
     }
@@ -135,15 +148,10 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
         email,
       });
       if (error) throw error;
-      toast.success("Correo de confirmación reenviado.");
+      toast.success("Correo enviado.");
       setShowResend(false);
-    } catch (error: unknown) {
-      const err = error as { message?: string; status?: number };
-      if (err.status === 429) {
-        toast.error("Espera unos segundos antes de reenviar.");
-      } else {
-        toast.error("Error al reenviar correo.");
-      }
+    } catch {
+      toast.error("Error al reenviar correo.");
     } finally {
       setIsLoading(false);
     }
@@ -152,29 +160,34 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
   if (isSuccess) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[400px] glass-dirty border-white/10 text-foreground !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%]">
-          <div className="flex flex-col items-center justify-center py-6 space-y-4 text-center">
-            <div className="p-3 bg-green-500/10 rounded-full">
-              <CheckCircle2 className="w-12 h-12 text-green-500" />
-            </div>
-            <DialogTitle className="text-2xl font-bold">
+        <DialogContent className="sm:max-w-[400px] border-none bg-transparent shadow-none p-0 !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%]">
+          <div className="relative overflow-hidden rounded-[32px] glass-dirty border border-white/10 p-8 flex flex-col items-center justify-center text-center">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-green-500/10 blur-[80px] rounded-full pointer-events-none" />
+
+            <motion.div
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              className="p-4 bg-green-500/10 rounded-full mb-6 border border-green-500/20"
+            >
+              <CheckCircle2 className="w-10 h-10 text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]" />
+            </motion.div>
+
+            <DialogTitle className="text-2xl font-black mb-2 text-foreground">
               ¡Revisa tu correo!
             </DialogTitle>
-            <DialogDescription className="text-slate-400 max-w-[280px]">
-              Hemos enviado un enlace de confirmación a{" "}
-              <span className="font-medium text-slate-200">{email}</span>.
+            <DialogDescription className="text-muted-foreground max-w-[280px] mb-6">
+              Hemos enviado un enlace mágico a{" "}
+              <span className="text-primary">{email}</span>
             </DialogDescription>
-            <p className="text-sm text-slate-500">
-              Haz clic en el enlace para activar tu cuenta y luego inicia
-              sesión.
-            </p>
+
             <Button
               variant="outline"
-              className="mt-4 border-slate-700 hover:bg-slate-900"
+              className="w-full h-12 rounded-xl bg-muted/20 border-border hover:bg-accent text-foreground transition-all hover:scale-[1.02] backdrop-blur-md"
               onClick={() => setIsSuccess(false)}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver al inicio de sesión
+              Volver al inicio
             </Button>
           </div>
         </DialogContent>
@@ -184,135 +197,222 @@ const AuthScreen = ({ open, onOpenChange }: AuthScreenProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px] glass-dirty border-white/10 text-foreground !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%]">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-            Acceso Privado
-          </DialogTitle>
-          <DialogDescription className="text-center text-slate-400">
-            Ingresa tus credenciales para acceder a tu bóveda segura.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[420px] border-none bg-transparent shadow-none p-0 overflow-visible !fixed !top-[50%] !left-[50%] !translate-x-[-50%] !translate-y-[-50%]">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="relative group"
+        >
+          {/* Animated Glow Halo */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-[34px] opacity-30 blur-xl group-hover:opacity-50 transition-opacity duration-1000 animate-pulse-glow" />
 
-        <Tabs defaultValue="login" className="w-full mt-4">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-            <TabsTrigger value="login">Entrar</TabsTrigger>
-            <TabsTrigger value="register">Registrarse</TabsTrigger>
-          </TabsList>
+          <div className="relative overflow-hidden rounded-[32px] glass-dirty border border-white/10 p-8 shadow-2xl backdrop-blur-2xl">
+            {/* Top Shine Accent */}
+            <div className="absolute top-0 inset-x-12 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-          <TabsContent value="login">
-            <form onSubmit={handleLogin} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="email-login">Correo electrónico</Label>
-                <Input
-                  id="email-login"
-                  type="email"
-                  placeholder="tu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-muted border-border focus:border-primary/50"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password-login">Contraseña</Label>
-                <Input
-                  id="password-login"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted border-border focus:border-primary/50"
-                  required
+            <DialogHeader className="flex flex-col items-center space-y-4 mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                <BrandLogo
+                  size={64}
+                  className="relative z-10 drop-shadow-2xl"
                 />
               </div>
 
-              {showResend && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full text-sm text-primary hover:text-primary/80"
-                  onClick={handleResendConfirmation}
-                  disabled={isLoading}
+              <div className="text-center space-y-1">
+                <DialogTitle className="text-3xl font-black tracking-tighter text-foreground drop-shadow-sm">
+                  Sex&Love
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground font-medium tracking-wide text-xs uppercase">
+                  Acceso Privado a la Bóveda
+                </DialogDescription>
+              </div>
+            </DialogHeader>
+
+            <Tabs
+              defaultValue="login"
+              className="w-full"
+              onValueChange={setActiveTab}
+            >
+              <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 rounded-2xl mb-6 border border-border">
+                <TabsTrigger
+                  value="login"
+                  className="rounded-xl data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-md data-[state=active]:text-foreground transition-all duration-300"
                 >
-                  ¿No recibiste el correo? Reenviar confirmación
-                </Button>
-              )}
+                  Entrar
+                </TabsTrigger>
+                <TabsTrigger
+                  value="register"
+                  className="rounded-xl data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-md data-[state=active]:text-foreground transition-all duration-300"
+                >
+                  Registro
+                </TabsTrigger>
+              </TabsList>
 
-              <Button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-neon transition-all hover:scale-[1.02]"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Entrar
-              </Button>
-            </form>
-          </TabsContent>
+              <div className="relative min-h-[300px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTab}
+                    initial={{
+                      opacity: 0,
+                      x: activeTab === "login" ? -20 : 20,
+                    }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: activeTab === "login" ? 20 : -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <TabsContent value="login" className="mt-0 space-y-4">
+                      <form onSubmit={handleLogin} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider ml-1">
+                            Email
+                          </Label>
+                          <div className="relative group/input">
+                            <Input
+                              type="email"
+                              placeholder="tu@email.com"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="h-12 bg-muted/10 border-border rounded-xl focus:border-primary/50 focus:bg-muted/20 transition-all text-foreground placeholder:text-muted-foreground/30 pl-4"
+                              required
+                            />
+                            <div className="absolute inset-0 rounded-xl ring-1 ring-border/0 group-hover/input:ring-border/40 pointer-events-none transition-all" />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider ml-1">
+                            Contraseña
+                          </Label>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="h-12 bg-muted/10 border-border rounded-xl focus:border-primary/50 focus:bg-muted/20 transition-all text-foreground placeholder:text-muted-foreground/30 pl-4"
+                            required
+                          />
+                        </div>
 
-          <TabsContent value="register">
-            <form onSubmit={handleSignUp} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="access-code">Código de Acceso</Label>
-                <Input
-                  id="access-code"
-                  type="text"
-                  placeholder="Código secreto"
-                  value={accessCode}
-                  onChange={(e) => setAccessCode(e.target.value)}
-                  className="bg-muted border-border focus:border-primary/50"
-                  required
-                />
+                        {error && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center"
+                          >
+                            {error}
+                          </motion.div>
+                        )}
+
+                        {showResend && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="w-full text-xs text-primary hover:text-primary/80 h-auto py-1"
+                            onClick={handleResendConfirmation}
+                            disabled={isLoading}
+                          >
+                            Reenviar confirmación
+                          </Button>
+                        )}
+
+                        <Button
+                          type="submit"
+                          className="w-full h-12 bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            "Acceder a la Bóveda"
+                          )}
+                        </Button>
+                      </form>
+                    </TabsContent>
+
+                    <TabsContent value="register" className="mt-0 space-y-4">
+                      <form onSubmit={handleSignUp} className="space-y-3">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider ml-1">
+                            Código de Invitación
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              placeholder="SECRET-CODE"
+                              value={accessCode}
+                              onChange={(e) => setAccessCode(e.target.value)}
+                              className="h-11 bg-muted/10 border-border rounded-xl focus:border-secondary/50 focus:bg-muted/20 text-foreground placeholder:text-muted-foreground/30 font-mono tracking-widest text-center"
+                              required
+                            />
+                            <Stars className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider ml-1">
+                              Usuario
+                            </Label>
+                            <Input
+                              placeholder="Alias"
+                              value={username}
+                              onChange={(e) => setUsername(e.target.value)}
+                              className="h-11 bg-muted/10 border-border rounded-xl focus:border-secondary/50 text-foreground"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider ml-1">
+                              Email
+                            </Label>
+                            <Input
+                              type="email"
+                              placeholder="tu@email.com"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="h-11 bg-muted/10 border-border rounded-xl focus:border-secondary/50 text-foreground"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider ml-1">
+                              Contraseña
+                            </Label>
+                            <Input
+                              type="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="h-11 bg-muted/10 border-border rounded-xl focus:border-secondary/50 text-foreground"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {error && (
+                          <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center">
+                            {error}
+                          </div>
+                        )}
+
+                        <Button
+                          type="submit"
+                          className="w-full h-12 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-foreground font-bold rounded-xl transition-all hover:scale-[1.02] disabled:opacity-70 mt-2"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            "Crear Identidad"
+                          )}
+                        </Button>
+                      </form>
+                    </TabsContent>
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="username-register">Nombre de usuario</Label>
-                <Input
-                  id="username-register"
-                  type="text"
-                  placeholder="Usuario"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="bg-muted border-border focus:border-secondary/50"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email-register">Correo electrónico</Label>
-                <Input
-                  id="email-register"
-                  type="email"
-                  placeholder="tu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-muted border-border focus:border-secondary/50"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password-register">Contraseña</Label>
-                <Input
-                  id="password-register"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted border-border focus:border-secondary/50"
-                  required
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-secondary/20 transition-all hover:scale-[1.02]"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Crear Cuenta
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
+            </Tabs>
+          </div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );

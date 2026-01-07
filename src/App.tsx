@@ -1,5 +1,6 @@
-import MainLayout from "./layouts/MainLayout";
+import BiometricGuard from "./components/common/BiometricGuard";
 import { useVaultStore } from "./store/vault.store";
+import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
 import NotesDashboard from "./features/notes/components/NotesDashboard";
 
@@ -96,9 +97,11 @@ function App() {
 
   if (isAuthenticated) {
     return (
-      <MainLayout>
-        <HomePage />
-      </MainLayout>
+      <BiometricGuard>
+        <MainLayout>
+          <HomePage />
+        </MainLayout>
+      </BiometricGuard>
     );
   }
 

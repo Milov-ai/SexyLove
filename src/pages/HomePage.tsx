@@ -10,9 +10,7 @@ import { getBounds } from "../lib/geo";
 import { BookIcon, HeartIcon } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ExpandableTabs from "@/components/ui/ExpandableTabs";
-import Header from "../layouts/Header";
 import LugaresCollapsible from "../features/places/components/LugaresCollapsible";
 import LugarCreateModal from "../features/places/components/LugarCreateModal";
 import { Button } from "@/components/ui/button";
@@ -223,7 +221,6 @@ const HomePage = () => {
 
   return (
     <>
-      <Header />
       <div className="p-4 md:p-8 pt-4 pb-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -232,11 +229,17 @@ const HomePage = () => {
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4"
         >
           <div className="lg:col-span-7 space-y-6">
-            <Card id="mapa">
-              <CardHeader>
-                <CardTitle>Geografía del Deseo</CardTitle>
-              </CardHeader>
-              <CardContent className="aspect-square lg:aspect-auto lg:h-[600px] overflow-hidden rounded-lg">
+            <div id="mapa" className="space-y-4">
+              <div className="flex justify-between items-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transition-all duration-300 hover:bg-white/10">
+                <h2 className="text-3xl font-black text-foreground tracking-tighter drop-shadow-xl flex items-center gap-2">
+                  <span className="text-platinum-gradient">Geografía</span>
+                  <span className="text-muted-foreground/30 font-thin">|</span>
+                  <span className="text-neon-gradient">Deseo</span>
+                </h2>
+                <div className="h-2 w-2 rounded-full bg-neon-primary animate-pulse shadow-neon" />
+              </div>
+
+              <div className="aspect-square lg:aspect-auto lg:h-[600px] overflow-hidden rounded-3xl relative border border-white/10 shadow-3xl bg-black/40 backdrop-blur-md">
                 <Map
                   ref={mapRef}
                   initialViewState={{
@@ -247,7 +250,6 @@ const HomePage = () => {
                   style={{
                     width: "100%",
                     height: "100%",
-                    borderRadius: "0.75rem",
                   }}
                   mapStyle="https://api.maptiler.com/maps/019a136b-d867-76fa-a7f4-c8574a83c377/style.json?key=ZgPtG2K57Kd9z6tNh1KQ"
                 >
@@ -299,8 +301,8 @@ const HomePage = () => {
                     </Source>
                   )}
                 </Map>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
             {isDesktop && <EphemeralChat />}
           </div>
           <div className="lg:col-span-5">
@@ -344,13 +346,11 @@ const HomePage = () => {
             </div>
           </div>
         </motion.div>
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-          <ExpandableTabs
-            tabs={tabs}
-            defaultValue="all"
-            onTabChange={setActiveTab}
-          />
-        </div>
+        <ExpandableTabs
+          tabs={tabs}
+          defaultValue="all"
+          onTabChange={setActiveTab}
+        />
       </div>
       {selectedLugar && (
         <ChronicleView
