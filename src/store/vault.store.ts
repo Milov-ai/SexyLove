@@ -53,7 +53,11 @@ interface VaultState {
 
   // Initialization & Sync
   /** Initializes the store, checking auth status and loading data */
-  initialize: () => Promise<void>;
+  /** Initializes the store, checking auth status and loading data */
+  initialize: (options?: {
+    autoLock?: boolean;
+    backgroundSync?: boolean;
+  }) => Promise<void>;
   fetchData: () => Promise<void>;
   loadFromDisk: () => Promise<void>;
   /** Syncs local state with the Supabase backend */
@@ -169,7 +173,8 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   realtimeChannel: null, // Store the channel
   isAutoSyncSetup: false,
 
-  initialize: async () => {
+  initialize: async (options = {}) => {
+    const { autoLock = true, backgroundSync = false } = options;
     const initUser = async (session: {
       user: { id: string; email?: string };
     }) => {
@@ -182,10 +187,9 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       set({
         isAuthenticated: true,
         user: { username, mainPin: "", duressPin: "" },
-        // SECURITY CRITICAL: Always lock on session initialization/reload
-        // This ensures the user starts at the Facade (Hidden Vault Mode)
-        isLocked: true,
-        showLockPrompt: false,
+        // SECURITY CRITICAL: Lock depending on the flow (default: true)
+        isLocked: autoLock,
+        showLockPrompt: false, // Always false initially
       });
 
       const {
@@ -197,7 +201,14 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       } = get();
       await loadFromDisk();
       await fetchProfiles();
-      await syncWithSupabase();
+
+      if (backgroundSync) {
+        // Run in background, allowing UI to unlock immediately
+        syncWithSupabase();
+      } else {
+        await syncWithSupabase();
+      }
+
       subscribeToRealtime();
       setupAutoSync();
     };

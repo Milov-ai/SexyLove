@@ -19,7 +19,8 @@ class BiometricService {
         biometryType: result.biometryType as any,
       };
     } catch (error) {
-      console.error("Biometric availability check failed:", error);
+      console.log("Biometric availability check failed (likely web):", error);
+      // Return unavailable instead of throwing, to prevent runtime crashes on web
       return { available: false, error: "Biometric unavailable" };
     }
   }

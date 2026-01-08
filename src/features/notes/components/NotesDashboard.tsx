@@ -431,9 +431,9 @@ const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
     });
   };
 
-  if (showAuthScreen) {
-    return <AuthScreen open={true} onOpenChange={setShowAuthScreen} />;
-  }
+  // if (showAuthScreen) {
+  //   return <AuthScreen open={true} onOpenChange={setShowAuthScreen} />;
+  // }
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
@@ -1105,6 +1105,11 @@ const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
             </SheetContent>
           </Sheet>
         </div>
+      )}
+
+      {/* Auth Screen Overlay */}
+      {showAuthScreen && (
+        <AuthScreen open={true} onOpenChange={setShowAuthScreen} />
       )}
     </div>
   );
