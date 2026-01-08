@@ -7,7 +7,7 @@ import type { Lugar, Fantasy } from "../schemas/vault";
 import MapMarker from "../features/places/components/MapMarker";
 import ChronicleView from "../features/places/components/ChronicleView";
 import { getBounds } from "../lib/geo";
-import { BookIcon, HeartIcon } from "lucide-react";
+import { BookIcon, HeartIcon, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
 import ExpandableTabs from "@/components/ui/ExpandableTabs";
@@ -230,13 +230,24 @@ const HomePage = () => {
         >
           <div className="lg:col-span-7 space-y-6">
             <div id="mapa" className="space-y-4">
-              <div className="flex justify-between items-center bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transition-all duration-300 hover:bg-white/10">
-                <h2 className="text-3xl font-black text-foreground tracking-tighter drop-shadow-xl flex items-center gap-2">
-                  <span className="text-platinum-gradient">Geografía</span>
-                  <span className="text-muted-foreground/30 font-thin">|</span>
-                  <span className="text-neon-gradient">Deseo</span>
-                </h2>
-                <div className="h-2 w-2 rounded-full bg-neon-primary animate-pulse shadow-neon" />
+              <div className="flex justify-between items-center bg-white/80 dark:bg-black/40 backdrop-blur-xl border border-violet-500/30 p-4 rounded-3xl shadow-[0_0_15px_rgba(139,92,246,0.15)] transition-all duration-300 hover:bg-white/90 dark:hover:bg-black/50 group">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-black/60 border border-violet-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.3)] group-hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] transition-all duration-500">
+                    <Globe className="w-5 h-5 text-violet-600 dark:text-violet-400 group-hover:text-violet-800 dark:group-hover:text-white transition-colors" />
+                  </div>
+                  <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                    <span className="drop-shadow-sm dark:drop-shadow-lg">
+                      Geografía
+                    </span>
+                    <span className="text-violet-400 dark:text-violet-500/50 font-thin text-lg">
+                      |
+                    </span>
+                    <span className="text-violet-600 dark:text-violet-300 drop-shadow-sm dark:drop-shadow-lg">
+                      Deseo
+                    </span>
+                  </h2>
+                </div>
+                <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse shadow-[0_0_10px_rgba(139,92,246,1)]" />
               </div>
 
               <div className="aspect-square lg:aspect-auto lg:h-[600px] overflow-hidden rounded-3xl relative border border-white/10 shadow-3xl bg-black/40 backdrop-blur-md">

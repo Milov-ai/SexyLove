@@ -29,19 +29,23 @@ const Header = () => {
   // Vault Theme Logic
   const isVaultMode = !isLocked;
   const containerClasses = isVaultMode
-    ? "bg-black/90 border-violet-500/50 shadow-[0_0_25px_rgba(139,92,246,0.3)] backdrop-blur-3xl"
+    ? "bg-white/80 dark:bg-black/90 border-violet-500/30 dark:border-violet-500/50 shadow-[0_0_20px_rgba(139,92,246,0.15)] dark:shadow-[0_0_25px_rgba(139,92,246,0.3)] backdrop-blur-3xl"
     : "glass-dirty border-white/10 shadow-3xl bg-white/5 dark:bg-black/30";
 
-  const textClasses = isVaultMode ? "text-white" : "text-foreground";
-  const logoClasses = isVaultMode ? "text-violet-500" : "text-neon-primary";
+  const textClasses = isVaultMode
+    ? "text-slate-900 dark:text-white"
+    : "text-foreground";
+  const logoClasses = isVaultMode
+    ? "text-violet-600 dark:text-violet-500"
+    : "text-neon-primary";
   const badgeClasses = isVaultMode
-    ? "border-violet-500/50 bg-violet-900/50 text-violet-100 shadow-[0_0_10px_rgba(139,92,246,0.5)]"
+    ? "border-violet-500/30 dark:border-violet-500/50 bg-violet-100/50 dark:bg-violet-900/50 text-violet-700 dark:text-violet-100 shadow-[0_0_10px_rgba(139,92,246,0.3)] dark:shadow-[0_0_10px_rgba(139,92,246,0.5)]"
     : "border-neon-primary/30 bg-gradient-to-r from-neon-primary to-neon-secondary text-white shadow-neon";
 
   return (
     <header
       className={cn(
-        "fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-6rem)] md:w-[calc(100%-10rem)] lg:w-[calc(100%-12rem)] max-w-7xl z-50 h-14 md:h-16 flex items-center justify-between px-6 md:px-8 rounded-full transition-all duration-500",
+        "fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-[calc(100%-6rem)] lg:w-[calc(100%-8rem)] max-w-7xl z-50 h-14 md:h-16 flex items-center justify-between px-6 md:px-8 rounded-full transition-all duration-500",
         containerClasses,
       )}
     >
@@ -69,7 +73,7 @@ const Header = () => {
         {user && (
           <Badge
             className={cn(
-              "rotate-[-5deg] animate-pulse pointer-events-none hidden md:flex",
+              "rotate-[-5deg] animate-pulse pointer-events-none flex",
               badgeClasses,
             )}
           >

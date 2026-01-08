@@ -45,16 +45,16 @@ const LugaresCollapsible = ({
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
-      <div className="flex items-center justify-between p-4 glass-dirty rounded-2xl border border-white/10 shadow-2xl mb-4">
+      <div className="flex items-center justify-between bg-white/80 dark:bg-black/40 backdrop-blur-xl border border-violet-500/30 p-4 rounded-3xl shadow-[0_0_15px_rgba(139,92,246,0.15)] transition-all duration-300 hover:bg-white/90 dark:hover:bg-black/50 group mb-4">
         <CollapsibleTrigger asChild>
-          <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="bg-white/5 p-2 rounded-full border border-white/10 group-hover:border-neon-primary/50 transition-colors shadow-inner">
+          <div className="flex items-center gap-3 cursor-pointer group">
+            <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-black/60 border border-violet-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.3)] group-hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] transition-all duration-500">
               <ChevronRightIcon
                 ref={iconRef}
-                className="size-4 text-slate-300 group-hover:text-neon-primary transition-colors"
+                className="size-5 text-violet-600 dark:text-violet-400 group-hover:text-violet-800 dark:group-hover:text-white transition-colors"
               />
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground group-hover:text-neon-primary transition-colors">
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white drop-shadow-sm dark:drop-shadow-lg group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
               Nuestros Lugares
             </h2>
           </div>

@@ -63,30 +63,34 @@
 
   /* Shadows (Visual Morbo) */
   --shadow-neon: 0 0 10px var(--primary), 0 0 20px var(--secondary);
-  --shadow-aura: 0 0 25px -5px oklch(0.6 0.25 300 / 0.15), 0 0 40px -10px oklch(0.7 0.2 260 / 0.1);
-  --shadow-aura-intense: 0 0 40px -5px oklch(0.6 0.25 300 / 0.3), 0 0 60px -10px oklch(0.7 0.2 260 / 0.2);
+  --shadow-aura:
+    0 0 25px -5px oklch(0.6 0.25 300 / 0.15),
+    0 0 40px -10px oklch(0.7 0.2 310 / 0.1);
+  --shadow-aura-intense:
+    0 0 40px -5px oklch(0.6 0.25 300 / 0.3),
+    0 0 60px -10px oklch(0.7 0.2 310 / 0.2);
 }
 
 :root {
-  /* Oasis White - High Tech Lab Feel */
-  --background: oklch(0.99 0.005 280);
-  --foreground: oklch(0.1 0.02 280);
+  /* Oasis White - High Tech Lab Feel (Neutral Platinum) */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.1 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.1 0.02 280);
+  --card-foreground: oklch(0.1 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.1 0.02 280);
+  --popover-foreground: oklch(0.1 0 0);
   --primary: oklch(0.6 0.25 300);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.7 0.2 260);
-  --secondary-foreground: oklch(0.1 0.02 280);
-  --muted: oklch(0.96 0.01 280);
-  --muted-foreground: oklch(0.45 0.05 280);
-  --accent: oklch(0.94 0.03 300);
-  --accent-foreground: oklch(0.1 0.02 280);
+  --secondary-foreground: oklch(0.1 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.94 0 0);
+  --accent-foreground: oklch(0.1 0 0);
   --destructive: oklch(0.6 0.15 20);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.92 0.01 280);
-  --input: oklch(0.92 0.01 280);
+  --border: oklch(0.92 0 0);
+  --input: oklch(0.92 0 0);
   --ring: oklch(0.6 0.25 300);
   --radius: 1.5rem;
 
@@ -96,9 +100,9 @@
 }
 
 .dark {
-  /* THE REAL VISUAL MORBO PALETTE - NEON NOIR */
-  --background: oklch(0.02 0.01 280); /* Decoupled Abyss */
-  --foreground: oklch(0.9 0.01 280); /* Mist White */
+  /* THE REAL VISUAL MORBO PALETTE - NEON NOIR (True Black / Neutral) */
+  --background: oklch(0.01 0 0); /* Pure Void Black */
+  --foreground: oklch(0.9 0 0); /* Mist White */
 
   --card: oklch(0.08 0.02 280); /* Obsidian Glass Core */
   --card-foreground: oklch(0.95 0.01 280);
@@ -109,7 +113,7 @@
   --primary: oklch(0.6 0.3 300); /* Vibrant Electric Magenta */
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.7 0.25 260); /* Radiant Cyber Violet */
+  --secondary: oklch(0.7 0.25 310); /* Radiant Cyber Pink/Violet */
   --secondary-foreground: oklch(1 0 0);
 
   --muted: oklch(0.04 0.01 280);
@@ -136,7 +140,7 @@
 
   /* Neon Accents - Dark Mode (Vibrant) */
   --neon-primary: oklch(0.6 0.3 300);
-  --neon-secondary: oklch(0.7 0.25 260);
+  --neon-secondary: oklch(0.7 0.25 310);
 }
 
 @layer utilities {
@@ -144,7 +148,7 @@
 
   .glass-premium {
     @apply backdrop-blur-[20px] bg-[length:200px_200px] shadow-aura;
-    background-color: rgba(30, 10, 50, 0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -154,9 +158,9 @@
     background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(0, 0, 0, 0.05);
   }
-  
+
   :is(.dark *) .glass-dirty {
-    background-color: rgba(30, 10, 50, 0.4);
+    background-color: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -179,9 +183,9 @@
   .text-glow-white {
     text-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
   }
-  
+
   :is(.light *) .text-glow-white {
-     text-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   }
 
   .border-glow {

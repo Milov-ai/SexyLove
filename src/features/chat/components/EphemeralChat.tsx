@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Send, Ghost } from "lucide-react";
 import { useVaultStore } from "@/store/vault.store";
 import { GlassCard } from "@/components/ui/premium/GlassCard";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader } from "@/components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
 
 const EphemeralChat = () => {
@@ -34,11 +34,15 @@ const EphemeralChat = () => {
       variant="dark"
       className="w-full border-white/5 shadow-2xl overflow-hidden backdrop-blur-xl"
     >
-      <CardHeader className="pb-3 pt-4 px-4 border-b border-white/5 bg-black/20">
-        <CardTitle className="text-xs font-bold tracking-widest uppercase text-muted-foreground flex items-center gap-2">
-          <Ghost className="w-3 h-3 text-neon-primary animate-pulse" />
-          <span>Whisper Mode</span>
-        </CardTitle>
+      <CardHeader className="pb-4 pt-4 px-4 bg-white/80 dark:bg-black/40 backdrop-blur-xl border-b border-violet-500/30 transition-all duration-300 hover:bg-white/90 dark:hover:bg-black/50 group">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-black/60 border border-violet-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+            <Ghost className="w-5 h-5 text-violet-600 dark:text-violet-400 animate-pulse" />
+          </div>
+          <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white drop-shadow-sm dark:drop-shadow-lg">
+            Chat Efímero
+          </h2>
+        </div>
       </CardHeader>
       <CardContent className="p-4 bg-transparent">
         <div

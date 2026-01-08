@@ -79,7 +79,7 @@ const LugarCard = ({ lugar }: LugarCardProps) => {
       <GlassCard
         variant="platinum"
         hoverEffect={true}
-        className="cursor-pointer overflow-hidden relative group/card border-white/5 bg-white/5 backdrop-blur-md"
+        className="cursor-pointer overflow-hidden relative group/card border-violet-500/30 bg-white/5 backdrop-blur-md shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] dark:shadow-[0_0_20px_rgba(139,92,246,0.3)] dark:hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-all duration-300"
         onClick={handleCenterMap}
       >
         <Button
