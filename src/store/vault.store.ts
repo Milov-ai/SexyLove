@@ -116,10 +116,18 @@ interface VaultState {
   showLockPrompt: boolean;
   requestPinEntry: boolean;
   ignoreInteractionsUntil: number;
+  lastUnlockTime: number;
   unlockVault: () => void;
   /** Locks the vault (sets isLocked=true). If silent=true, no prompt is shown initially (facade mode) */
   lockVault: (silent?: boolean) => Promise<void>;
 }
+
+/**
+ * Vault timeout threshold in milliseconds (5 minutes)
+ * After this duration, full authentication flow (biometric + PIN option) is required
+ * Within this duration, only biometric authentication is shown for convenience
+ */
+export const VAULT_TIMEOUT_MS = 300000; // 5 minutes = 300,000ms
 
 /**
  * Global Zustand store for managing Vault state.
@@ -148,7 +156,13 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   showLockPrompt: false,
   requestPinEntry: false, // When true, BiometricGuard shows PIN directly
   ignoreInteractionsUntil: 0, // Timestamp until which interactions should be ignored
-  unlockVault: () => set({ isLocked: false, requestPinEntry: false }),
+  lastUnlockTime: 0, // Timestamp of last successful vault unlock (for timeout logic)
+  unlockVault: () =>
+    set({
+      isLocked: false,
+      requestPinEntry: false,
+      lastUnlockTime: Date.now(),
+    }),
   unlockedAchievements: [],
   profiles: [],
   userProfile: null,
@@ -169,9 +183,9 @@ export const useVaultStore = create<VaultState>((set, get) => ({
         isAuthenticated: true,
         user: { username, mainPin: "", duressPin: "" },
         // SECURITY CRITICAL: Always lock on session initialization/reload
-        // This ensures the user must verify identity when opening the app
+        // This ensures the user starts at the Facade (Hidden Vault Mode)
         isLocked: true,
-        showLockPrompt: true,
+        showLockPrompt: false,
       });
 
       const {

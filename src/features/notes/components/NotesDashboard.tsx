@@ -236,14 +236,43 @@ const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
       setClickCount(newCount);
       if (newCount >= 3) {
         // Smart Trigger: Check if we are just locked or need full login
-        const { isAuthenticated, isLocked } = useVaultStore.getState();
+        const { isAuthenticated, isLocked, lockVault } =
+          useVaultStore.getState();
 
         if (isAuthenticated && isLocked) {
           console.log("[NotesDashboard] 3-Click: Requesting PIN Unlock");
+
+          // Intelligent Re-entry:
+          // If within timeout, request Biometric ONLY (requestPinEntry: false)
+          // If timeout exceeded, allow full auth (requestPinEntry: true if we want to force PIN, but BiometricGuard handles defaulting to Biometric.
+          // actually, requestPinEntry: true FORCES PIN screen. We probably want Biometric checks unless Biometric is unavailable?
+          // BUT, `BiometricGuard` has "auto-switch to PIN after 3 failures".
+          // IF we want "Biometric First", we should start with requestPinEntry: false.
+          // BUT if timeout is exceeded, do we want to force PIN? No, user says "Full Auth Flow" (Biometric + PIN option).
+          // `BiometricGuard` shows PIN option button if `shouldRequireFullAuth` is true.
+          // So we should just set requestPinEntry to FALSE always here, letting BiometricGuard decide?
+          // WAIT. If I set requestPinEntry: false, it will use `shouldRequireFullAuth` to decide if "Use PIN" button is shown.
+          // If I set requestPinEntry: true, it forces the PIN screen directly.
+          // The Requirement says: "Re-entry (<5min): Biometric only". "Re-entry (>5min): Biometric + PIN option".
+          // Neither says "Force PIN screen".
+          // So requestPinEntry should likely be FALSE, unless there's a specific reason to force PIN.
+          // Let's set it to false and let BiometricGuard handle the UI logic via `shouldRequireFullAuth`.
+          // Wait, verify `BiometricGuard` entry logic:
+          // It calls `attemptBiometric` if `!showPinFallback`.
+          // If `requestPinEntry` is false, `showPinFallback` starts false.
+          // So Biometric starts.
+          // If timeout exceeded, `shouldRequireFullAuth` returns true, so "Use PIN" button is visible.
+          // If timeout NOT exceeded, "Use PIN" button is hidden.
+          // This matches requirements perfectly.
+
           useVaultStore.setState({
             showLockPrompt: true,
-            requestPinEntry: true,
+            requestPinEntry: false, // Let BiometricGuard logic handle the UI state
           });
+        } else if (isAuthenticated && !isLocked) {
+          // EXPLICIT EXIT: User is inside vault (unlocked) -> Lock and Exit silently
+          console.log("[NotesDashboard] 3-Click: Exiting Vault (Silent Lock)");
+          lockVault(true);
         } else {
           console.log("[NotesDashboard] 3-Click: Requesting Auth Screen");
           setShowAuthScreen(true);

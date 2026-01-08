@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { AnimatePresence, motion } from "framer-motion";
-import { Lock, Fingerprint, KeyRound, ArrowLeft } from "lucide-react";
+import { Lock, Fingerprint, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { biometricService } from "@/services/biometric.service";
 import { pinService } from "@/services/pin.service";
@@ -24,10 +24,15 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lockoutRemaining, setLockoutRemaining] = useState(0);
   const [userEmail, setUserEmail] = useState<string | undefined>();
-  const [titleClickCount, setTitleClickCount] = useState(0);
-  const clickTracker = useRef({ count: 0, lastTime: 0 });
-  const [debugToast, setDebugToast] = useState("");
+
+  const [biometricFailures, setBiometricFailures] = useState(0);
+
   const PIN_LENGTH = 4;
+
+  useEffect(() => {
+    if (biometricFailures > 0)
+      console.log("Biometric failures:", biometricFailures);
+  }, [biometricFailures]);
 
   useEffect(() => {
     const getEmail = async () => {
@@ -68,14 +73,31 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
 
       const verified = await biometricService.verifyIdentity();
       if (verified) {
+        setBiometricFailures(0);
         unlockVault();
       } else {
-        // Failed or cancelled
+        // Increment failure counter
+        setBiometricFailures((prev) => {
+          const newCount = prev + 1;
+          if (newCount >= 3) {
+            // Auto-switch to PIN after 3 failures
+            setShowPinFallback(true);
+            return 0; // Reset counter after switching
+          }
+          return newCount;
+        });
       }
     } catch (err) {
       console.error("Biometric error:", err);
-      // Don't show pin fallback immediately on cancel, only on error
-      // setShowPinFallback(true);
+      // On actual error (not just user cancellation), increment failure too
+      setBiometricFailures((prev) => {
+        const newCount = prev + 1;
+        if (newCount >= 3) {
+          setShowPinFallback(true);
+          return 0;
+        }
+        return newCount;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +106,13 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
   // Trigger biometric if requested and not showing PIN
   useEffect(() => {
     if (isLocked && showLockPrompt && !showPinFallback) {
+      // Logic for intelligent prompt:
+      // If we are within timeout window, we still want to trigger biometric automatically.
+      // But we might want to hide the "Use PIN" button content-wise.
+      // The requirement says: "Re-entry within 5 min sets: Biometric only (no PIN screen)"
+      // Actually, BiometricGuard logic currently shows both buttons or PIN screen.
+      // We will adjust the RENDERING based on shouldRequireFullAuth.
+      // But we still ALWAYS attempt biometric on mount if locked.
       attemptBiometric();
     }
   }, [isLocked, showLockPrompt, showPinFallback, attemptBiometric]);
@@ -169,44 +198,6 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
   };
 
   // Triple-click on title exits to facade (consistent with app UX pattern)
-  const handleTitleClick = (e: React.MouseEvent) => {
-    // Stop propagation to prevent clicking through to NotesDashboard
-    e.stopPropagation();
-    e.nativeEvent.stopImmediatePropagation();
-
-    const now = Date.now();
-    const tracker = clickTracker.current;
-
-    // Use a very generous 2-second window for the triple-click
-    if (now - tracker.lastTime < 2000) {
-      tracker.count += 1;
-    } else {
-      tracker.count = 1;
-    }
-
-    tracker.lastTime = now;
-
-    // Sync to state ONLY for the visual counter feedback
-    setTitleClickCount(tracker.count);
-
-    console.log(
-      `[BiometricGuard] [${new Date().toISOString()}] SYNC Click. Count: ${tracker.count}`,
-    );
-
-    if (tracker.count >= 3) {
-      console.log(
-        `[BiometricGuard] [${new Date().toISOString()}] Triple click detected! Exiting to facade.`,
-      );
-      setDebugToast("¡SALIDA DETECTADA!");
-      handleCancel();
-      tracker.count = 0;
-      setTitleClickCount(0);
-    } else {
-      setDebugToast(`Click ${tracker.count}/3`);
-      // Hide toast after pulse
-      setTimeout(() => setDebugToast(""), 1000);
-    }
-  };
 
   const handleChangeUser = async () => {
     await supabase.auth.signOut();
@@ -247,239 +238,267 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
       <AnimatePresence>
         {showLockPrompt && (
           <div
-            className="fixed inset-0 z-[100000] flex items-center justify-center bg-background/60 backdrop-blur-xl transition-all duration-500"
+            className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/30 backdrop-blur-md transition-all duration-500"
             onClick={(e) => {
-              // BLOCK EVERYTHING: Prevent any click on the overlay from reaching the facade
               e.stopPropagation();
               e.nativeEvent.stopImmediatePropagation();
               console.log("[BiometricGuard] Overlay backdrop click blocked");
             }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-sm mx-4"
+              className="relative w-full max-w-sm flex flex-col items-center gap-6"
             >
-              {/* Glow Halo */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50 rounded-[34px] opacity-30 blur-xl animate-pulse-aura pointer-events-none" />
-
-              {/* Glass Container */}
-              <div className="relative overflow-hidden rounded-[32px] glass-dirty border border-border p-8 shadow-2xl shadow-primary/10">
-                {/* Top Shine Accent */}
-                <div className="absolute top-0 inset-x-12 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-
-                {/* Background Ambient Blur */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/20 blur-[90px] rounded-full pointer-events-none" />
-
-                <div className="relative z-10 flex flex-col items-center">
-                  {/* Lock Icon */}
-                  <motion.div
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    onClick={handleTitleClick}
-                    className="h-20 w-20 rounded-full bg-muted/20 border border-border flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(var(--primary),0.3)] backdrop-blur-md cursor-pointer"
-                  >
-                    <Lock className="h-10 w-10 text-primary drop-shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
-                  </motion.div>
-
-                  <div
-                    onClick={handleTitleClick}
-                    className="p-4 -m-4 cursor-pointer z-50 select-none active:scale-95 transition-transform"
-                  >
-                    <h2
-                      className={cn(
-                        "text-3xl font-black mb-2 tracking-tight drop-shadow-md transition-colors duration-100",
-                        titleClickCount > 0
-                          ? "text-primary"
-                          : "text-foreground",
-                      )}
-                    >
-                      Bóveda Segura{" "}
-                      {titleClickCount > 0 && `(${titleClickCount})`}
-                    </h2>
-                  </div>
-                  {userEmail ? (
-                    <p className="text-sm font-medium text-muted-foreground mb-8 bg-muted/30 py-1 px-3 rounded-full border border-border">
-                      {userEmail}
-                    </p>
-                  ) : (
-                    <div className="mb-8" />
+              {/* BLOCK 1: HEADER (Floating Pill) */}
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="rounded-full bg-black/40 backdrop-blur-xl border border-violet-500/30 px-8 py-4 flex items-center gap-3 shadow-[0_0_20px_rgba(139,92,246,0.2)]"
+              >
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="h-10 w-10 rounded-full bg-violet-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.4)]"
+                >
+                  <Lock className="h-5 w-5 text-violet-400 drop-shadow-[0_0_8px_rgba(139,92,246,0.8)]" />
+                </motion.div>
+                <div className="flex flex-col">
+                  <span className="text-lg font-black tracking-tight leading-none text-white">
+                    Bóveda Segura
+                  </span>
+                  {userEmail && (
+                    <span className="text-[10px] font-bold text-violet-300 uppercase tracking-wider">
+                      {userEmail.split("@")[0]}
+                    </span>
                   )}
+                </div>
+              </motion.div>
 
-                  {!showPinFallback ? (
-                    // Biometric prompt
-                    <motion.div
-                      key="biometric"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="w-full space-y-4"
-                    >
-                      <Button
-                        onClick={attemptBiometric}
-                        disabled={isLoading}
-                        className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 border-none text-primary-foreground font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
-                      >
-                        <Fingerprint className="h-6 w-6 mr-2" />
-                        <span className="text-lg">Acceso Biométrico</span>
-                      </Button>
-                      <Button
-                        onClick={() => setShowPinFallback(true)}
-                        variant="ghost"
-                        className="w-full h-12 rounded-2xl border border-border hover:bg-muted/30 text-foreground transition-all"
-                      >
-                        <KeyRound className="h-5 w-5 mr-2" />
-                        Usar PIN
-                      </Button>
-                    </motion.div>
-                  ) : (
-                    // PIN fallback
-                    <motion.div
-                      key="pin"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="w-full"
-                    >
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold text-center mb-6">
-                        Introduce tu Código
-                      </p>
+              {/* BLOCK 2: AUTH DISPLAY (Floating Card) */}
+              <div className="w-full relative group z-20">
+                {/* Violet Glow Halo */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/40 via-purple-500/40 to-violet-600/40 rounded-[34px] opacity-30 blur-xl group-hover:opacity-50 transition-opacity duration-1000 animate-pulse-aura pointer-events-none" />
 
-                      {/* PIN Dots */}
-                      <motion.div
-                        animate={isShaking ? { x: [-10, 10, -10, 10, 0] } : {}}
-                        transition={{ duration: 0.4 }}
-                        className="flex justify-center gap-4 mb-8"
-                      >
-                        {Array.from({ length: PIN_LENGTH }).map((_, i) => (
-                          <div
-                            key={i}
-                            className={cn(
-                              "w-4 h-4 rounded-full border-2 transition-all duration-300 shadow-md",
-                              pin.length > i
-                                ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary),0.8)] scale-110"
-                                : "border-border bg-transparent",
-                            )}
-                          />
-                        ))}
-                      </motion.div>
+                <div className="relative overflow-hidden rounded-[32px] bg-black/60 backdrop-blur-xl border border-violet-500/20 p-6 shadow-[0_0_40px_rgba(139,92,246,0.15)] transition-all duration-500">
+                  {/* Background Elements */}
+                  <div className="absolute top-0 inset-x-12 h-[1px] bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+                  <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-violet-600/20 blur-[60px] rounded-full pointer-events-none" />
 
-                      {/* Error Message */}
-                      <AnimatePresence>
-                        {error && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            className="bg-destructive/10 border border-destructive/20 text-destructive text-sm py-2 px-4 rounded-xl mb-4 text-center backdrop-blur-sm"
-                          >
-                            {error}
-                          </motion.div>
-                        )}
-                        {lockoutRemaining > 0 && (
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="bg-accent/20 border border-accent/30 text-accent-foreground text-sm py-2 px-4 rounded-xl mb-4 text-center backdrop-blur-sm"
-                          >
-                            Bloqueado por {lockoutRemaining}s
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Numpad */}
-                      <div className="grid grid-cols-3 gap-3 mb-6">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                          <motion.button
-                            key={num}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => handleDigit(String(num))}
-                            disabled={isLoading || lockoutRemaining > 0}
-                            className={cn(
-                              "h-16 w-full rounded-2xl flex items-center justify-center text-2xl font-bold glass-premium",
-                              "text-foreground border border-border",
-                              "active:bg-white/20 transition-all duration-100",
-                              "disabled:opacity-50 disabled:cursor-not-allowed",
-                            )}
-                          >
-                            {num}
-                          </motion.button>
-                        ))}
-                        <div className="h-16 w-full" />
-                        <motion.button
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => handleDigit("0")}
-                          disabled={isLoading || lockoutRemaining > 0}
-                          className={cn(
-                            "h-16 w-full rounded-2xl flex items-center justify-center text-2xl font-bold glass-premium",
-                            "text-foreground border border-border",
-                            "active:bg-white/20 transition-all duration-100",
-                            "disabled:opacity-50 disabled:cursor-not-allowed",
-                          )}
-                        >
-                          0
-                        </motion.button>
-                        <motion.button
-                          whileTap={{ scale: 0.9 }}
-                          onClick={handleBackspace}
-                          disabled={isLoading}
-                          className="h-16 w-full rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground glass-premium border border-border active:bg-muted/30"
-                        >
-                          ⌫
-                        </motion.button>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  <div className="pt-2 flex items-center justify-between px-2 w-full mt-auto">
+                  <div className="relative z-10 min-h-[160px] flex flex-col justify-center items-center">
                     {!showPinFallback ? (
-                      <button
-                        onClick={handleChangeUser}
-                        className="text-xs font-semibold text-destructive/80 hover:text-destructive uppercase tracking-wider flex items-center gap-1 transition-colors"
+                      <motion.div
+                        key="biometric"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="flex flex-col items-center gap-6 py-4"
                       >
-                        <ArrowLeft className="w-3 h-3" /> Salir
-                      </button>
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-violet-500/30 blur-xl rounded-full animate-pulse" />
+                          <Button
+                            onClick={attemptBiometric}
+                            disabled={isLoading}
+                            className="w-24 h-24 rounded-full bg-black/50 border-2 border-violet-500/50 text-violet-400 hover:bg-violet-600 hover:text-white hover:scale-105 hover:border-violet-400 transition-all duration-300 shadow-[0_0_30px_rgba(139,92,246,0.3)] z-10 p-0 grid place-items-center"
+                          >
+                            <Fingerprint className="h-10 w-10" />
+                          </Button>
+                        </div>
+                        <div className="text-center space-y-1">
+                          <h3 className="text-xl font-bold text-white">
+                            Autenticación Biométrica
+                          </h3>
+                          <p className="text-xs text-zinc-400 font-medium">
+                            Pulsa el icono para verificar identidad
+                          </p>
+                        </div>
+                      </motion.div>
                     ) : (
-                      <button
-                        onClick={() => {
-                          setShowPinFallback(false);
-                          attemptBiometric();
-                        }}
-                        className="text-xs font-semibold text-primary/80 hover:text-primary uppercase tracking-wider transition-colors"
+                      <motion.div
+                        key="pin-display"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="w-full flex flex-col items-center justify-center gap-6"
                       >
-                        Usar Biometría
-                      </button>
-                    )}
+                        <div className="text-center">
+                          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-300/80">
+                            Introduce PIN
+                          </h3>
+                        </div>
 
-                    <button
-                      onClick={handleCancel}
-                      className="text-xs font-semibold text-muted-foreground hover:text-foreground uppercase tracking-wider transition-colors"
-                    >
-                      Cancelar
-                    </button>
+                        {/* PIN Dots */}
+                        <motion.div
+                          animate={
+                            isShaking ? { x: [-10, 10, -10, 10, 0] } : {}
+                          }
+                          transition={{ duration: 0.4 }}
+                          className="flex justify-center gap-4"
+                        >
+                          {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+                            <div
+                              key={i}
+                              className={cn(
+                                "w-4 h-4 rounded-full border-2 transition-all duration-300 shadow-md",
+                                pin.length > i
+                                  ? "bg-violet-500 border-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.8)] scale-110"
+                                  : "border-white/10 bg-black/40",
+                              )}
+                            />
+                          ))}
+                        </motion.div>
+
+                        {/* Error Message */}
+                        <div className="h-8 flex items-center justify-center w-full">
+                          <AnimatePresence mode="wait">
+                            {error && (
+                              <motion.div
+                                key="error"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="bg-red-500/20 border border-red-500/30 text-red-300 text-[10px] font-bold py-1 px-3 rounded-full"
+                              >
+                                {error}
+                              </motion.div>
+                            )}
+                            {lockoutRemaining > 0 && (
+                              <motion.div
+                                key="lockout"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="bg-orange-500/20 border border-orange-500/30 text-orange-300 text-[10px] font-bold py-1 px-3 rounded-full"
+                              >
+                                Bloqueado por {lockoutRemaining}s
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 </div>
               </div>
+
+              {/* BLOCK 3: FLOATING NUMPAD (Detached Keys) */}
+              <AnimatePresence>
+                {showPinFallback && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: 20, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full z-10"
+                  >
+                    <div className="grid grid-cols-3 gap-6 px-4 justify-items-center">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => (
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.03 + 0.1 }}
+                          key={num}
+                          whileTap={{
+                            scale: 0.9,
+                            backgroundColor: "rgba(139,92,246,0.2)",
+                          }}
+                          onClick={() => handleDigit(String(num))}
+                          disabled={isLoading || lockoutRemaining > 0}
+                          className="h-16 w-16 rounded-full flex items-center justify-center text-2xl font-bold bg-black/40 border border-violet-500/20 backdrop-blur-md shadow-[0_0_10px_rgba(139,92,246,0.1)] hover:bg-violet-600/20 hover:border-violet-500/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all text-white active:shadow-inner"
+                        >
+                          {num}
+                        </motion.button>
+                      ))}
+                      {/* Empty Slot Left */}
+                      <div />
+
+                      {/* Zero */}
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4 }}
+                        whileTap={{
+                          scale: 0.9,
+                          backgroundColor: "rgba(139,92,246,0.2)",
+                        }}
+                        onClick={() => handleDigit("0")}
+                        disabled={isLoading || lockoutRemaining > 0}
+                        className="h-16 w-16 rounded-full flex items-center justify-center text-2xl font-bold bg-black/40 border border-violet-500/20 backdrop-blur-md shadow-[0_0_10px_rgba(139,92,246,0.1)] hover:bg-violet-600/20 hover:border-violet-500/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all text-white active:shadow-inner"
+                      >
+                        0
+                      </motion.button>
+
+                      {/* Backspace */}
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.45 }}
+                        whileTap={{ scale: 0.9, x: -5 }}
+                        onClick={handleBackspace}
+                        disabled={isLoading}
+                        className="h-16 w-16 rounded-full flex items-center justify-center text-violet-300/50 hover:text-red-400 transition-colors"
+                      >
+                        <span className="text-2xl font-light">⌫</span>
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* BLOCK 4: ACTIONS (Floating Pill) */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="rounded-full bg-black/60 backdrop-blur-xl border border-violet-500/20 px-6 py-3 flex items-center gap-4 shadow-[0_0_20px_rgba(0,0,0,0.4)]"
+              >
+                <button
+                  onClick={handleChangeUser}
+                  className="p-2 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                  title="Cerrar Sessión"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+
+                <div className="w-[1px] h-6 bg-white/10" />
+
+                {!showPinFallback ? (
+                  <button
+                    onClick={() => setShowPinFallback(true)}
+                    className="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-bold text-white uppercase tracking-wider transition-all border border-white/5"
+                  >
+                    Usar PIN
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setShowPinFallback(false);
+                      attemptBiometric();
+                    }}
+                    className="px-4 py-1.5 rounded-full bg-violet-600/20 hover:bg-violet-600/30 text-xs font-bold text-violet-300 uppercase tracking-wider transition-all border border-violet-500/30"
+                  >
+                    Biometría
+                  </button>
+                )}
+
+                <div className="w-[1px] h-6 bg-white/10" />
+
+                <button
+                  onClick={handleCancel}
+                  className="p-2 rounded-full hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors"
+                  title="Cancelar (Ir a Notas)"
+                >
+                  <span className="text-xl leading-none font-bold">×</span>
+                </button>
+              </motion.div>
             </motion.div>
           </div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {debugToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.2 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200000] bg-primary text-primary-foreground px-6 py-3 rounded-full font-black shadow-[0_0_30px_rgba(var(--primary),0.5)] border-2 border-border"
-          >
-            {debugToast}
-          </motion.div>
         )}
       </AnimatePresence>
     </>
