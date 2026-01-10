@@ -2,9 +2,9 @@ import BiometricGuard from "./components/common/BiometricGuard";
 import { useVaultStore } from "./store/vault.store";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
-import NotesDashboard from "./features/notes/components/NotesDashboard";
+import AuthScreen from "./features/auth/components/AuthScreen";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ChameleonRemote } from "./features/chameleon/logic/ChameleonRemote";
 import { ProposalOverlay } from "@/features/proposal/components/ProposalOverlay";
 import { useEternitySync } from "@/features/proposal/hooks/useEternitySync";
@@ -14,9 +14,14 @@ import { supabase } from "@/lib/supabase";
 
 function App() {
   const { isAuthenticated, initialize } = useVaultStore();
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    initialize();
+    const init = async () => {
+      await initialize();
+      setIsInitializing(false);
+    };
+    init();
 
     // Initialize Notifications (Android focus)
     notificationService.initialize();
@@ -95,20 +100,25 @@ function App() {
   // ETERNITY PROTOCOL: Initialize Proposal Sync
   useEternitySync();
 
-  if (isAuthenticated) {
-    return (
+  // Show nothing while initializing (prevents flash)
+  if (isInitializing) {
+    return null;
+  }
+
+  // SECURITY: Login First - No data/UI until authenticated
+  if (!isAuthenticated) {
+    return <AuthScreen />;
+  }
+
+  // Authenticated: Show Vault with Biometric Guard
+  return (
+    <>
+      <ProposalOverlay />
       <BiometricGuard>
         <MainLayout>
           <HomePage />
         </MainLayout>
       </BiometricGuard>
-    );
-  }
-
-  return (
-    <>
-      <ProposalOverlay />
-      <NotesDashboard />
     </>
   );
 }

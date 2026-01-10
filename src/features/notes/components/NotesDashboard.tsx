@@ -24,7 +24,7 @@ import {
 import { App } from "@capacitor/app";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import AuthScreen from "@/features/auth/components/AuthScreen";
+// AuthScreen is now rendered by App.tsx directly - removed from here
 import {
   Sheet,
   SheetContent,
@@ -95,7 +95,7 @@ const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
   const [pendingFolderId, setPendingFolderId] = useState<string | null>(null);
 
   // Auth Trigger State
-  const [showAuthScreen, setShowAuthScreen] = useState(false);
+  // Auth is now handled by App.tsx
   const [clickCount, setClickCount] = useState(0);
   const [isChameleonOpen, setIsChameleonOpen] = useState(false);
   const [isMinecraftOpen, setIsMinecraftOpen] = useState(false);
@@ -274,8 +274,13 @@ const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
           console.log("[NotesDashboard] 3-Click: Exiting Vault (Silent Lock)");
           lockVault(true);
         } else {
-          console.log("[NotesDashboard] 3-Click: Requesting Auth Screen");
-          setShowAuthScreen(true);
+          // This case (unauthenticated) should never happen since App.tsx shows AuthScreen first
+          // But if it does, trigger PIN prompt as fallback
+          console.log("[NotesDashboard] 3-Click: Fallback - Requesting PIN");
+          useVaultStore.setState({
+            showLockPrompt: true,
+            requestPinEntry: true,
+          });
         }
         setClickCount(0);
       }
@@ -1107,10 +1112,7 @@ const NotesDashboard = ({ isFacade = false }: NotesDashboardProps) => {
         </div>
       )}
 
-      {/* Auth Screen Overlay */}
-      {showAuthScreen && (
-        <AuthScreen open={true} onOpenChange={setShowAuthScreen} />
-      )}
+      {/* Auth Screen is now rendered by App.tsx */}
     </div>
   );
 };

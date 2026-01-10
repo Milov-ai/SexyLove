@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import NotesDashboard from "@/features/notes/components/NotesDashboard";
 import PinSetup from "@/features/auth/components/PinSetup";
+import { useSecurityMonitor } from "@/hooks/useSecurityMonitor";
 
 interface BiometricGuardProps {
   children: React.ReactNode;
@@ -28,6 +29,15 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
 
   const [biometricFailures, setBiometricFailures] = useState(0);
   const [isPinSetupRequired, setIsPinSetupRequired] = useState(false);
+
+  // SECURITY: Detect DOM tampering (only when overlay is visible)
+  useSecurityMonitor({
+    targetSelector: "[data-security-overlay]",
+    enabled: showLockPrompt, // Only monitor when overlay is showing
+    onTamperDetected: () => {
+      console.error("[BiometricGuard] TAMPERING DETECTED!");
+    },
+  });
 
   const PIN_LENGTH = 4;
 
@@ -286,6 +296,7 @@ const BiometricGuard = ({ children }: BiometricGuardProps) => {
       <AnimatePresence>
         {showLockPrompt && (
           <div
+            data-security-overlay
             className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-md transition-all duration-500"
             onClick={(e) => {
               e.stopPropagation();

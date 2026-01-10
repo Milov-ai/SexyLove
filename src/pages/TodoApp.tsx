@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
-import AuthScreen from "../features/auth/components/AuthScreen";
 import { notificationService } from "@/services/NotificationService";
 
 const TodoApp = () => {
@@ -16,7 +15,6 @@ const TodoApp = () => {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
-  const [showAuthScreen, setShowAuthScreen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [lastClickTime, setLastClickTime] = useState(0);
 
@@ -53,14 +51,14 @@ const TodoApp = () => {
     setLastClickTime(now);
 
     if (clickCount + 1 >= 3) {
-      setShowAuthScreen(true);
+      // Auth is now handled by App.tsx - triple-click does nothing here
       setClickCount(0);
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-4 sm:p-6 md:p-8 font-sans">
-      <AuthScreen open={showAuthScreen} onOpenChange={setShowAuthScreen} />
+      {/* Auth is now handled by App.tsx */}
 
       <div className="max-w-2xl mx-auto">
         <header className="text-center mb-8">
